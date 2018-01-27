@@ -65,13 +65,13 @@ Background.prototype.update = function () {
 }
 
 Background.prototype.draw = function (ctx) {
-	ctx.drawImage(AM.getAsset("img/background.png"), 0, 0);
+	ctx.drawImage(AM.getAsset("img/map.png"), 0, 0);
 	Entity.prototype.draw.call(this);
 }
 
 
 function Player(game) { //spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, reverse, scale
-	var spritesheet = AM.getAsset("img/player_scav.png");
+	var spritesheet = AM.getAsset("img/scavenger.png");
 	this.upAnimation = new Animation(spritesheet,           512,    64,     64, 64, 0.1, 4, true, false,  0.75);
 	this.downAnimation = new Animation(spritesheet,         0,      128,    64, 64, 0.1, 4, true, false,  0.75);
 	this.rightAnimation = new Animation(spritesheet,        512,    128,    64, 64, 0.1, 4, true, false,  0.75);
@@ -88,6 +88,7 @@ function Player(game) { //spriteSheet, startX, startY, frameWidth, frameHeight, 
 	this.attack = false;
 	this.dead = false; 
 	this.life = 200;
+	this.height = 64;
 
 	this.speed = 150;
 	this.game = game;
@@ -178,6 +179,8 @@ function Scavenger(game, enemy) {
 	this.right = false;
 	this.attack = false;
 	this.speed = 50;
+
+	this.height = 64;
  
 	this.angle = 2 * Math.PI;
 	this.game = game;
@@ -332,11 +335,236 @@ Scavenger.prototype.draw = function () {
 	Entity.prototype.draw.call(this); 
 }
 
+function RobotTier1(game, taskAsset) { //spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, scale
+	var spriteSheet = AM.getAsset("img/robotSpriteSheet1.png"); 
+	this.upAnimation = new Animation(spriteSheet, 0, 512, 64, 64, 0.1, 8, true, false, 0.75);
+	this.downAnimation = new Animation(spriteSheet, 0, 0, 64, 64, 0.1, 8, true, false, 0.75);
+	this.rightAnimation = new Animation(spriteSheet, 0, 1152, 64, 64, 0.1, 11, true, false, 0.75);
+	this.leftAnimation = new Animation(spriteSheet, 0, 1088, 64, 64, 0.1, 11, true, false, 0.75);
+	
+	this.up = false;
+	this.down = true;
+	this.left = false;
+	this.right = false;
+	
+	this.repairUpAnimation = new Animation(spriteSheet, 512, 640, 64, 64, 0.1, 4, true, false, 0.75);
+	this.repairDownAnimation = new Animation(spriteSheet, 256, 512, 64, 64, 0.1, 4, true, false, 0.75);
+	this.repairRightAnimation = new Animation(spriteSheet, 0, 192, 64, 64, 0.1, 4, true, false, 0.75);
+	this.repairLeftAnimation = new Animation(spriteSheet, 512, 704, 64, 64, 0.1, 4, true, false, 0.75);
+	
+	this.repair = false;
+	
+	this.gatherBerryUpAnimation = new Animation(spriteSheet, 256, 640, 64, 64, 0.1, 4, true, false, 0.75);
+	this.gatherBerryDownAnimation = new Animation(spriteSheet, 0, 704, 64, 64, 0.1, 4, true, false, 0.75);
+	this.gatherBerryRightAnimation = new Animation(spriteSheet, 512, 320, 64, 64, 0.1, 4, true, false, 0.75);
+	this.gatherBerryLeftAnimation = new Animation(spriteSheet, 512, 384, 64, 64, 0.1, 4, true, false, 0.75);
+	
+	this.gatherBerry = false;
+	
+	this.gatherScrapUpAnimation = new Animation(spriteSheet, 512, 448, 64, 64, 0.1, 4, true, false, 0.75);
+	this.gatherScrapDownAnimation = new Animation(spriteSheet, 0, 512, 64, 64, 0.1, 4, true, false, 0.75);
+	this.gatherScrapRightAnimation = new Animation(spriteSheet, 512, 192, 64, 64, 0.1, 4, true, false, 0.75);
+	this.gatherScrapLeftAnimation = new Animation(spriteSheet, 512, 512, 64, 64, 0.1, 4, true, false, 0.75);
+	
+	this.gatherScrap = false;
+	//add rest
+	
+	this.taskAsset = taskAsset;
+
+	this.dead = false; 
+	this.life = 200; //robots life?
+
+	this.speed = 75;
+	this.angle = 2 *Math.PI;
+	this.dy = 0;
+	this.dx = 0;
+	this.distance = 0;
+	this.game = game;
+	this.ctx = game.ctx; 
+	
+	Entity.call(this, game, Math.floor(this.game.width / 2), Math.floor(this.game.height / 2));
+}
+
+RobotTier1.prototype = new Entity();
+RobotTier1.prototype.constructor = RobotTier1;
+
+RobotTier1.prototype.update = function(){
+	
+
+	this.game.moveTo(this, this.taskAsset);
+	if(Math.floor(this.distance) < 32){
+		this.repair = true;
+	} else {  
+		this.repair = false; 
+				
+		this.x += this.dx * this.game.clockTick * this.speed;
+		this.y += this.dy * this.game.clockTick * this.speed;
+
+		this.dx = Math.floor(this.dx);
+		this.dy = Math.floor(this.dy);
+		
+ 		if(this.dx ===this.dy) { 
+			if(this.dx < 0) {
+				this.left = true;
+				this.right = false; 
+				this.up = false;
+				this.down = false;
+			} else {
+				this.left = false;
+				this.right = true;
+				this.up = false;
+				this.down = false;
+			} 
+		} else if (this.dx > this.dy) {	 
+			if(this.dx < 0) {
+				this.down = true;
+				this.up = false;
+				this.left = false;
+				this.right = false; 
+			} else {
+				this.down = false;
+				this.up = true;
+				this.left = false;
+				this.right = false; 
+			} 
+		} else { 
+			if(this.dy < 0) {
+				this.down = false;
+				this.up = true;
+				this.left = false;
+				this.right = false; 
+			} else {
+				this.down = true;
+				this.up = false;
+				this.left = false;
+				this.right = false; 
+			} 
+		}
+	} 
+	Entity.prototype.update.call(this);  
+}
+
+RobotTier1.prototype.draw = function(){
+	
+	if(this.gatherBerry){
+		if(this.down){
+			this.gatherBerryDownAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+		} else if(this.left){
+			this.gatherBerryLeftAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);		
+		} else if(this.right){
+			this.gatherBerryRightAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);		
+		}else{
+			this.gatherBerryUpAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);		
+		}
+	} else if( this.repair){
+		if(this.down){
+			this.repairDownAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+		} else if(this.left){
+			this.repairLeftAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);		
+		} else if(this.right){
+			this.repairRightAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);		
+		}else{
+			this.repairUpAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);		
+		}
+	} else if (this.down) {
+		this.downAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+	} else if (this.left) {
+		this.leftAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+	} else if (this.right) {
+		this.rightAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+	} else {
+		this.upAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);  
+	} 
+	
+	Entity.prototype.draw.call(this);
+}
+
+
+// Environment Entities
+function Foliage(game) {
+	this.game = game;   
+	this.ctx = game.ctx;    
+	this.spritesheet = "img/tree.png";	
+	this.x = 0;
+	this.y = 0;
+	if(this.spritesheet === "img/tree.png") {
+		this.height = 124;
+	}
+	this.height = 50;
+	this.game.forestGen(this);
+	Entity.call(this, game, this.x, this.y);
+}
+
+Foliage.prototype = new Entity();
+Foliage.prototype.constructor = Foliage;
+
+Foliage.prototype.update = function () {
+}
+
+Foliage.prototype.draw = function (ctx) {
+	ctx.drawImage(AM.getAsset(this.spritesheet), this.x, this.y);
+	Entity.prototype.draw.call(this);
+}
+
+// Environment Entities
+function Building(game) {
+	this.game = game;   
+	this.ctx = game.ctx;    
+	this.spriteSheet = "img/building1.png";
+	this.x = 0;
+	this.y = 0;
+ 
+ 	this.height = 125;
+	
+	this.game.cityGen(this);
+	Entity.call(this, game, this.x, this.y);
+}
+
+Building.prototype = new Entity();
+Building.prototype.constructor = Building;
+
+Building.prototype.update = function () {
+}
+
+Building.prototype.draw = function (ctx) {
+	ctx.drawImage(AM.getAsset(this.spritesheet), this.x, this.y);
+	Entity.prototype.draw.call(this);
+}
+
+
+function SpaceShip(game) {
+	this.spritesheet = "img/spaceship.png";
+	this.game = game;   
+	this.ctx = game.ctx;     
+ 	this.x =  Math.floor(this.game.width / 2);
+ 	this.y =  Math.floor(this.game.height / 2);
+ 	this.height = 156;
+	Entity.call(this, game,this.x - 150 , this.y - this.height /2);
+
+ }
+
+SpaceShip.prototype = new Entity();
+SpaceShip.prototype.constructor = SpaceShip;
+
+SpaceShip.prototype.update = function () {
+}
+
+SpaceShip.prototype.draw = function (ctx) {
+	ctx.drawImage(AM.getAsset(this.spritesheet), this.x, this.y);
+	Entity.prototype.draw.call(this);
+}
+
 var AM = new AssetManager(); 
 
-AM.queueDownload("img/background.png");
-AM.queueDownload("img/scavenger.png"); 
-AM.queueDownload("img/player_scav.png"); 
+AM.queueDownload("img/map.png");
+AM.queueDownload("img/scavenger.png");  
+AM.queueDownload("img/tree.png"); 
+AM.queueDownload("img/bush.png"); 
+AM.queueDownload("img/building1.png"); 
+AM.queueDownload("img/building2.png"); 
+AM.queueDownload("img/building3.png"); 
+AM.queueDownload("img/spaceship.png");
+AM.queueDownload("img/robotSpriteSheet1.png");
 
 AM.downloadAll(function () {
 	var canvas = document.getElementById("gameWorld");
@@ -348,13 +576,33 @@ AM.downloadAll(function () {
 	gameEngine.start()
 
 
+	var numTrees = Math.floor(Math.random() * 21) + 30;
+	var numBuildings = Math.floor(Math.random() * 6) + 10;
+
 	var player = new Player(gameEngine);
 	var map = new Background(gameEngine);
 	var scav = new Scavenger(gameEngine, player); 
+	var spaceship = new SpaceShip(gameEngine); 
+	var robot = new RobotTier1(gameEngine, spaceship);
 
 	gameEngine.addEntity(map);  
+
+	for(var i = 0; i < numTrees; i++) {
+		gameEngine.addEntity(new Foliage(gameEngine));     
+	}
+
+	for(var i = 0; i < numBuildings; i++) {
+		gameEngine.addEntity(new Building(gameEngine));     
+	}
+
+	gameEngine.addEntity(spaceship);   
+
+	gameEngine.addEntity(scav); 
+
+	gameEngine.addEntity(robot);     
+
 	gameEngine.addEntity(player);  
-	gameEngine.addEntity(scav);     
+
 
 	console.log("All Done!");
 });

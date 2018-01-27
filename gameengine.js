@@ -10,6 +10,18 @@ window.requestAnimFrame = (function () {
             };
 })();
 
+
+function compare(entityA, entityB) {
+  if (entityA.y - entityA.height < entityB.y - entityB.height) {
+    return -1;
+  }
+  if (entityA.y - entityA.height > entityB.y - entityB.height) {
+    return 1;
+  }
+  // a must be equal to b
+  return 0;
+}
+
 /** Game Engine **/
 function GameEngine() {
     this.entities = [];
@@ -68,13 +80,14 @@ GameEngine.prototype.keyListener = function() {
 
 }
 
-
 GameEngine.prototype.addEntity = function (entity) {
     console.log('added entity');
     this.entities.push(entity);
 }
 
 GameEngine.prototype.draw = function () {
+    this.entities.sort(compare);
+
     this.ctx.clearRect(0, 0, this.width, this.height);
     this.ctx.save();
     for (var i = 0; i < this.entities.length; i++) {
@@ -123,6 +136,32 @@ GameEngine.prototype.moveTo = function(entity, target) {
 	entity.dx = dx;
 	entity.dy = dy; 
 	entity.distance = distance;  
+}
+
+/**
+    Gives a x and y value to a given entity for generating the forest.
+**/
+GameEngine.prototype.forestGen = function(entity) {
+    var x = Math.floor(Math.random() * 300) - 64;
+    var y = Math.floor(Math.random() * 640) - 64;
+    entity.x = x;
+    entity.y = y;
+    if(Math.random() >= 0.5) {   
+       entity.spritesheet = "img/tree.png"; 
+    } else {
+        entity.spritesheet = "img/bush.png"; 
+    }
+}
+
+/**
+    Gives a x and y value to a given entity for generating the city.
+**/
+GameEngine.prototype.cityGen = function(entity) {
+    var x = Math.floor(Math.random() * 240) + 1040;
+    var y = Math.floor(Math.random() * 640) - 64;
+    entity.x = x;
+    entity.y = y;
+    entity.spritesheet = "img/building" + (Math.floor(Math.random() * 3) + 1) + ".png";
 }
 
 /** Timer **/
