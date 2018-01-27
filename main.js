@@ -342,6 +342,163 @@ Scavenger.prototype.draw = function () {
 	Entity.prototype.draw.call(this); 
 }
 
+function Rummager(game, enemy) {  
+	var spritesheet = AM.getAsset("img/rummager.png"); 
+	this.upAnimation = new Animation(spritesheet,          0,    0,     64, 64, 0.1, 8, true,  false,  0.75);
+	this.downAnimation = new Animation(spritesheet,        0,    64,   	64, 64, 0.1, 8, true,  false,  0.75);
+	this.rightAnimation = new Animation(spritesheet,       0,    128,    64, 64, 0.1, 8, true,  false, 0.75);
+	this.leftAnimation = new Animation(spritesheet,        0,    192,    64, 64, 0.1, 8, true,  false,   0.75);    
+	this.up = false;
+	this.down = false;
+	this.left = false;
+	this.right = false;
+	this.speed = 50;
+
+	this.height = 64;
+ 
+	this.angle = 2 * Math.PI;
+	this.game = game;
+	this.ctx = game.ctx;  
+	this.dy = 0;
+	this.dx = 0;
+	this.distance = 0;
+	this.enemy = enemy;
+	Entity.call(this, game, Math.floor((Math.random() * this.game.width ) + 1), this.game.height);
+}
+
+Rummager.prototype = new Entity();
+Rummager.prototype.constructor = Rummager;
+
+Rummager.prototype.update = function () {
+	if(this.enemy.dead) {
+		mid = {
+			x: -64,
+			y: -64
+		};
+		this.game.moveTo(this, mid);
+
+		this.x += this.dx * this.game.clockTick * this.speed;
+			this.y += this.dy * this.game.clockTick * this.speed;
+
+			this.dx = Math.floor(this.dx);
+			this.dy = Math.floor(this.dy);
+
+			if(this.dx === this.dy) { 
+				if(this.dx < 0) {
+					this.left = true;
+					this.right = false; 
+					this.up = false;
+					this.down = false;
+				} else {
+					this.left = false;
+					this.right = true;
+					this.up = false;
+					this.down = false;
+				} 
+			} else if (this.dx > this.dy) {	 
+				if(this.dx < 0) {
+					this.down = true;
+					this.up = false;
+					this.left = false;
+					this.right = false; 
+				} else {
+					this.down = false;
+					this.up = true;
+					this.left = false;
+					this.right = false; 
+				} 
+		 	} else { 
+
+				if(this.dy < 0) {
+					this.down = false;
+					this.up = true;
+					this.left = false;
+					this.right = false; 
+				} else {
+					this.down = true;
+					this.up = false;
+					this.left = false;
+					this.right = false; 
+				} 
+		 	}
+
+	} else {
+
+		this.game.moveTo(this, this.enemy);
+		 
+		if(Math.floor(this.distance) < 32) {
+			this.attack = true;
+			this.enemy.life--;  
+			if(this.enemy.life < 0) { 
+				this.enemy.dead = true;
+				this.attack = false;
+			}
+		} else {  
+			this.attack = false;
+	
+			this.x += this.dx * this.game.clockTick * this.speed;
+			this.y += this.dy * this.game.clockTick * this.speed;
+
+			this.dx = Math.floor(this.dx);
+			this.dy = Math.floor(this.dy);
+
+			if(this.dx === this.dy) { 
+				if(this.dx < 0) {
+					this.left = true;
+					this.right = false; 
+					this.up = false;
+					this.down = false;
+				} else {
+					this.left = false;
+					this.right = true;
+					this.up = false;
+					this.down = false;
+				} 
+			} else if (this.dx > this.dy) {	 
+				if(this.dx < 0) {
+					this.down = true;
+					this.up = false;
+					this.left = false;
+					this.right = false; 
+				} else {
+					this.down = false;
+					this.up = true;
+					this.left = false;
+					this.right = false; 
+				} 
+		 	} else { 
+
+				if(this.dy < 0) {
+					this.down = false;
+					this.up = true;
+					this.left = false;
+					this.right = false; 
+				} else {
+					this.down = true;
+					this.up = false;
+					this.left = false;
+					this.right = false; 
+				} 
+		 	}
+		} 
+	}
+	
+	Entity.prototype.update.call(this);  
+} 
+
+Rummager.prototype.draw = function () { 
+    if (this.down) {
+		this.downAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+	} else if (this.left) {
+		this.leftAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+	} else if (this.right) {
+		this.rightAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+	} else {
+		this.upAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);  
+	}
+	Entity.prototype.draw.call(this); 
+}
+
 function RobotTier1(game, taskAsset) { //spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, scale
 	var spriteSheet = AM.getAsset("img/robotSpriteSheet1.png"); 
 	this.upAnimation = new Animation(spriteSheet, 0, 512, 64, 64, 0.1, 8, true, false, 0.75);
@@ -593,6 +750,7 @@ AM.downloadAll(function () {
 	var scav = new Scavenger(gameEngine, player); 
 	var spaceship = new SpaceShip(gameEngine); 
 	var robot = new RobotTier1(gameEngine, spaceship);
+	var rummager = new Rummager(gameEngine, robot);
 
 	gameEngine.addEntity(map);  
 
@@ -609,7 +767,7 @@ AM.downloadAll(function () {
 	gameEngine.addEntity(scav); 
 
 	gameEngine.addEntity(robot);     
-
+	gameEngine.addEntity(rummager);     
 	gameEngine.addEntity(player);  
 
 
