@@ -107,6 +107,24 @@ GameEngine.prototype.loop = function () {
     this.draw(); 
 }
 
+/**
+	Moves the given entity to the target. 
+	The target and the entity must have a x and y coordinates. 
+**/
+GameEngine.prototype.moveTo = function(entity, target) {
+ 	var dx = target.x - entity.x;
+	var dy = target.y - entity.y; 
+	var distance = Math.sqrt(dx * dx + dy * dy);
+	 
+	if(distance) {  
+		dx /= distance;
+		dy /= distance;
+	} 
+	entity.dx = dx;
+	entity.dy = dy; 
+	entity.distance = distance;  
+}
+
 /** Timer **/
 function Timer() {
     this.gameTime = 0;
