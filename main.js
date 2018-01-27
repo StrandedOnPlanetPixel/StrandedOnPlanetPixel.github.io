@@ -72,16 +72,17 @@ Background.prototype.draw = function (ctx) {
 
 function Player(game) { //spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, scale
 	var spritesheet = AM.getAsset("img/space_traveler.png");
-	this.upAnimation = new Animation(spritesheet,           0,	448,	64, 64, 0.1, 	8, true,	0.75);
-	this.downAnimation = new Animation(spritesheet,         0,	256,    64, 64, 0.1, 	8, true,	0.75);
-	this.rightAnimation = new Animation(spritesheet,        0,	384,    64, 64, 0.1, 	8, true,	0.75);
-	this.leftAnimation = new Animation(spritesheet,         0,	320,    64, 64, 0.1, 	8, true,	0.75);    
-	this.upAttackAnimation = new Animation(spritesheet,     0,	0,		64, 64, 0.1, 	8, true,	0.75);    
-	this.downAttackAnimation = new Animation(spritesheet,   0,	0,		64, 64, 0.1, 	8, true,	0.75);    
-	this.rightAttackAnimation = new Animation(spritesheet,  0,	0,		64, 64, 0.1, 	8, true,	0.75);    
-	this.leftAttackAnimation = new Animation(spritesheet,   0,	64,		64, 64, 0.1, 	8, true,	0.75);
-	this.programAnimation = new Animation(spritesheet,      0,	192,	64, 64, 0.1, 	8, true,	0.75);
-	this.dyingAnimation = new Animation(spritesheet,        0,	128,	64, 64, 0.01,	8, false,	0.75);  
+	this.upAnimation = new Animation(spritesheet,           0,	448,	64, 64, 0.1, 	8, true,	false,	0.75);
+	this.downAnimation = new Animation(spritesheet,         0,	256,    64, 64, 0.1, 	8, true,	false,	0.75);
+	this.rightAnimation = new Animation(spritesheet,        0,	384,    64, 64, 0.1, 	8, true,	false,	0.75);
+	this.leftAnimation = new Animation(spritesheet,         0,	320,    64, 64, 0.1, 	8, true,	false,	0.75);    
+	this.upAttackAnimation = new Animation(spritesheet,     0,	0,		64, 64, 0.1, 	8, true,	false,	0.75);    
+	this.downAttackAnimation = new Animation(spritesheet,   0,	0,		64, 64, 0.1, 	8, true,	false,	0.75);    
+	this.rightAttackAnimation = new Animation(spritesheet,  0,	0,		64, 64, 0.1, 	8, true,	false,	0.75);    
+	this.leftAttackAnimation = new Animation(spritesheet,   0,	64,		64, 64, 0.1, 	8, true,	false,	0.75);
+	this.programAnimation = new Animation(spritesheet,      0,	192,	64, 64, 0.1, 	8, true,	false,	0.75);
+	this.dyingAnimation = new Animation(spritesheet,        0,	128,	64, 64, 0.001,	8, false,	false,	0.75); 
+	this.deadAnimation = new Animation(spritesheet,        448,	128,	64, 64, 0.01,	1, true,	false,	0.75);  
 
 	this.up = false;
 	this.down = true;
@@ -141,9 +142,8 @@ Player.prototype.update = function () {
 
 Player.prototype.draw = function () {
  	if(this.dead) {
-		this.dyingAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y); 
-		Entity.prototype.draw.call(this); 
-		this.removeFromWorld = true; 
+ 		console.log("dead")
+		this.deadAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y); 
 	} else if(this.attack) {
 		if (this.down) {
 			this.downAttackAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
@@ -165,7 +165,6 @@ Player.prototype.draw = function () {
 	} 
 	
 	Entity.prototype.draw.call(this); 
-	 
 }
 
 function Scavenger(game, enemy) {  
