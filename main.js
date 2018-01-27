@@ -79,7 +79,7 @@ function Player(game) { //spriteSheet, startX, startY, frameWidth, frameHeight, 
 	this.upAttackAnimation = new Animation(spritesheet,     0,	0,		64, 64, 0.1, 	8, true,	false,	0.75);    
 	this.downAttackAnimation = new Animation(spritesheet,   0,	0,		64, 64, 0.1, 	8, true,	false,	0.75);    
 	this.rightAttackAnimation = new Animation(spritesheet,  0,	0,		64, 64, 0.1, 	8, true,	false,	0.75);    
-	this.leftAttackAnimation = new Animation(spritesheet,   0,	64,		64, 64, 0.1, 	8, true,	false,	0.75);
+	this.leftAttackAnimation = new Animation(spritesheet,   0,	64,		64, 64, 0.1, 	8, true,	true,	0.75);
 	this.programAnimation = new Animation(spritesheet,      0,	192,	64, 64, 0.1, 	8, true,	false,	0.75);
 	this.dyingAnimation = new Animation(spritesheet,        0,	128,	64, 64, 0.001,	8, false,	false,	0.75); 
 	this.deadAnimation = new Animation(spritesheet,        448,	128,	64, 64, 0.01,	1, true,	false,	0.75);  
@@ -102,40 +102,37 @@ Player.prototype = new Entity();
 Player.prototype.constructor = Player;
 
 Player.prototype.update = function () {
-	if(this.game.keys.up) {
-		console.log("up");
-		this.up = true;   
-		this.down = false;
-		this.left = false;
-		this.right = false;
-		this.y -= this.game.clockTick * this.speed;  
-	} else if (this.game.keys.down) { 
-		console.log("down");
-		this.up = false;   
-		this.down = true;
-		this.left = false;
-		this.right = false;
-		this.y += this.game.clockTick * this.speed;
-	} else if (this.game.keys.left) {
-		console.log("left");
-		this.up = false;   
-		this.down = false;
-		this.left = true;
-		this.right = false;   
-		this.x -= this.game.clockTick * this.speed;   
-	} else if (this.game.keys.right) {
-		console.log("right");
-		this.up = false;   
-		this.down = false;
-		this.left = false;
-		this.right = true;        
-		this.x += this.game.clockTick * this.speed;      
-	} 
-	if(this.game.keys.attack) {
-		console.log("attack");
-		this.attack = true;
-	} else {
-		this.attack = false;
+	if(!this.dead) {
+		if(this.game.keys.up) {
+	 		this.up = true;   
+			this.down = false;
+			this.left = false;
+			this.right = false;
+			this.y -= this.game.clockTick * this.speed;  
+		} else if (this.game.keys.down) { 
+	 		this.up = false;   
+			this.down = true;
+			this.left = false;
+			this.right = false;
+			this.y += this.game.clockTick * this.speed;
+		} else if (this.game.keys.left) {
+	 		this.up = false;   
+			this.down = false;
+			this.left = true;
+			this.right = false;   
+			this.x -= this.game.clockTick * this.speed;   
+		} else if (this.game.keys.right) {
+	 		this.up = false;   
+			this.down = false;
+			this.left = false;
+			this.right = true;        
+			this.x += this.game.clockTick * this.speed;      
+		} 
+		if(this.game.keys.attack) {
+	 		this.attack = true;
+		} else {
+			this.attack = false;
+		}
 	}
 	Entity.prototype.update.call(this); 
 } 
@@ -169,7 +166,6 @@ Player.prototype.draw = function () {
 
 function Scavenger(game, enemy) {  
 	var spritesheet = AM.getAsset("img/scavenger.png");
-				 //spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, scale
 	this.upAnimation = new Animation(spritesheet,           512,    64,     64, 64, 0.1, 4, true,  false,  0.75);
 	this.downAnimation = new Animation(spritesheet,         0,      128,    64, 64, 0.1, 4, true,  false,  0.75);
 	this.rightAnimation = new Animation(spritesheet,        512,    128,    64, 64, 0.1, 4, true,   false, 0.75);
@@ -207,53 +203,7 @@ Scavenger.prototype.update = function () {
 			x: -64,
 			y: -64
 		};
-		this.game.moveTo(this, mid);
-
-		this.x += this.dx * this.game.clockTick * this.speed;
-			this.y += this.dy * this.game.clockTick * this.speed;
-
-			this.dx = Math.floor(this.dx);
-			this.dy = Math.floor(this.dy);
-
-			if(this.dx === this.dy) { 
-				if(this.dx < 0) {
-					this.left = true;
-					this.right = false; 
-					this.up = false;
-					this.down = false;
-				} else {
-					this.left = false;
-					this.right = true;
-					this.up = false;
-					this.down = false;
-				} 
-			} else if (this.dx > this.dy) {	 
-				if(this.dx < 0) {
-					this.down = true;
-					this.up = false;
-					this.left = false;
-					this.right = false; 
-				} else {
-					this.down = false;
-					this.up = true;
-					this.left = false;
-					this.right = false; 
-				} 
-		 	} else { 
-
-				if(this.dy < 0) {
-					this.down = false;
-					this.up = true;
-					this.left = false;
-					this.right = false; 
-				} else {
-					this.down = true;
-					this.up = false;
-					this.left = false;
-					this.right = false; 
-				} 
-		 	}
-
+		this.enemy = mid;
 	} else {
 
 		this.game.moveTo(this, this.enemy);
@@ -343,10 +293,10 @@ Scavenger.prototype.draw = function () {
 
 function Rummager(game, enemy) {  
 	var spritesheet = AM.getAsset("img/rummager.png"); 
-	this.upAnimation = new Animation(spritesheet,          0,    0,     64, 64, 0.1, 8, true,  false,  0.75);
-	this.downAnimation = new Animation(spritesheet,        0,    64,   	64, 64, 0.1, 8, true,  false,  0.75);
-	this.leftAnimation = new Animation(spritesheet,       0,    128,    64, 64, 0.1, 8, true,  false, 0.75);
-	this.rightAnimation = new Animation(spritesheet,        0,    192,    64, 64, 0.1, 8, true,  false,   0.75);    
+	this.leftAnimation = new Animation(spritesheet,          0,    0,     64, 64, 0.1, 8, true,  false,  0.75);
+	this.rightAnimation = new Animation(spritesheet,        0,    64,   	64, 64, 0.1, 8, true,  false,  0.75);
+	this.upAnimation = new Animation(spritesheet,       0,    128,    64, 64, 0.1, 8, true,  false, 0.75);
+	this.downAnimation = new Animation(spritesheet,        0,    192,    64, 64, 0.1, 8, true,  false,   0.75);    
 	this.up = false;
 	this.down = false;
 	this.left = false;
@@ -373,54 +323,8 @@ Rummager.prototype.update = function () {
 		mid = {
 			x: -64,
 			y: -64
-		};
-		this.game.moveTo(this, mid);
-
-		this.x += this.dx * this.game.clockTick * this.speed;
-			this.y += this.dy * this.game.clockTick * this.speed;
-
-			this.dx = Math.floor(this.dx);
-			this.dy = Math.floor(this.dy);
-
-			if(this.dx === this.dy) { 
-				if(this.dx < 0) {
-					this.left = true;
-					this.right = false; 
-					this.up = false;
-					this.down = false;
-				} else {
-					this.left = false;
-					this.right = true;
-					this.up = false;
-					this.down = false;
-				} 
-			} else if (this.dx > this.dy) {	 
-				if(this.dx < 0) {
-					this.down = true;
-					this.up = false;
-					this.left = false;
-					this.right = false; 
-				} else {
-					this.down = false;
-					this.up = true;
-					this.left = false;
-					this.right = false; 
-				} 
-		 	} else { 
-
-				if(this.dy < 0) {
-					this.down = false;
-					this.up = true;
-					this.left = false;
-					this.right = false; 
-				} else {
-					this.down = true;
-					this.up = false;
-					this.left = false;
-					this.right = false; 
-				} 
-		 	}
-
+		}; 
+		this.enemy = mid;
 	} else {
 
 		this.game.moveTo(this, this.enemy);
@@ -766,7 +670,9 @@ AM.downloadAll(function () {
 	gameEngine.addEntity(scav); 
 
 	gameEngine.addEntity(robot);     
+	
 	gameEngine.addEntity(rummager);     
+
 	gameEngine.addEntity(player);  
 
 
