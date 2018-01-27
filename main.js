@@ -660,24 +660,32 @@ AM.downloadAll(function () {
 	var map = new Background(gameEngine);
 	var scav = new Scavenger(gameEngine, player); 
 	var spaceship = new SpaceShip(gameEngine); 
-	var robot = new RobotTier1(gameEngine, spaceship);
+	var robot = new RobotTier1(gameEngine, spaceship); 
 	var rummager = new Rummager(gameEngine, robot);
 
 	gameEngine.addEntity(map);  
 
 	for(var i = 0; i < numTrees; i++) {
-		gameEngine.addEntity(new Foliage(gameEngine));     
+		var foliage = new Foliage(gameEngine);
+		gameEngine.addEntity(foliage); 
+		if(i == 1 || i == 4) {
+			gameEngine.addEntity(new RobotTier1(gameEngine, foliage));     
+		}    
 	}
 
 	for(var i = 0; i < numBuildings; i++) {
-		gameEngine.addEntity(new Building(gameEngine));     
+		var building = new Building(gameEngine);
+		gameEngine.addEntity(building); 
+		if(i == 1) {
+			gameEngine.addEntity(new RobotTier1(gameEngine, building));     
+		}  
 	}
 
 	gameEngine.addEntity(spaceship);   
 
 	gameEngine.addEntity(scav); 
 
-	gameEngine.addEntity(robot);     
+	gameEngine.addEntity(robot);       
 	
 	gameEngine.addEntity(rummager);     
 
