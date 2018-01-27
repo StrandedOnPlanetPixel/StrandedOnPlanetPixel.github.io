@@ -174,14 +174,14 @@ Player.prototype.draw = function () {
 
 function Alien(game, enemy) {  
 	var spritesheet = AM.getAsset("img/alien.png");
-	this.upAnimation = new Animation(spritesheet,           64,    256,     64, 64, 0.1, 4, true,  false,  0.75);
-	this.downAnimation = new Animation(spritesheet,         64,    0,    64, 64, 0.1, 4, true,  false,  0.75);
-	this.rightAnimation = new Animation(spritesheet,        192,   0,    64, 64, 0.1, 4, true,   false, 0.75);
-	this.leftAnimation = new Animation(spritesheet,         192,   256,    64, 64, 0.1, 4, true, false,   0.75);    
-	this.upAttackAnimation = new Animation(spritesheet,     192,    256,  64, 64, 0.1, 4, true, false,   0.75);    
-	this.downAttackAnimation = new Animation(spritesheet,   0,    	64,  64, 64, 0.1, 4, true, false,   0.75);    
-	this.rightAttackAnimation = new Animation(spritesheet,  192,   256, 64, 64, 0.1, 4, true, false,   0.75);    
-	this.leftAttackAnimation = new Animation(spritesheet,   128,    0,  64, 64, 0.1, 4, true, false,   0.75); 
+	this.upAnimation = new Animation(spritesheet,           256,    192,     64, 64, 0.1, 4, true,  false,  0.75);
+	this.downAnimation = new Animation(spritesheet,         0,     64,    64, 64, 0.1, 4, true,  false,  0.75);
+	this.rightAnimation = new Animation(spritesheet,        0,   256,    64, 64, 0.1, 4, true,   false, 0.75);
+	this.leftAnimation = new Animation(spritesheet,         256,   256,    64, 64, 0.1, 4, true, false,   0.75);    
+	this.upAttackAnimation = new Animation(spritesheet,     0,    128,  64, 64, 0.1, 4, true, false,   0.75);    
+	this.downAttackAnimation = new Animation(spritesheet,   0,    	128,  64, 64, 0.1, 4, true, false,   0.75);    
+	this.rightAttackAnimation = new Animation(spritesheet,  256,   64, 64, 64, 0.1, 4, true, false,   0.75);    
+	this.leftAttackAnimation = new Animation(spritesheet,   0,    192,  64, 64, 0.1, 4, true, false,   0.75); 
 	this.dyingAnimation = new Animation(spritesheet,        0,    0, 64, 64, 0.1, 8, false,  false,  0.75);    
 	this.up = false;
 	this.down = false;
