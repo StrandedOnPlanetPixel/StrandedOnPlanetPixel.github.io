@@ -346,8 +346,8 @@ function Rummager(game, enemy) {
 	var spritesheet = AM.getAsset("img/rummager.png"); 
 	this.upAnimation = new Animation(spritesheet,          0,    0,     64, 64, 0.1, 8, true,  false,  0.75);
 	this.downAnimation = new Animation(spritesheet,        0,    64,   	64, 64, 0.1, 8, true,  false,  0.75);
-	this.rightAnimation = new Animation(spritesheet,       0,    128,    64, 64, 0.1, 8, true,  false, 0.75);
-	this.leftAnimation = new Animation(spritesheet,        0,    192,    64, 64, 0.1, 8, true,  false,   0.75);    
+	this.leftAnimation = new Animation(spritesheet,       0,    128,    64, 64, 0.1, 8, true,  false, 0.75);
+	this.rightAnimation = new Animation(spritesheet,        0,    192,    64, 64, 0.1, 8, true,  false,   0.75);    
 	this.up = false;
 	this.down = false;
 	this.left = false;
