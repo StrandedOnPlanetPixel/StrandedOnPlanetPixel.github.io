@@ -199,7 +199,7 @@ function Alien(game, enemy) {
 	this.dx = 0;
 	this.distance = 0;
 	this.enemy = enemy;
-	Entity.call(this, game, this.game.width, Math.floor((Math.random() * this.game.height) + 1);
+	Entity.call(this, game, Math.floor((Math.random() * this.game.width ) + 1), this.game.height);
 }
 
 Alien.prototype = new Entity();
