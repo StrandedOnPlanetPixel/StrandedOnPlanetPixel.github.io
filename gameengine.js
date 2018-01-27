@@ -65,6 +65,7 @@ GameEngine.prototype.keyListener = function() {
         if(keyPressed === 'D' || e.which === 39) that.keys.right = true;  
         if(keyPressed === 'S' || e.which === 40) that.keys.down = true; 
         if(keyPressed === ' ') that.keys.attack = true; 
+        if(keyPressed === 'Q') that.keys.program = true; 
         e.preventDefault(); 
     }, false);  
 
@@ -75,11 +76,12 @@ GameEngine.prototype.keyListener = function() {
         if(keyReleased === 'D' || e.which === 39) that.keys.right = false;  
         if(keyReleased === 'S' || e.which === 40) that.keys.down = false; 
         if(keyReleased === ' ') that.keys.attack = false; 
+        if(keyReleased === 'Q') that.keys.program = false; 
         e.preventDefault(); 
     }, false);  
 
 }
-
+ 
 GameEngine.prototype.addEntity = function (entity) {
     console.log('added entity');
     this.entities.push(entity);

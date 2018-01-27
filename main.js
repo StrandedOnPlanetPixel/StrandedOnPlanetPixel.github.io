@@ -89,6 +89,7 @@ function Player(game) { //spriteSheet, startX, startY, frameWidth, frameHeight, 
 	this.left = false;
 	this.right = false;
 	this.attack = false;
+	this.program = false;
 	this.dead = false; 
 	this.life = 200;
 
@@ -132,7 +133,12 @@ Player.prototype.update = function () {
 	 		this.attack = true;
 		} else {
 			this.attack = false;
-		}
+		} 
+		if(this.game.keys.program) {
+	 		this.program = true;
+		} else {
+			this.program = false;
+		} 
 	}
 	Entity.prototype.update.call(this); 
 } 
@@ -151,6 +157,8 @@ Player.prototype.draw = function () {
 		} else {
 			this.upAttackAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);  
 		}
+	} else if (this.program) {
+		this.programAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);  
 	} else if (this.down) {
 		this.downAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
 	} else if (this.left) {
