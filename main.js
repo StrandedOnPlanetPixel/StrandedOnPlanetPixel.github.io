@@ -172,6 +172,134 @@ Player.prototype.draw = function () {
 	Entity.prototype.draw.call(this); 
 }
 
+function Alien(game, enemy) {  
+	var spritesheet = AM.getAsset("img/alien.png");
+	this.upAnimation = new Animation(spritesheet,           64,    256,     64, 64, 0.1, 4, true,  false,  0.75);
+	this.downAnimation = new Animation(spritesheet,         64,    0,    64, 64, 0.1, 4, true,  false,  0.75);
+	this.rightAnimation = new Animation(spritesheet,        192,   0,    64, 64, 0.1, 4, true,   false, 0.75);
+	this.leftAnimation = new Animation(spritesheet,         192,   256,    64, 64, 0.1, 4, true, false,   0.75);    
+	this.upAttackAnimation = new Animation(spritesheet,     192,    256,  64, 64, 0.1, 4, true, false,   0.75);    
+	this.downAttackAnimation = new Animation(spritesheet,   0,    	64,  64, 64, 0.1, 4, true, false,   0.75);    
+	this.rightAttackAnimation = new Animation(spritesheet,  192,   256, 64, 64, 0.1, 4, true, false,   0.75);    
+	this.leftAttackAnimation = new Animation(spritesheet,   128,    0,  64, 64, 0.1, 4, true, false,   0.75); 
+	this.dyingAnimation = new Animation(spritesheet,        0,    0, 64, 64, 0.1, 8, false,  false,  0.75);    
+	this.up = false;
+	this.down = false;
+	this.left = false;
+	this.right = false;
+	this.attack = false;
+	this.speed = 50;
+
+	this.height = 64;
+ 
+	this.angle = 2 * Math.PI;
+	this.game = game;
+	this.ctx = game.ctx;  
+	this.dy = 0;
+	this.dx = 0;
+	this.distance = 0;
+	this.enemy = enemy;
+	Entity.call(this, game, this.game.width, Math.floor((Math.random() * this.game.height) + 1);
+}
+
+Alien.prototype = new Entity();
+Alien.prototype.constructor = Alien;
+
+Alien.prototype.update = function () {
+	if(this.enemy.dead) {
+		mid = {
+			x: -64,
+			y: -64
+		};
+		this.enemy = mid;
+	} else {
+
+		this.game.moveTo(this, this.enemy);
+		 
+		if(Math.floor(this.distance) < 32) {
+			this.attack = true;
+			this.enemy.life--;  
+			if(this.enemy.life < 0) { 
+				this.enemy.dead = true;
+				this.attack = false;
+			}
+		} else {  
+			this.attack = false;
+	
+			this.x += this.dx * this.game.clockTick * this.speed;
+			this.y += this.dy * this.game.clockTick * this.speed;
+
+			this.dx = Math.floor(this.dx);
+			this.dy = Math.floor(this.dy);
+
+			if(this.dx === this.dy) { 
+				if(this.dx < 0) {
+					this.left = true;
+					this.right = false; 
+					this.up = false;
+					this.down = false;
+				} else {
+					this.left = false;
+					this.right = true;
+					this.up = false;
+					this.down = false;
+				} 
+			} else if (this.dx > this.dy) {	 
+				if(this.dx < 0) {
+					this.down = true;
+					this.up = false;
+					this.left = false;
+					this.right = false; 
+				} else {
+					this.down = false;
+					this.up = true;
+					this.left = false;
+					this.right = false; 
+				} 
+		 	} else { 
+
+				if(this.dy < 0) {
+					this.down = false;
+					this.up = true;
+					this.left = false;
+					this.right = false; 
+				} else {
+					this.down = true;
+					this.up = false;
+					this.left = false;
+					this.right = false; 
+				} 
+		 	}
+		} 
+	}
+	
+	Entity.prototype.update.call(this);  
+} 
+
+Alien.prototype.draw = function () { 
+ 	if(this.attack) {
+		if (this.down) {
+			this.downAttackAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+		} else if (this.left) {
+			this.leftAttackAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+		} else if (this.right) {
+			this.rightAttackAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+		} else {
+			this.upAttackAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);  
+		}
+	} else if (this.down) {
+		this.downAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+	} else if (this.left) {
+		this.leftAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+	} else if (this.right) {
+		this.rightAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+	} else {
+		this.upAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);  
+	}
+	Entity.prototype.draw.call(this); 
+}
+
+
 function Scavenger(game, enemy) {  
 	var spritesheet = AM.getAsset("img/scavenger.png");
 	this.upAnimation = new Animation(spritesheet,           512,    64,     64, 64, 0.1, 4, true,  false,  0.75);
@@ -531,7 +659,7 @@ RobotTier1.prototype.draw = function(){
 		}else{
 			this.gatherBerryUpAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);		
 		}
-	} else if( this.repair){
+	} else if(this.repair){
 		if(this.down){
 			this.repairDownAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
 		} else if(this.left){
@@ -642,6 +770,7 @@ AM.queueDownload("img/building3.png");
 AM.queueDownload("img/spaceship.png");
 AM.queueDownload("img/robotSpriteSheet1.png");
 AM.queueDownload("img/rummager.png");
+AM.queueDownload("img/alien.png");
 
 AM.downloadAll(function () {
 	var canvas = document.getElementById("gameWorld");
@@ -662,6 +791,7 @@ AM.downloadAll(function () {
 	var spaceship = new SpaceShip(gameEngine); 
 	var robot = new RobotTier1(gameEngine, spaceship); 
 	var rummager = new Rummager(gameEngine, robot);
+	var alien = new Alien(gameEngine, player);
 
 	gameEngine.addEntity(map);  
 
@@ -686,6 +816,8 @@ AM.downloadAll(function () {
 	gameEngine.addEntity(scav); 
 
 	gameEngine.addEntity(robot);       
+
+	gameEngine.addEntity(alien);       
 	
 	gameEngine.addEntity(rummager);     
 
