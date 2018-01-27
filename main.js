@@ -565,6 +565,7 @@ AM.queueDownload("img/building2.png");
 AM.queueDownload("img/building3.png"); 
 AM.queueDownload("img/spaceship.png");
 AM.queueDownload("img/robotSpriteSheet1.png");
+AM.queueDownload("img/rummager.png");
 
 AM.downloadAll(function () {
 	var canvas = document.getElementById("gameWorld");
