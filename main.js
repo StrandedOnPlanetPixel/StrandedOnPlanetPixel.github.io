@@ -1,50 +1,48 @@
-
-function Animation(spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, scale) {
-	this.spriteSheet = spriteSheet;
-	this.startX = startX;
-	this.startY = startY;
-	this.frameWidth = frameWidth;
-	this.frameDuration = frameDuration;
-	this.frameHeight = frameHeight;
-	this.frames = frames;
-	this.totalTime = frameDuration * frames;
-	this.elapsedTime = 0;
-	this.loop = loop;
-	this.scale = scale;
+function Animation(spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, reverse, scale) {
+    this.spriteSheet = spriteSheet;
+    this.startX = startX;
+    this.startY = startY;
+    this.frameWidth = frameWidth;
+    this.frameDuration = frameDuration;
+    this.frameHeight = frameHeight;
+    this.frames = frames;
+    this.totalTime = frameDuration * frames;
+    this.elapsedTime = 0;
+    this.loop = loop;
+    this.reverse = reverse;
+    this.scale = scale;
 }
 
 Animation.prototype.drawFrame = function (tick, ctx, x, y) {
-	this.elapsedTime += tick;
-	if (this.isDone()) { 
-		if (this.loop)
-			this.elapsedTime = 0;
-	}
-	var frame = this.currentFrame();
-	var xindex = 0;
-	var yindex = 0;
-	xindex = frame % this.sheetWidth;
-	yindex = Math.floor(frame / this.sheetWidth);
+    var scaleBy = this.scale || 1;
+    this.elapsedTime += tick;
+    if (this.loop) {
+        if (this.isDone()) {
+            this.elapsedTime = 0;
+        }
+    } else if (this.isDone()) {
+        return;
+    }
+    var index = this.reverse ? this.frames - this.currentFrame() - 1 : this.currentFrame();
+    var vindex = 0;
+    if ((index + 1) * this.frameWidth + this.startX > this.spriteSheet.width) {
+        index -= Math.floor((this.spriteSheet.width - this.startX) / this.frameWidth);
+        vindex++;
+    }
+    while ((index + 1) * this.frameWidth > this.spriteSheet.width) {
+        index -= Math.floor(this.spriteSheet.width / this.frameWidth);
+        vindex++;
+    }
 
-	var index = this.reverse ? this.frames - this.currentFrame() - 1 : this.currentFrame();
-	var vindex = 0;
-	if ((index + 1) * this.frameWidth + this.startX > this.spriteSheet.width) {
-		index -= Math.floor((this.spriteSheet.width - this.startX) / this.frameWidth);
-		vindex++;
-	}
-	while ((index + 1) * this.frameWidth > this.spriteSheet.width) {
-		index -= Math.floor(this.spriteSheet.width / this.frameWidth);
-		vindex++;
-	}
-
-	var locX = x;
-	var locY = y;
-	var offset = vindex === 0 ? this.startX : 0;
-	ctx.drawImage(this.spriteSheet,
-				  index * this.frameWidth + offset, vindex * this.frameHeight + this.startY,  // source from sheet
-				  this.frameWidth, this.frameHeight,
-				  locX, locY,
-				 this.frameWidth * this.scale,
-				 this.frameHeight * this.scale);
+    var locX = x;
+    var locY = y;
+    var offset = vindex === 0 ? this.startX : 0;
+    ctx.drawImage(this.spriteSheet,
+                  index * this.frameWidth + offset, vindex * this.frameHeight + this.startY,  // source from sheet
+                  this.frameWidth, this.frameHeight,
+                  locX, locY,
+                  this.frameWidth * scaleBy,
+                  this.frameHeight * scaleBy);
 }
 
 Animation.prototype.currentFrame = function () {
@@ -67,22 +65,22 @@ Background.prototype.update = function () {
 }
 
 Background.prototype.draw = function (ctx) {
-	ctx.drawImage(AM.getAsset("img/map.png"), 0, 0);
+	ctx.drawImage(AM.getAsset("img/background.png"), 0, 0);
 	Entity.prototype.draw.call(this);
 }
 
 
-function Player(game) { //spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, scale
-	var spritesheet = AM.getAsset("img/scavenger.png");
-	this.upAnimation = new Animation(spritesheet,           512,    64,     64, 64, 0.1, 4, true,   0.75);
-	this.downAnimation = new Animation(spritesheet,         0,      128,    64, 64, 0.1, 4, true,   0.75);
-	this.rightAnimation = new Animation(spritesheet,        512,    128,    64, 64, 0.1, 4, true,   0.75);
-	this.leftAnimation = new Animation(spritesheet,         256,    128,    64, 64, 0.1, 4, true,   0.75);    
-	this.upAttackAnimation = new Animation(spritesheet,     0,      0,  	64, 64, 0.1, 4, true,   0.75);    
-	this.downAttackAnimation = new Animation(spritesheet,   256,    0,  	64, 64, 0.1, 4, true,   0.75);    
-	this.rightAttackAnimation = new Animation(spritesheet,  0,      64, 	64, 64, 0.1, 4, true,   0.75);    
-	this.leftAttackAnimation = new Animation(spritesheet,   512,    0,  	64, 64, 0.1, 4, true,   0.75);  
-	this.deadAnimation = new Animation(spritesheet,        	448,    64, 	64, 64, 0.1, 1, true,   0.75);    
+function Player(game) { //spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, reverse, scale
+	var spritesheet = AM.getAsset("img/player_scav.png");
+	this.upAnimation = new Animation(spritesheet,           512,    64,     64, 64, 0.1, 4, true, false,  0.75);
+	this.downAnimation = new Animation(spritesheet,         0,      128,    64, 64, 0.1, 4, true, false,  0.75);
+	this.rightAnimation = new Animation(spritesheet,        512,    128,    64, 64, 0.1, 4, true, false,  0.75);
+	this.leftAnimation = new Animation(spritesheet,         256,    128,    64, 64, 0.1, 4, true, false,  0.75);    
+	this.upAttackAnimation = new Animation(spritesheet,     0,      0,  	64, 64, 0.1, 4, true, false,  0.75);    
+	this.downAttackAnimation = new Animation(spritesheet,   256,    0,  	64, 64, 0.1, 4, true, false,  0.75);    
+	this.rightAttackAnimation = new Animation(spritesheet,  0,      64, 	64, 64, 0.1, 4, true, false,  0.75);    
+	this.leftAttackAnimation = new Animation(spritesheet,   512,    0,  	64, 64, 0.1, 4, true, false,  0.75);  
+	this.deadAnimation = new Animation(spritesheet,        	448,    64, 	64, 64, 0.1, 1, true, false,  0.75);    
 	this.up = false;
 	this.down = true;
 	this.left = false;
@@ -165,15 +163,15 @@ Player.prototype.draw = function () {
 function Scavenger(game, enemy) {  
 	var spritesheet = AM.getAsset("img/scavenger.png");
 				 //spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, scale
-	this.upAnimation = new Animation(spritesheet,           512,    64,     64, 64, 0.1, 4, true,   0.75);
-	this.downAnimation = new Animation(spritesheet,         0,      128,    64, 64, 0.1, 4, true,   0.75);
-	this.rightAnimation = new Animation(spritesheet,        512,    128,    64, 64, 0.1, 4, true,   0.75);
-	this.leftAnimation = new Animation(spritesheet,         256,    128,    64, 64, 0.1, 4, true,   0.75);    
-	this.upAttackAnimation = new Animation(spritesheet,     0,      0,  64, 64, 0.1, 4, true,   0.75);    
-	this.downAttackAnimation = new Animation(spritesheet,   256,    0,  64, 64, 0.1, 4, true,   0.75);    
-	this.rightAttackAnimation = new Animation(spritesheet,  0,      64, 64, 64, 0.1, 4, true,   0.75);    
-	this.leftAttackAnimation = new Animation(spritesheet,   512,    0,  64, 64, 0.1, 4, true,   0.75); 
-	this.dyingAnimation = new Animation(spritesheet,        256,    64, 64, 64, 0.1, 4, false,   0.75);    
+	this.upAnimation = new Animation(spritesheet,           512,    64,     64, 64, 0.1, 4, true,  false,  0.75);
+	this.downAnimation = new Animation(spritesheet,         0,      128,    64, 64, 0.1, 4, true,  false,  0.75);
+	this.rightAnimation = new Animation(spritesheet,        512,    128,    64, 64, 0.1, 4, true,   false, 0.75);
+	this.leftAnimation = new Animation(spritesheet,         256,    128,    64, 64, 0.1, 4, true, false,   0.75);    
+	this.upAttackAnimation = new Animation(spritesheet,     0,      0,  64, 64, 0.1, 4, true, false,   0.75);    
+	this.downAttackAnimation = new Animation(spritesheet,   256,    0,  64, 64, 0.1, 4, true, false,   0.75);    
+	this.rightAttackAnimation = new Animation(spritesheet,  0,      64, 64, 64, 0.1, 4, true, false,   0.75);    
+	this.leftAttackAnimation = new Animation(spritesheet,   512,    0,  64, 64, 0.1, 4, true, false,   0.75); 
+	this.dyingAnimation = new Animation(spritesheet,        256,    64, 64, 64, 0.1, 4, false,  false,  0.75);    
 	this.up = false;
 	this.down = false;
 	this.left = false;
@@ -201,6 +199,52 @@ Scavenger.prototype.update = function () {
 			y: -64
 		};
 		this.game.moveTo(this, mid);
+
+		this.x += this.dx * this.game.clockTick * this.speed;
+			this.y += this.dy * this.game.clockTick * this.speed;
+
+			this.dx = Math.floor(this.dx);
+			this.dy = Math.floor(this.dy);
+
+			if(this.dx === this.dy) { 
+				if(this.dx < 0) {
+					this.left = true;
+					this.right = false; 
+					this.up = false;
+					this.down = false;
+				} else {
+					this.left = false;
+					this.right = true;
+					this.up = false;
+					this.down = false;
+				} 
+			} else if (this.dx > this.dy) {	 
+				if(this.dx < 0) {
+					this.down = true;
+					this.up = false;
+					this.left = false;
+					this.right = false; 
+				} else {
+					this.down = false;
+					this.up = true;
+					this.left = false;
+					this.right = false; 
+				} 
+		 	} else { 
+
+				if(this.dy < 0) {
+					this.down = false;
+					this.up = true;
+					this.left = false;
+					this.right = false; 
+				} else {
+					this.down = true;
+					this.up = false;
+					this.left = false;
+					this.right = false; 
+				} 
+		 	}
+
 	} else {
 
 		this.game.moveTo(this, this.enemy);
@@ -261,7 +305,6 @@ Scavenger.prototype.update = function () {
 		 	}
 		} 
 	}
-
 	
 	Entity.prototype.update.call(this);  
 } 
@@ -291,8 +334,9 @@ Scavenger.prototype.draw = function () {
 
 var AM = new AssetManager(); 
 
-AM.queueDownload("img/map.png");
-AM.queueDownload("img/scavenger.png");  
+AM.queueDownload("img/background.png");
+AM.queueDownload("img/scavenger.png"); 
+AM.queueDownload("img/player_scav.png"); 
 
 AM.downloadAll(function () {
 	var canvas = document.getElementById("gameWorld");
