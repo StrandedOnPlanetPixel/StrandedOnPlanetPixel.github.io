@@ -1,3 +1,4 @@
+var drawBoundingCircles = true;
 
 window.requestAnimFrame = (function () {
     return window.requestAnimationFrame ||
@@ -8,8 +9,7 @@ window.requestAnimFrame = (function () {
             function (/* function */ callback, /* DOMElement */ element) {
                 window.setTimeout(callback, 1000 / 60);
             };
-})();
-
+})(); 
 
 function compare(entityA, entityB) {
   if (entityA.y - entityA.height < entityB.y - entityB.height) {
@@ -25,11 +25,16 @@ function compare(entityA, entityB) {
 /** Game Engine **/
 function GameEngine() {
     this.entities = [];
+    this.environmentEntities = [];
+    this.npcEntities = [];
+    this.friendlyEntities = [];
+    this.hostileEntities = [];
     this.ctx = null;
     this.width = null;
     this.height = null;
     this.click = null;
     this.mouse = null;
+    this.showOutlines = true;
     this.keys = {
         up: false,
         down: false,
@@ -82,12 +87,33 @@ GameEngine.prototype.keyListener = function() {
 
 }
  
-GameEngine.prototype.addEntity = function (entity) {
+GameEngine.prototype.addEntity = function(entity) {
     console.log('added entity');
     this.entities.push(entity);
 }
 
+GameEngine.prototype.addNpcEntity = function(entity, friendly) {
+    console.log('added npc entity');
+    this.entities.push(entity);
+    this.npcEntities.push(entity);
+    if(friendly) {
+        this.friendlyEntities.push(entity);
+    } else {
+        this.hostileEntities.push(entity);
+    }
+}
+
+
+GameEngine.prototype.addEnvironmentEntity = function(entity) {
+    console.log('added an environment entity');    
+    this.entities.push(entity);
+    this.environmentEntities.push(entity);
+}
+
+
 GameEngine.prototype.draw = function () {
+
+
     this.entities.sort(compare);
 
     this.ctx.clearRect(0, 0, this.width, this.height);
@@ -197,10 +223,17 @@ Entity.prototype.update = function () {
 Entity.prototype.draw = function (ctx) {
     if (this.game.showOutlines && this.radius) {
         this.game.ctx.beginPath();
-        this.game.ctx.strokeStyle = "green";
+        this.game.ctx.strokeStyle = "yellow";
         this.game.ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
         this.game.ctx.stroke();
         this.game.ctx.closePath();
+        if(this.visualRadius) { 
+            this.game.ctx.beginPath();
+            this.game.ctx.strokeStyle = "red";
+            this.game.ctx.arc(this.x, this.y, this.visualRadius, 0, Math.PI * 2, false);
+            this.game.ctx.stroke();
+            this.game.ctx.closePath();
+        }
     }
 }
 

@@ -1,3 +1,4 @@
+
 function Animation(spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, reverse, scale) {
     this.spriteSheet = spriteSheet;
     this.startX = startX;
@@ -13,7 +14,7 @@ function Animation(spriteSheet, startX, startY, frameWidth, frameHeight, frameDu
     this.scale = scale;
 }
 
-Animation.prototype.drawFrame = function (tick, ctx, x, y) {
+Animation.prototype.drawFrame = function (tick, ctx, x, y, radius) {
     var scaleBy = this.scale || 1;
     this.elapsedTime += tick;
     if (this.loop) {
@@ -34,8 +35,8 @@ Animation.prototype.drawFrame = function (tick, ctx, x, y) {
         vindex++;
     }
 
-    var locX = x;
-    var locY = y;
+    var locX = x - radius;
+    var locY = y - radius;
     var offset = vindex === 0 ? this.startX : 0;
     ctx.drawImage(this.spriteSheet,
                   index * this.frameWidth + offset, vindex * this.frameHeight + this.startY,  // source from sheet
@@ -51,6 +52,75 @@ Animation.prototype.currentFrame = function () {
 
 Animation.prototype.isDone = function () {
 	return (this.elapsedTime >= this.totalTime);
+}
+
+function distance(a, b) {
+    var dx = a.x - b.x;
+    var dy = a.y - b.y;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
+function collide(ent, otherEnt) {
+    return distance(ent, otherEnt) < ent.radius + otherEnt.radius;
+};
+
+function collideLeft(ent) {
+    return (ent.x - ent.radius) < 0;
+};
+
+function collideRight(ent) {
+    return (ent.x + ent.radius) > width;
+};
+
+function collideTop(ent) {
+    return (ent.y - ent.radius) < 0;
+};
+
+function collideBottom(ent) {
+    return (ent.y + ent.radius) > height;
+};
+
+function moveEntityToTarget(ent, target) { 
+	var dx = target.x - ent.x;
+	var dy = target.y - ent.y; 
+	var distance = Math.sqrt(dx * dx + dy * dy);
+	 
+	if(distance) {  
+		dx /= distance;
+		dy /= distance;
+	}   
+ 	if(dx === dy) { 
+		if(dx < 0) {
+			ent.animation = ent.leftAnimation;
+		} else {
+			ent.animation = ent.rightAnimation;
+		} 
+	} else {	 
+		if(dx < 0 || dy > 0) {
+			ent.animation = ent.downAnimation;
+		} else {				
+			ent.animation = ent.upAnimation;
+		}
+ 	} 
+	ent.x += dx * ent.game.clockTick * ent.speed;
+	ent.y += dy * ent.game.clockTick * ent.speed;
+}
+
+function attack(ent) {
+	if(this.dx === this.dy) { 
+		if(this.dx < 0) {
+			this.animation = this.leftAttackAnimation;
+		} else {
+			this.animation = this.rightAttackAnimation;
+		} 
+	} else {	 
+		if(this.dx < 0 || this.dy > 0) {
+			this.animation = this.downAttackAnimation;
+		} else {				
+			this.animation = this.upAttackAnimation;
+
+		}
+ 	}  
 }
 
 // no inheritance
@@ -70,8 +140,10 @@ Background.prototype.draw = function (ctx) {
 }
 
 
-function Player(game) { //spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, scale
+function Player(game) {
 	var spritesheet = AM.getAsset("img/space_traveler.png");
+	this.animation = new Animation(spritesheet,             0,	448,	64, 64, 0.1, 	8, true,	false,	0.75);
+	this.stillAnimation = new Animation(spritesheet,        0,	256,    64, 64, 0.1, 	1, true,	false,	0.75);
 	this.upAnimation = new Animation(spritesheet,           0,	448,	64, 64, 0.1, 	8, true,	false,	0.75);
 	this.downAnimation = new Animation(spritesheet,         0,	256,    64, 64, 0.1, 	8, true,	false,	0.75);
 	this.rightAnimation = new Animation(spritesheet,        0,	384,    64, 64, 0.1, 	8, true,	false,	0.75);
@@ -84,96 +156,77 @@ function Player(game) { //spriteSheet, startX, startY, frameWidth, frameHeight, 
 	this.dyingAnimation = new Animation(spritesheet,        0,	128,	64, 64, 0.001,	8, false,	false,	0.75); 
 	this.deadAnimation = new Animation(spritesheet,        448,	128,	64, 64, 0.01,	1, true,	false,	0.75);  
 
-	this.up = false;
-	this.down = true;
-	this.left = false;
-	this.right = false;
-	this.attack = false;
-	this.program = false;
-	this.dead = false; 
-	this.life = 200;
-
-	this.speed = 150;
 	this.game = game;
 	this.ctx = game.ctx; 
-	Entity.call(this, game, Math.floor(this.game.width / 2), Math.floor(this.game.height / 2));
+	this.radius = 24;  
+	Entity.call(this, game, width / 2, height / 2 ); 
+	this.x += this.radius;
+	this.y += this.radius;
+
+	// The radius is the spritesheet height divided by two?
+	this.lives = 200;
+	this.speed = 150;
 }
 
 Player.prototype = new Entity();
 Player.prototype.constructor = Player;
 
 Player.prototype.update = function () {
-	if(!this.dead) {
-		if(this.game.keys.up) {
-	 		this.up = true;   
-			this.down = false;
-			this.left = false;
-			this.right = false;
-			this.y -= this.game.clockTick * this.speed;  
-		} else if (this.game.keys.down) { 
-	 		this.up = false;   
-			this.down = true;
-			this.left = false;
-			this.right = false;
-			this.y += this.game.clockTick * this.speed;
-		} else if (this.game.keys.left) {
-	 		this.up = false;   
-			this.down = false;
-			this.left = true;
-			this.right = false;   
-			this.x -= this.game.clockTick * this.speed;   
-		} else if (this.game.keys.right) {
-	 		this.up = false;   
-			this.down = false;
-			this.left = false;
-			this.right = true;        
-			this.x += this.game.clockTick * this.speed;      
-		} 
+	if (collideLeft(this) || collideRight(this)) { 
+        if (collideLeft(this)) this.x = this.radius;
+        if (collideRight(this)) this.x = width - this.radius; 
+    }
+
+    if (collideTop(this) || collideBottom(this)) {
+        if (collideTop(this)) this.y = this.radius;
+        if (collideBottom(this)) this.y = height - this.radius; 
+    }
+    
+  	if(this.lives > 0) {
 		if(this.game.keys.attack) {
-	 		this.attack = true;
+		 	if(this.game.keys.up) {
+		 		this.animation = this.upAttackAnimation; 
+			} else if (this.game.keys.down) {  
+		 		this.animation = this.downAttackAnimation; 
+			} else if (this.game.keys.left) {
+		 		this.animation = this.leftAttackAnimation;    
+			} else if (this.game.keys.right) {
+		 		this.animation = this.rightAttackAnimation;       
+			} 
 		} else {
-			this.attack = false;
+			if(this.game.keys.up) {
+		 		this.animation = this.upAnimation;
+		 		this.y -= this.game.clockTick * this.speed;  
+			} else if (this.game.keys.down) {  
+		 		this.animation = this.downAnimation;
+				this.y += this.game.clockTick * this.speed;
+			} else if (this.game.keys.left) {
+		 		this.animation = this.leftAnimation; 
+				this.x -= this.game.clockTick * this.speed;   
+			} else if (this.game.keys.right) {
+		 		this.animation = this.rightAnimation;    
+				this.x += this.game.clockTick * this.speed;      
+			} else {
+		 		this.animation = this.stillAnimation;    
+			}
 		} 
 		if(this.game.keys.program) {
-	 		this.program = true;
-		} else {
-			this.program = false;
-		} 
-	}
+	 		this.animation = this.programAnimation;
+		}  
+	} else {
+		this.animation = this.deadAnimation;
+	} 
 	Entity.prototype.update.call(this); 
 } 
 
 Player.prototype.draw = function () {
- 	if(this.dead) {
- 		console.log("dead")
-		this.deadAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y); 
-	} else if(this.attack) {
-		if (this.down) {
-			this.downAttackAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
-		} else if (this.left) {
-			this.leftAttackAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
-		} else if (this.right) {
-			this.rightAttackAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
-		} else {
-			this.upAttackAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);  
-		}
-	} else if (this.program) {
-		this.programAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);  
-	} else if (this.down) {
-		this.downAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
-	} else if (this.left) {
-		this.leftAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
-	} else if (this.right) {
-		this.rightAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
-	} else {
-		this.upAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);  
-	} 
-	
+ 	this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius); 
 	Entity.prototype.draw.call(this); 
 }
 
 function Alien(game, enemy) {  
 	var spritesheet = AM.getAsset("img/alien.png");
+	this.animation = new Animation(spritesheet,             256,    192,     64, 64, 0.1, 4, true,  false,  0.75);
 	this.upAnimation = new Animation(spritesheet,           256,    192,     64, 64, 0.1, 4, true,  false,  0.75);
 	this.downAnimation = new Animation(spritesheet,         0,     64,    64, 64, 0.1, 4, true,  false,  0.75);
 	this.rightAnimation = new Animation(spritesheet,        0,   256,    64, 64, 0.1, 4, true,   false, 0.75);
@@ -183,125 +236,69 @@ function Alien(game, enemy) {
 	this.rightAttackAnimation = new Animation(spritesheet,  256,   64, 64, 64, 0.1, 4, true, false,   0.75);    
 	this.leftAttackAnimation = new Animation(spritesheet,   0,    192,  64, 64, 0.1, 4, true, false,   0.75); 
 	this.dyingAnimation = new Animation(spritesheet,        0,    0, 64, 64, 0.1, 8, false,  false,  0.75);    
-	this.up = false;
-	this.down = false;
-	this.left = false;
-	this.right = false;
-	this.attack = false;
-	this.speed = 50;
-
-	this.height = 64;
- 
-	this.angle = 2 * Math.PI;
+	
 	this.game = game;
-	this.ctx = game.ctx;  
-	this.dy = 0;
-	this.dx = 0;
-	this.distance = 0;
+	this.ctx = game.ctx; 
 	this.enemy = enemy;
-	Entity.call(this, game, Math.floor((Math.random() * this.game.width ) + 1), this.game.height);
+	Entity.call(this, game, Math.random() * width, height);
+	this.radius = 24;
+	this.lives = 200;
+	this.speed = 50;
+	this.visualRadius = 200;
 }
 
 Alien.prototype = new Entity();
 Alien.prototype.constructor = Alien;
 
 Alien.prototype.update = function () {
-	if(this.enemy.dead) {
-		mid = {
-			x: -64,
-			y: -64
-		};
-		this.enemy = mid;
-	} else {
+	if (collideLeft(this) || collideRight(this)) { 
+        if (collideLeft(this)) this.x = this.radius;
+        if (collideRight(this)) this.x = width - this.radius; 
+    }
 
-		this.game.moveTo(this, this.enemy);
-		 
-		if(Math.floor(this.distance) < 32) {
-			this.attack = true;
-			this.enemy.life--;  
-			if(this.enemy.life < 0) { 
-				this.enemy.dead = true;
-				this.attack = false;
+    if (collideTop(this) || collideBottom(this)) {
+        if (collideTop(this)) this.y = this.radius;
+        if (collideBottom(this)) this.y = height - this.radius; 
+    }
+
+	for (var i = 0; i < this.game.friendlyEntities.length; i++) {
+        var ent = this.game.friendlyEntities[i];
+        if (this != ent && collide(this, ent)) {
+	    	this.animation = this.downAttackAnimation;
+        }  
+    }
+
+    var closestEnt = this.game.friendlyEntities[0];
+    for (var i = 0; i < this.game.friendlyEntities.length; i++) {
+       	var ent = this.game.friendlyEntities[i];
+        if (ent != this && collide(this, { x: ent.x, y: ent.y, radius: this.visualRadius })) {
+			var dist = distance(this, ent); 
+			if(dist < distance(this, closestEnt)) {
+				closestEnt = ent;
 			}
-		} else {  
-			this.attack = false;
-	
-			this.x += this.dx * this.game.clockTick * this.speed;
-			this.y += this.dy * this.game.clockTick * this.speed;
+        }  
+    }
 
-			this.dx = Math.floor(this.dx);
-			this.dy = Math.floor(this.dy);
+	this.game.moveTo(this, closestEnt);
 
-			if(this.dx === this.dy) { 
-				if(this.dx < 0) {
-					this.left = true;
-					this.right = false; 
-					this.up = false;
-					this.down = false;
-				} else {
-					this.left = false;
-					this.right = true;
-					this.up = false;
-					this.down = false;
-				} 
-			} else if (this.dx > this.dy) {	 
-				if(this.dx < 0) {
-					this.down = true;
-					this.up = false;
-					this.left = false;
-					this.right = false; 
-				} else {
-					this.down = false;
-					this.up = true;
-					this.left = false;
-					this.right = false; 
-				} 
-		 	} else { 
 
-				if(this.dy < 0) {
-					this.down = false;
-					this.up = true;
-					this.left = false;
-					this.right = false; 
-				} else {
-					this.down = true;
-					this.up = false;
-					this.left = false;
-					this.right = false; 
-				} 
-		 	}
-		} 
-	}
-	
+	if(collide(this, closestEnt)) {
+ 		console.log("Alien attacking " + closestEnt);
+ 		attack(this);
+	} else {
+	  	moveEntityToTarget(this, closestEnt);
+	} 
 	Entity.prototype.update.call(this);  
 } 
 
 Alien.prototype.draw = function () { 
- 	if(this.attack) {
-		if (this.down) {
-			this.downAttackAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
-		} else if (this.left) {
-			this.leftAttackAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
-		} else if (this.right) {
-			this.rightAttackAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
-		} else {
-			this.upAttackAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);  
-		}
-	} else if (this.down) {
-		this.downAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
-	} else if (this.left) {
-		this.leftAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
-	} else if (this.right) {
-		this.rightAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
-	} else {
-		this.upAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);  
-	}
+ 	this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius); 
 	Entity.prototype.draw.call(this); 
 }
 
-
 function Scavenger(game, enemy) {  
 	var spritesheet = AM.getAsset("img/scavenger.png");
+	this.animation = new Animation(spritesheet,             512,    64,     64, 64, 0.1, 4, true,  false,  0.75);
 	this.upAnimation = new Animation(spritesheet,           512,    64,     64, 64, 0.1, 4, true,  false,  0.75);
 	this.downAnimation = new Animation(spritesheet,         0,      128,    64, 64, 0.1, 4, true,  false,  0.75);
 	this.rightAnimation = new Animation(spritesheet,        512,    128,    64, 64, 0.1, 4, true,   false, 0.75);
@@ -311,22 +308,15 @@ function Scavenger(game, enemy) {
 	this.rightAttackAnimation = new Animation(spritesheet,  0,      64, 64, 64, 0.1, 4, true, false,   0.75);    
 	this.leftAttackAnimation = new Animation(spritesheet,   512,    0,  64, 64, 0.1, 4, true, false,   0.75); 
 	this.dyingAnimation = new Animation(spritesheet,        256,    64, 64, 64, 0.1, 4, false,  false,  0.75);    
-	this.up = false;
-	this.down = false;
-	this.left = false;
-	this.right = false;
-	this.attack = false;
-	this.speed = 50;
 
-	this.height = 64;
- 
-	this.angle = 2 * Math.PI;
 	this.game = game;
-	this.ctx = game.ctx;  
-	this.dy = 0;
-	this.dx = 0;
-	this.distance = 0;
+	this.ctx = game.ctx; 
 	this.enemy = enemy;
+	Entity.call(this, game, Math.random() * width, height);
+	this.radius = 24;
+	this.lives = 200;
+	this.speed = 50;
+	this.visualRadius = 200;
 	Entity.call(this, game, Math.floor((Math.random() * this.game.width ) + 1), this.game.height);
 }
 
@@ -334,96 +324,47 @@ Scavenger.prototype = new Entity();
 Scavenger.prototype.constructor = Scavenger;
 
 Scavenger.prototype.update = function () {
-	if(this.enemy.dead) {
-		mid = {
-			x: -64,
-			y: -64
-		};
-		this.enemy = mid;
-	} else {
+	if (collideLeft(this) || collideRight(this)) { 
+        if (collideLeft(this)) this.x = this.radius;
+        if (collideRight(this)) this.x = width - this.radius; 
+    }
 
-		this.game.moveTo(this, this.enemy);
-		 
-		if(Math.floor(this.distance) < 32) {
-			this.attack = true;
-			this.enemy.life--;  
-			if(this.enemy.life < 0) { 
-				this.enemy.dead = true;
-				this.attack = false;
+    if (collideTop(this) || collideBottom(this)) {
+        if (collideTop(this)) this.y = this.radius;
+        if (collideBottom(this)) this.y = height - this.radius; 
+    }
+
+	for (var i = 0; i < this.game.friendlyEntities.length; i++) {
+        var ent = this.game.friendlyEntities[i];
+        if (this != ent && collide(this, ent)) {
+	    	this.animation = this.downAttackAnimation;
+        }  
+    }
+
+    var closestEnt = this.game.friendlyEntities[0];
+    for (var i = 0; i < this.game.friendlyEntities.length; i++) {
+       	var ent = this.game.friendlyEntities[i];
+        if (ent != this && collide(this, { x: ent.x, y: ent.y, radius: this.visualRadius })) {
+			var dist = distance(this, ent); 
+			if(dist < distance(this, closestEnt)) {
+				closestEnt = ent;
 			}
-		} else {  
-			this.attack = false;
-	
-			this.x += this.dx * this.game.clockTick * this.speed;
-			this.y += this.dy * this.game.clockTick * this.speed;
+        }  
+    }
 
-			this.dx = Math.floor(this.dx);
-			this.dy = Math.floor(this.dy);
+	this.game.moveTo(this, closestEnt);
 
-			if(this.dx === this.dy) { 
-				if(this.dx < 0) {
-					this.left = true;
-					this.right = false; 
-					this.up = false;
-					this.down = false;
-				} else {
-					this.left = false;
-					this.right = true;
-					this.up = false;
-					this.down = false;
-				} 
-			} else if (this.dx > this.dy) {	 
-				if(this.dx < 0) {
-					this.down = true;
-					this.up = false;
-					this.left = false;
-					this.right = false; 
-				} else {
-					this.down = false;
-					this.up = true;
-					this.left = false;
-					this.right = false; 
-				} 
-		 	} else { 
-
-				if(this.dy < 0) {
-					this.down = false;
-					this.up = true;
-					this.left = false;
-					this.right = false; 
-				} else {
-					this.down = true;
-					this.up = false;
-					this.left = false;
-					this.right = false; 
-				} 
-		 	}
-		} 
-	}
-	
+	if(collide(this, closestEnt)) {
+ 		console.log("Scavenger attacking " + closestEnt);
+ 		attack(this); 
+	} else {
+		moveEntityToTarget(this, closestEnt);
+	} 
 	Entity.prototype.update.call(this);  
 } 
 
 Scavenger.prototype.draw = function () { 
- 	if(this.attack) {
-		if (this.down) {
-			this.downAttackAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
-		} else if (this.left) {
-			this.leftAttackAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
-		} else if (this.right) {
-			this.rightAttackAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
-		} else {
-			this.upAttackAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);  
-		}
-	} else if (this.down) {
-		this.downAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
-	} else if (this.left) {
-		this.leftAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
-	} else if (this.right) {
-		this.rightAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
-	} else {
-		this.upAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);  
-	}
+ 	this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius); 
 	Entity.prototype.draw.call(this); 
 }
 
@@ -433,21 +374,16 @@ function Rummager(game, enemy) {
 	this.rightAnimation = new Animation(spritesheet,        0,    64,   	64, 64, 0.1, 8, true,  false,  0.75);
 	this.upAnimation = new Animation(spritesheet,       0,    128,    64, 64, 0.1, 8, true,  false, 0.75);
 	this.downAnimation = new Animation(spritesheet,        0,    192,    64, 64, 0.1, 8, true,  false,   0.75);    
-	this.up = false;
-	this.down = false;
-	this.left = false;
-	this.right = false;
-	this.speed = 50;
-
-	this.height = 64;
- 
-	this.angle = 2 * Math.PI;
+	
 	this.game = game;
 	this.ctx = game.ctx;  
-	this.dy = 0;
-	this.dx = 0;
-	this.distance = 0;
-	this.enemy = enemy;
+	Entity.call(this, game, Math.random() * width, height);
+	this.radius = 24;
+	this.lives = 200;
+	this.speed = 50;
+	this.visualRadius = 200;
+	this.lastBulletTime = 0;
+
 	Entity.call(this, game, Math.floor((Math.random() * this.game.width ) + 1), this.game.height);
 }
 
@@ -455,87 +391,108 @@ Rummager.prototype = new Entity();
 Rummager.prototype.constructor = Rummager;
 
 Rummager.prototype.update = function () {
-	if(this.enemy.dead) {
-		mid = {
-			x: -64,
-			y: -64
-		}; 
-		this.enemy = mid;
-	} else {
+	if (collideLeft(this) || collideRight(this)) { 
+        if (collideLeft(this)) this.x = this.radius;
+        if (collideRight(this)) this.x = width - this.radius; 
+    }
 
-		this.game.moveTo(this, this.enemy);
-		 
-		if(Math.floor(this.distance) < 32) {
-			this.attack = true;
-			this.enemy.life--;  
-			if(this.enemy.life < 0) { 
-				this.enemy.dead = true;
-				this.attack = false;
+    if (collideTop(this) || collideBottom(this)) {
+        if (collideTop(this)) this.y = this.radius;
+        if (collideBottom(this)) this.y = height - this.radius; 
+    }
+
+	for (var i = 0; i < this.game.friendlyEntities.length; i++) {
+        var ent = this.game.friendlyEntities[i];
+        if (this != ent && collide(this, ent)) {
+	    	this.animation = this.downAttackAnimation;
+        }  
+    }
+
+    var closestEnt = this.game.friendlyEntities[0];
+    for (var i = 0; i < this.game.friendlyEntities.length; i++) {
+       	var ent = this.game.friendlyEntities[i];
+        if (ent != this && collide(this, { x: ent.x, y: ent.y, radius: this.visualRadius })) {
+			var dist = distance(this, ent); 
+			if(dist < distance(this, closestEnt)) {
+				closestEnt = ent;
 			}
-		} else {  
-			this.attack = false;
-	
-			this.x += this.dx * this.game.clockTick * this.speed;
-			this.y += this.dy * this.game.clockTick * this.speed;
+        }  
+    }
 
-			this.dx = Math.floor(this.dx);
-			this.dy = Math.floor(this.dy);
+	if(collide(this, {x: closestEnt.x, y: closestEnt.y, radius: this.visualRadius})) {
+ 		this.animation = this.shootAnimation;
 
-			if(this.dx === this.dy) { 
-				if(this.dx < 0) {
-					this.left = true;
-					this.right = false; 
-					this.up = false;
-					this.down = false;
-				} else {
-					this.left = false;
-					this.right = true;
-					this.up = false;
-					this.down = false;
-				} 
-			} else if (this.dx > this.dy) {	 
-				if(this.dx < 0) {
-					this.down = true;
-					this.up = false;
-					this.left = false;
-					this.right = false; 
-				} else {
-					this.down = false;
-					this.up = true;
-					this.left = false;
-					this.right = false; 
-				} 
-		 	} else { 
-
-				if(this.dy < 0) {
-					this.down = false;
-					this.up = true;
-					this.left = false;
-					this.right = false; 
-				} else {
-					this.down = true;
-					this.up = false;
-					this.left = false;
-					this.right = false; 
-				} 
-		 	}
-		} 
-	}
-	
+ 		if(!this.lastBulletTime) {
+			this.game.addEntity(new Bullet(this.game, this, closestEnt));
+	 		this.lastBulletTime = this.game.timer.gameTime; 
+ 		} else if(this.lastBulletTime < this.game.timer.gameTime - 3) {
+	 	 	console.log("Rummager shoots at " + closestEnt);
+			this.game.addEntity(new Bullet(this.game, this, closestEnt));
+	 		this.lastBulletTime = this.game.timer.gameTime; 
+	 	}
+	} else {
+		moveEntityToTarget(this, closestEnt);
+	} 
 	Entity.prototype.update.call(this);  
 } 
 
 Rummager.prototype.draw = function () { 
     if (this.down) {
-		this.downAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+		this.downAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);
 	} else if (this.left) {
-		this.leftAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+		this.leftAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);
 	} else if (this.right) {
-		this.rightAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+		this.rightAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);
 	} else {
-		this.upAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);  
+		this.upAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);  
 	}
 	Entity.prototype.draw.call(this); 
+}
+
+function Bullet(game, parent, target) {
+	var spriteSheet = AM.getAsset("img/bullet.png");
+	this.animation = new Animation(spriteSheet, 0, 0, 16, 16, 0.1, 1, true, false, 0.75);
+	this.targetLocation = {x: target.x + width, y: target.y + height, radius: target.radius}; 
+	this.target = target;  
+	this.game = game;
+	this.ctx = game.ctx; 
+	Entity.call(this, game, parent.x, parent.y);
+ 	this.radius = 8; 
+	this.speed = 50;
+}
+
+Bullet.prototype = new Entity();
+Bullet.prototype.constructor = Bullet;
+
+Bullet.prototype.update = function() {
+	if (collideLeft(this) || collideRight(this)) {  
+        this.removeFromWorld = true;
+    }
+
+    if (collideTop(this) || collideBottom(this)) { 
+        this.removeFromWorld = true;
+    }
+
+    if(collide(this, this.target)) {
+    	this.target.lives -= 5;
+        this.removeFromWorld = true;
+    } else { 
+    	var dx = this.targetLocation.x - this.x;
+		var dy = this.targetLocation.y - this.y; 
+		var distance = Math.sqrt(dx * dx + dy * dy);
+		 
+		if(distance) {  
+			dx /= distance;
+			dy /= distance;
+		}    
+		this.x += dx * this.game.clockTick * this.speed;
+		this.y += dy * this.game.clockTick * this.speed;
+    }
+	Entity.prototype.update.call(this);  			
+}
+Bullet.prototype.draw = function() {
+	this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);  
+	Entity.prototype.draw.call(this);
 }
 
 function RobotTier1(game, taskAsset) { //spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, scale
@@ -584,7 +541,7 @@ function RobotTier1(game, taskAsset) { //spriteSheet, startX, startY, frameWidth
 	this.distance = 0;
 	this.game = game;
 	this.ctx = game.ctx; 
-	
+	this.radius = 24;
 	Entity.call(this, game, Math.floor(this.game.width / 2), Math.floor(this.game.height / 2));
 }
 
@@ -651,32 +608,32 @@ RobotTier1.prototype.draw = function(){
 	
 	if(this.gatherBerry){
 		if(this.down){
-			this.gatherBerryDownAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+			this.gatherBerryDownAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);
 		} else if(this.left){
-			this.gatherBerryLeftAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);		
+			this.gatherBerryLeftAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);		
 		} else if(this.right){
-			this.gatherBerryRightAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);		
+			this.gatherBerryRightAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);		
 		}else{
-			this.gatherBerryUpAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);		
+			this.gatherBerryUpAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);		
 		}
 	} else if(this.repair){
 		if(this.down){
-			this.repairDownAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+			this.repairDownAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);
 		} else if(this.left){
-			this.repairLeftAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);		
+			this.repairLeftAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);		
 		} else if(this.right){
-			this.repairRightAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);		
+			this.repairRightAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);		
 		}else{
-			this.repairUpAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);		
+			this.repairUpAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);		
 		}
 	} else if (this.down) {
-		this.downAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+		this.downAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y,this.radius);
 	} else if (this.left) {
-		this.leftAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+		this.leftAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);
 	} else if (this.right) {
-		this.rightAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+		this.rightAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);
 	} else {
-		this.upAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);  
+		this.upAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);  
 	} 
 	
 	Entity.prototype.draw.call(this);
@@ -757,6 +714,8 @@ SpaceShip.prototype.draw = function (ctx) {
 	Entity.prototype.draw.call(this);
 }
 
+var height = null;
+var width = null;
 var AM = new AssetManager(); 
 
 AM.queueDownload("img/map.png");
@@ -771,10 +730,14 @@ AM.queueDownload("img/spaceship.png");
 AM.queueDownload("img/robotSpriteSheet1.png");
 AM.queueDownload("img/rummager.png");
 AM.queueDownload("img/alien.png");
+AM.queueDownload("img/bullet.png");
 
 AM.downloadAll(function () {
 	var canvas = document.getElementById("gameWorld");
 	var ctx = canvas.getContext("2d");
+
+	height = canvas.height;
+	width = canvas.width;
 
 	var gameEngine = new GameEngine(); 
 
@@ -797,32 +760,26 @@ AM.downloadAll(function () {
 
 	for(var i = 0; i < numTrees; i++) {
 		var foliage = new Foliage(gameEngine);
-		gameEngine.addEntity(foliage); 
+		gameEngine.addEnvironmentEntity(foliage); 
 		if(i == 1 || i == 4) {
-			gameEngine.addEntity(new RobotTier1(gameEngine, foliage));     
+			gameEngine.addNpcEntity(new RobotTier1(gameEngine, foliage), true);     
 		}    
 	}
 
 	for(var i = 0; i < numBuildings; i++) {
 		var building = new Building(gameEngine);
-		gameEngine.addEntity(building); 
+		gameEngine.addEnvironmentEntity(building); 
 		if(i == 1) {
-			gameEngine.addEntity(new RobotTier1(gameEngine, building));     
+			gameEngine.addNpcEntity(new RobotTier1(gameEngine, building), true);     
 		}  
 	}
 
-	gameEngine.addEntity(spaceship);   
-
-	gameEngine.addEntity(scav); 
-
-	gameEngine.addEntity(robot);       
-
-	gameEngine.addEntity(alien);       
-	
-	gameEngine.addEntity(rummager);     
-
-	gameEngine.addEntity(player);  
-
-
+	gameEngine.addNpcEntity(spaceship, true);   
+	gameEngine.addNpcEntity(scav, false);   
+	gameEngine.addNpcEntity(robot, true);       
+	gameEngine.addNpcEntity(alien, false);       
+	gameEngine.addNpcEntity(rummager, false);      
+	gameEngine.addNpcEntity(player, true);  
+ 
 	console.log("All Done!");
 });
