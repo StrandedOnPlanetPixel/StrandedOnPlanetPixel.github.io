@@ -112,10 +112,6 @@ GameEngine.prototype.addEnvironmentEntity = function(entity) {
 
 
 GameEngine.prototype.draw = function () {
-
-
-    this.entities.sort(compare);
-
     this.ctx.clearRect(0, 0, this.width, this.height);
     this.ctx.save();
     for (var i = 0; i < this.entities.length; i++) {

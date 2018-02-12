@@ -283,7 +283,6 @@ Alien.prototype.update = function () {
 
 
 	if(collide(this, closestEnt)) {
- 		console.log("Alien attacking " + closestEnt);
  		attack(this);
 	} else {
 	  	moveEntityToTarget(this, closestEnt);
@@ -355,7 +354,6 @@ Scavenger.prototype.update = function () {
 	this.game.moveTo(this, closestEnt);
 
 	if(collide(this, closestEnt)) {
- 		console.log("Scavenger attacking " + closestEnt);
  		attack(this); 
 	} else {
 		moveEntityToTarget(this, closestEnt);
@@ -425,7 +423,7 @@ Rummager.prototype.update = function () {
  		if(!this.lastBulletTime) {
 			this.game.addEntity(new Bullet(this.game, this, closestEnt));
 	 		this.lastBulletTime = this.game.timer.gameTime; 
- 		} else if(this.lastBulletTime < this.game.timer.gameTime - 3) {
+ 		} else if(this.lastBulletTime < this.game.timer.gameTime - 1.5) {
 	 	 	console.log("Rummager shoots at " + closestEnt);
 			this.game.addEntity(new Bullet(this.game, this, closestEnt));
 	 		this.lastBulletTime = this.game.timer.gameTime; 
@@ -452,13 +450,21 @@ Rummager.prototype.draw = function () {
 function Bullet(game, parent, target) {
 	var spriteSheet = AM.getAsset("img/bullet.png");
 	this.animation = new Animation(spriteSheet, 0, 0, 16, 16, 0.1, 1, true, false, 0.75);
-	this.targetLocation = {x: target.x + width, y: target.y + height, radius: target.radius}; 
+	this.upAnimation = new Animation(spriteSheet, 0, 0, 16, 16, 0.1, 1, true, false, 0.75);
+	this.downAnimation = new Animation(spriteSheet, 0, 0, 16, 16, 0.1, 1, true, false, 0.75);
+	this.leftAnimation = new Animation(spriteSheet, 0, 0, 16, 16, 0.1, 1, true, false, 0.75);
+	this.rightAnimation = new Animation(spriteSheet, 0, 0, 16, 16, 0.1, 1, true, false, 0.75);
+	this.explodeAnimation = new Animation(spriteSheet, 0, 0, 16, 16, 0.1, 1, true, false, 0.75);
+
+	var dy = target.y - parent.y;
+	var dx = target.x - parent.x;
+	this.targetLocation = {x: dx * 100, y: dy * 100, radius: target.radius}; 
 	this.target = target;  
 	this.game = game;
 	this.ctx = game.ctx; 
 	Entity.call(this, game, parent.x, parent.y);
  	this.radius = 8; 
-	this.speed = 50;
+	this.speed = 75;
 }
 
 Bullet.prototype = new Entity();
@@ -473,23 +479,23 @@ Bullet.prototype.update = function() {
         this.removeFromWorld = true;
     }
 
-    if(collide(this, this.target)) {
-    	this.target.lives -= 5;
-        this.removeFromWorld = true;
-    } else { 
-    	var dx = this.targetLocation.x - this.x;
-		var dy = this.targetLocation.y - this.y; 
-		var distance = Math.sqrt(dx * dx + dy * dy);
-		 
-		if(distance) {  
-			dx /= distance;
-			dy /= distance;
-		}    
-		this.x += dx * this.game.clockTick * this.speed;
-		this.y += dy * this.game.clockTick * this.speed;
-    }
+    for (var i = 0; i < this.game.friendlyEntities.length; i++) {
+        var ent = this.game.friendlyEntities[i];
+        if (this != ent && collide(this, ent)) {
+        	this.animation = this.explodeAnimation;
+	    	ent.lives -= 5;
+	    	console.log("DAMAGE bullet explodeAnimation ");
+    	    this.removeFromWorld = true;
+        }  
+    } 
+
+    if(!this.removeFromWorld) { 
+		moveEntityToTarget(this, this.targetLocation);
+    } 
+
 	Entity.prototype.update.call(this);  			
 }
+
 Bullet.prototype.draw = function() {
 	this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);  
 	Entity.prototype.draw.call(this);
