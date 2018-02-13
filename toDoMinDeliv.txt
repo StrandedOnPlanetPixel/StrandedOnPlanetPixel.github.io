@@ -1,0 +1,81 @@
+To-Do:
+	fix alien side view (Amanda)
+	rummager animations (Taylor)
+	bullet entity (Taylor)
+	sprite for space ship (Taylor)
+
+	fix controls (Amanda)
+		mouse input for robot menus 
+
+	collision detection (Taylor)
+
+	webpage (Zira)
+		display controls
+
+	game title on page (Taylor)
+	
+	code cleanup (Taylor)
+		make page scrollable
+		fix animation completes on button clicked
+	
+	resource management (Amanda)
+		counters
+		cap on resources
+
+	display resources (Zira)
+		element above canvas
+		placeholder images
+		player health
+	
+	menus for our robots (Amanda)
+		simple menu with images as buttons for each resource type
+		display robot health
+		programming
+			gathering scrap
+			gathering berries
+			defending
+			repairing
+			charging
+			mining
+			lumber-jacking
+	
+	levels (Zira)
+		this will be the bonus material needed
+	
+	start screen (Zira)
+		so user clicks canvas
+		controls
+	
+	audio (Zira)
+		music
+		sound effects
+
+	day/night cycle (Taylor)
+		adjusting view
+		adjusting charge levels
+		baddies come out at night
+		only certain enemies come out at night (random?)
+
+	level object
+
+	checks for win and lose
+	
+	lose conditions
+		when everyone is dead, or something
+		we had discussed making the screen look like its turns off when we die... 
+	
+	win conditions
+		ship health 100%
+		resources at appropriate levels
+		ship takes off with everyone on board
+			no robot left behind!
+
+
+	extras
+		different player colors
+		weird songs
+		start/stop music and sounds
+		volume control
+		multiple levels
+		score for levels
+		
