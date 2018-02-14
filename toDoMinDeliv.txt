@@ -42,8 +42,7 @@ To-Do:
 		music
 		sound effects
 
-	day/night cycle (Taylor)
-		adjusting view
+	day/night cycle (Taylor) 
 		adjusting charge levels
 		baddies come out at night
 		only certain enemies come out at night (random?)

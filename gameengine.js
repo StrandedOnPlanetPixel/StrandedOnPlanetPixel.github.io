@@ -1,5 +1,3 @@
-var drawBoundingCircles = true;
-
 window.requestAnimFrame = (function () {
     return window.requestAnimationFrame ||
             window.webkitRequestAnimationFrame ||
@@ -11,19 +9,10 @@ window.requestAnimFrame = (function () {
             };
 })(); 
 
-function compare(entityA, entityB) {
-  if (entityA.y - entityA.height < entityB.y - entityB.height) {
-    return -1;
-  }
-  if (entityA.y - entityA.height > entityB.y - entityB.height) {
-    return 1;
-  }
-  // a must be equal to b
-  return 0;
-}
-
 /** Game Engine **/
 function GameEngine() {
+    this.showOutlines = true;
+
     this.entities = [];
     this.environmentEntities = [];
     this.npcEntities = [];
@@ -34,11 +23,11 @@ function GameEngine() {
     this.hostileEntities = [];
     this.ctx = null;
     this.level = null;
+    this.dayLength = null;
     this.width = null;
     this.height = null;
-    this.click = null;
-    this.mouse = null;
-    this.showOutlines = true;
+    this.click = {x: 0, y: 0,radius: 0};
+    this.mouse = {x: 0, y: 0,radius: 0};
     this.keys = {
         up: false,
         down: false,
@@ -60,7 +49,7 @@ GameEngine.prototype.init = function (ctx) {
 }
 
 GameEngine.prototype.start = function () {
-    console.log("starting game");
+    console.log("starting game");   
     var that = this;
     (function gameLoop() {
         that.loop();
@@ -69,6 +58,13 @@ GameEngine.prototype.start = function () {
 }
 
 GameEngine.prototype.keyListener = function() {
+    var getXandY = function (e) {
+        var x = e.clientX - that.ctx.canvas.getBoundingClientRect().left;
+        var y = e.clientY - that.ctx.canvas.getBoundingClientRect().top;
+         
+        return {x: x, y: y, radius: 16};
+    }
+
     var that = this;
     this.ctx.canvas.addEventListener("keydown", function(e) {
         var keyPressed = String.fromCharCode(e.which); 
@@ -91,6 +87,14 @@ GameEngine.prototype.keyListener = function() {
         if(keyReleased === 'Q') that.keys.program = false; 
         e.preventDefault(); 
     }, false);  
+
+    this.ctx.canvas.addEventListener("click", function (e) {
+        that.click = getXandY(e);  
+    }, false);
+
+    this.ctx.canvas.addEventListener("mousemove", function (e) {
+        that.mouse = getXandY(e);  
+    }, false);
 
 }
  
@@ -143,7 +147,7 @@ GameEngine.prototype.draw = function () {
     this.ctx.save();
     for (var i = 0; i < this.entities.length; i++) {
         this.entities[i].draw(this.ctx);
-    }
+    } 
     this.ctx.restore();
 }
 
@@ -152,7 +156,6 @@ GameEngine.prototype.update = function () {
 
     for (var i = 0; i < entitiesCount; i++) {
         var entity = this.entities[i];
-
         if (!entity.removeFromWorld) {
             entity.update();
         }
@@ -166,7 +169,7 @@ GameEngine.prototype.update = function () {
 }
 
 GameEngine.prototype.loop = function () {
-    this.clockTick = this.timer.tick();
+    this.clockTick = this.timer.tick(); 
     this.update();
     this.draw(); 
 } 

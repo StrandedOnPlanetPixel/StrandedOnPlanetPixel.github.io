@@ -46,6 +46,37 @@ Animation.prototype.drawFrame = function (tick, ctx, x, y, radius) {
                   this.frameHeight * scaleBy);
 }
 
+Animation.prototype.drawTime = function (tick, ctx, x, y) {
+    var scaleBy = this.scale || 1;
+    this.elapsedTime += tick;
+    if (this.loop) {
+        if (this.isDone()) {
+            this.elapsedTime = 0;
+        }
+    } else if (this.isDone()) {
+        return;
+    }
+    var index = this.reverse ? this.frames - this.currentFrame() - 1 : this.currentFrame();
+    var vindex = 0;
+    if ((index + 1) * this.frameWidth + this.startX > this.spriteSheet.width) {
+        index -= Math.floor((this.spriteSheet.width - this.startX) / this.frameWidth);
+        vindex++;
+    }
+    while ((index + 1) * this.frameWidth > this.spriteSheet.width) {
+        index -= Math.floor(this.spriteSheet.width / this.frameWidth);
+        vindex++;
+    }
+
+    var frame = index * this.frameWidth + offset; 
+    var offset = vindex === 0 ? this.startX : 0;
+    ctx.drawImage(this.spriteSheet,
+                  index * this.frameWidth + offset, vindex * this.frameHeight + this.startY,  // source from sheet
+                  this.frameWidth, this.frameHeight,
+                  x, y,
+                  this.frameWidth * scaleBy,
+                  this.frameHeight * scaleBy);
+}
+
 Animation.prototype.currentFrame = function () {
 	return Math.floor(this.elapsedTime / this.frameDuration);
 }
@@ -60,8 +91,11 @@ function distance(a, b) {
     return Math.sqrt(dx * dx + dy * dy);
 }
 
-function collide(ent, otherEnt) {
-    return distance(ent, otherEnt) < ent.radius + otherEnt.radius;
+function collide(ent, otherEnt) { 
+	if(ent && otherEnt) {
+		return distance(ent, otherEnt) < ent.radius + otherEnt.radius;
+	}	
+	return false;
 };
 
 function collideLeft(ent) {
@@ -140,17 +174,16 @@ Background.prototype.update = function () {
 Background.prototype.draw = function (ctx) {
 	ctx.drawImage(AM.getAsset("img/map.png"), 0, 0);
 	Entity.prototype.draw.call(this);
-}
-
+} 
 
 function Player(game) {
 	var spritesheet = AM.getAsset("img/space_traveler.png");
 	this.animation = new Animation(spritesheet,             0,	448,	64, 64, 0.1, 	8, true,	false,	0.75);
 	this.stillAnimation = new Animation(spritesheet,        0,	256,    64, 64, 0.1,	1, true,	false,	0.75);
-	this.upAnimation = new Animation(spritesheet,           0,	448,	64, 64, 0.1, 	8, true,	false,	0.75);
-	this.downAnimation = new Animation(spritesheet,         0,	256,    64, 64, 0.1, 	8, true,	false,	0.75);
-	this.rightAnimation = new Animation(spritesheet,        0,	384,    64, 64, 0.1, 	8, true,	false,	0.75);
-	this.leftAnimation = new Animation(spritesheet,         0,	320,    64, 64, 0.1, 	8, true,	false,	0.75);    
+	this.upAnimation = new Animation(spritesheet,           0,	448,	64, 64, 0.095, 	8, true,	false,	0.75);
+	this.downAnimation = new Animation(spritesheet,         0,	256,    64, 64, 0.095, 	8, true,	false,	0.75);
+	this.rightAnimation = new Animation(spritesheet,        0,	384,    64, 64, 0.095, 	8, true,	false,	0.75);
+	this.leftAnimation = new Animation(spritesheet,         0,	320,    64, 64, 0.095, 	8, true,	false,	0.75);    
 	this.attackAnimation = new Animation(spritesheet,       0,	0,		64, 64, 0.1, 	8, true,	false,	0.75);    
 	this.frontAttackAnimation = new Animation(spritesheet,  0,	0,		64, 64, 0.1, 	8, true,	false,	0.75);    
  	this.leftAttackAnimation = new Animation(spritesheet,   0,	0,		64, 64, 0.1, 	8, true,	false,	0.75);    
@@ -161,7 +194,7 @@ function Player(game) {
 
 	this.game = game;
 	this.ctx = game.ctx; 
-	Entity.call(this, game, width / 2, height / 2 ); 
+	Entity.call(this, game, (width / 2) - 25, (height / 2 ) + 25); 
 	this.radius = 24;   
 	this.x += this.radius;
 	this.y += this.radius;
@@ -392,7 +425,7 @@ Rummager.prototype.update = function () {
 	for (var i = 0; i < this.game.friendlyEntities.length; i++) {
         var ent = this.game.friendlyEntities[i];
         if (this != ent && collide(this, ent)) {
-	    	this.animation = this.downAttackAnimation; 
+	    	this.animation = this.upAnimation; 
         }  
     }
 
@@ -652,7 +685,6 @@ function SpaceShip(game) {
 	this.ctx = game.ctx; 
 	this.spritesheet = "img/spaceship.png";
 	this.size = 160;
-
  	this.image = new Animation(AM.getAsset(this.spritesheet), (this.game.level * this.size), 0, 160, 160, 0.1, 1, true, false, 1);  
  	this.radius = 77;
 	Entity.call(this, game, width / 2, height / 2);
@@ -661,7 +693,11 @@ function SpaceShip(game) {
 SpaceShip.prototype = new Entity();
 SpaceShip.prototype.constructor = SpaceShip;
 
-SpaceShip.prototype.update = function () {
+SpaceShip.prototype.update = function () {  
+	if(collide(this, this.game.click)) {
+		console.log("you clicked on the space ship");
+		this.game.click = null;
+	} 
 }
 
 SpaceShip.prototype.draw = function (ctx) {
@@ -674,6 +710,7 @@ var width = null;
 var AM = new AssetManager(); 
 
 AM.queueDownload("img/map.png");
+AM.queueDownload("img/day_night_shadow.png");
 AM.queueDownload("img/space_traveler.png");
 AM.queueDownload("img/scavenger.png");  
 AM.queueDownload("img/tree.png"); 
@@ -703,14 +740,14 @@ AM.downloadAll(function () {
 	var numBuildings = Math.floor(Math.random() * 6) + 10;
 
 	var player = new Player(gameEngine);
-	var map = new Background(gameEngine);
-	var scav = new Scavenger(gameEngine, player); 
-	var spaceship = new SpaceShip(gameEngine); 
-	var robot = new RobotTier1(gameEngine, spaceship); 
-	var rummager = new Rummager(gameEngine, robot);
-	var alien = new Alien(gameEngine, player);
+	var map = new Background(gameEngine); 
+	var spaceship = new SpaceShip(gameEngine);  
+
 
 	gameEngine.addEntity(map);  
+	gameEngine.addNpcEntity(spaceship, true);    
+	gameEngine.addNpcEntity(player, true);  
+ 	gameEngine.addNpcEntity(new Rummager(gameEngine), false);
 
 	treeEnts = [new Tree(gameEngine, 64, 64), new Tree(gameEngine, 222, 55), new Tree(gameEngine, 130, 85), 
 				new Tree(gameEngine, 305, 70), new Tree(gameEngine, 85, 160), new Tree(gameEngine, 155, 193), 
@@ -747,13 +784,7 @@ AM.downloadAll(function () {
 		gameEngine.addBuildingEntity(buildingEnts[i]);
 	}
 
+   
 
-	gameEngine.addNpcEntity(spaceship, true);   
-	gameEngine.addNpcEntity(scav, false);   
-	gameEngine.addNpcEntity(robot, true);       
-	gameEngine.addNpcEntity(alien, false);       
-	gameEngine.addNpcEntity(rummager, false);      
-	gameEngine.addNpcEntity(player, true);  
- 
 	console.log("All Done!");
 });
