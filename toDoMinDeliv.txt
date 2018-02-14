@@ -1,22 +1,14 @@
 To-Do:
 	fix alien side view (Amanda)
-	rummager animations (Taylor)
-	bullet entity (Taylor)
-	sprite for space ship (Taylor)
+	rummager animations (Taylor) 
 
 	fix controls (Amanda)
 		mouse input for robot menus 
 
-	collision detection (Taylor)
-
 	webpage (Zira)
 		display controls
-
-	game title on page (Taylor)
 	
-	code cleanup (Taylor)
-		make page scrollable
-		fix animation completes on button clicked
+    fix animation completes on button clicked (taylor)
 	
 	resource management (Amanda)
 		counters

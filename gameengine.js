@@ -28,8 +28,12 @@ function GameEngine() {
     this.environmentEntities = [];
     this.npcEntities = [];
     this.friendlyEntities = [];
+    this.treeEntities = [];
+    this.bushEntities = [];
+    this.buildingEntities = [];
     this.hostileEntities = [];
     this.ctx = null;
+    this.level = null;
     this.width = null;
     this.height = null;
     this.click = null;
@@ -39,12 +43,15 @@ function GameEngine() {
         up: false,
         down: false,
         left: false,
-        right: false
+        right: false,
+        attack: false,
+        program: false
     };
 }
 
 GameEngine.prototype.init = function (ctx) {
     this.ctx = ctx;
+    this.level = 2; // change this to "upgrade" the spaceship (0 to 4)
     this.width = this.ctx.canvas.width;
     this.height = this.ctx.canvas.height;
     this.keyListener();
@@ -103,6 +110,26 @@ GameEngine.prototype.addNpcEntity = function(entity, friendly) {
     }
 }
 
+GameEngine.prototype.addTreeEntity = function(entity) {
+    console.log('added tree entity');
+    this.entities.push(entity);
+    this.treeEntities.push(entity);
+    this.environmentEntities.push(entity);
+}   
+
+GameEngine.prototype.addBushEntity = function(entity) {
+    console.log('added bush entity');
+    this.entities.push(entity);
+    this.bushEntities.push(entity);
+    this.environmentEntities.push(entity);
+}   
+
+GameEngine.prototype.addBuildingEntity = function(entity) {
+    console.log('added building entity');
+    this.entities.push(entity);
+    this.buildingEntities.push(entity);
+    this.environmentEntities.push(entity);
+} 
 
 GameEngine.prototype.addEnvironmentEntity = function(entity) {
     console.log('added an environment entity');    
@@ -142,52 +169,8 @@ GameEngine.prototype.loop = function () {
     this.clockTick = this.timer.tick();
     this.update();
     this.draw(); 
-}
-
-/**
-	Moves the given entity to the target. 
-	The target and the entity must have a x and y coordinates. 
-**/
-GameEngine.prototype.moveTo = function(entity, target) {
- 	var dx = target.x - entity.x;
-	var dy = target.y - entity.y; 
-	var distance = Math.sqrt(dx * dx + dy * dy);
-	 
-	if(distance) {  
-		dx /= distance;
-		dy /= distance;
-	} 
-	entity.dx = dx;
-	entity.dy = dy; 
-	entity.distance = distance;  
-}
-
-/**
-    Gives a x and y value to a given entity for generating the forest.
-**/
-GameEngine.prototype.forestGen = function(entity) {
-    var x = Math.floor(Math.random() * 300) - 64;
-    var y = Math.floor(Math.random() * 640) - 64;
-    entity.x = x;
-    entity.y = y;
-    if(Math.random() >= 0.5) {   
-       entity.spritesheet = "img/tree.png"; 
-    } else {
-        entity.spritesheet = "img/bush.png"; 
-    }
-}
-
-/**
-    Gives a x and y value to a given entity for generating the city.
-**/
-GameEngine.prototype.cityGen = function(entity) {
-    var x = Math.floor(Math.random() * 240) + 1040;
-    var y = Math.floor(Math.random() * 640) - 64;
-    entity.x = x;
-    entity.y = y;
-    entity.spritesheet = "img/building" + (Math.floor(Math.random() * 3) + 1) + ".png";
-}
-
+} 
+ 
 /** Timer **/
 function Timer() {
     this.gameTime = 0;
