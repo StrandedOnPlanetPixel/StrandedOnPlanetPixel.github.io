@@ -38,7 +38,7 @@ function GameEngine() {
     this.height = null;
     this.click = null;
     this.mouse = null;
-    this.showOutlines = true;
+    this.showOutlines = false;
     this.keys = {
         up: false,
         down: false,

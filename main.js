@@ -764,6 +764,7 @@ AM.downloadAll(function () {
 function setupSound() {
 	backgroundSong.src = "audio/Module2Wav.wav";
 	backgroundSong.loop = "true";
+	backgroundSong.play();
 	var audioToggle = document.getElementById("audioToggle").addEventListener("click", toggleSound); 
 }
 
