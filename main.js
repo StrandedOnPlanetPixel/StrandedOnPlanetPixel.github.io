@@ -671,7 +671,6 @@ SpaceShip.prototype.draw = function (ctx) {
 
 var height = null;
 var width = null;
-var backgroundSong = document.createElement("audio");
 
 var AM = new AssetManager(); 
 
@@ -758,24 +757,7 @@ AM.downloadAll(function () {
 	gameEngine.addNpcEntity(rummager, false);      
 	gameEngine.addNpcEntity(player, true);  
 
-	//setupSound();
 	soundManager.setupBackgroundMusic();
+	//soundManager.audioToggle = document.getElementById("audioToggle").addEventListener("click", soundManager.toggleBackgroundMusic); 
 	console.log("All Done!");
 });
-
-function setupSound() {
-	backgroundSong.src = "audio/Module2.mp3";
-	backgroundSong.loop = "true";
-	backgroundSong.play();
-	var audioToggle = document.getElementById("audioToggle").addEventListener("click", toggleSound); 
-}
-
-function toggleSound() {
-	if(backgroundSong.paused) {
-		console.log("playing sound");
-		backgroundSong.play();			
-	} else {
-		console.log("paused sound");
-		backgroundSong.pause();
-	}
-}
