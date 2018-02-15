@@ -754,6 +754,11 @@ AM.downloadAll(function () {
 	gameEngine.addNpcEntity(alien, false);       
 	gameEngine.addNpcEntity(rummager, false);      
 	gameEngine.addNpcEntity(player, true);  
+
+	var backgroundSong = document.createElement("audio");
+	backgroundSong.src = "audio/Module2Wav.wav";
+	backgroundSong.loop = "true";
+	backgroundSong.play();
  
 	console.log("All Done!");
 });
