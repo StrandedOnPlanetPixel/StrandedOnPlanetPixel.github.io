@@ -429,7 +429,7 @@ Rummager.prototype.draw = function () {
 		this.rightAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);
 	} else {
 		this.upAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);  
-	}
+
 	Entity.prototype.draw.call(this); 
 }
 
