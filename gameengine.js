@@ -69,6 +69,12 @@ GameEngine.prototype.start = function () {
 }
 
 GameEngine.prototype.keyListener = function() {
+    var getXandY = function(e) {
+        var x = e.clientX - that.ctx.canvas.getBoundingClientRect().left;
+        var y = e.clientY - that.ctx.canvas.getBoundingClientRect().top;
+        return {x: x, y: y, radius: 16};
+    }
+
     var that = this;
     this.ctx.canvas.addEventListener("keydown", function(e) {
         var keyPressed = String.fromCharCode(e.which); 
@@ -91,6 +97,15 @@ GameEngine.prototype.keyListener = function() {
         if(keyReleased === 'Q') that.keys.program = false; 
         e.preventDefault(); 
     }, false);  
+
+    this.ctx.canvas.addEventListener("click", function (e) {
+        that.click = getXandY(e);  
+    }, false);
+
+    this.ctx.canvas.addEventListener("mousemove", function (e) {
+        that.mouse = getXandY(e);  
+    }, false);
+
 
 }
  

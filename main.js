@@ -61,7 +61,10 @@ function distance(a, b) {
 }
 
 function collide(ent, otherEnt) {
-    return distance(ent, otherEnt) < ent.radius + otherEnt.radius;
+	if(ent && otherEnt) {
+    	return distance(ent, otherEnt) < ent.radius + otherEnt.radius;
+	} 
+	return false;
 };
 
 function collideLeft(ent) {
@@ -662,6 +665,10 @@ SpaceShip.prototype = new Entity();
 SpaceShip.prototype.constructor = SpaceShip;
 
 SpaceShip.prototype.update = function () {
+	if(collide(this, this.game.click)){
+		console.log("you clicked on the SpaceShip");
+		this.game.click = null;
+	}
 }
 
 SpaceShip.prototype.draw = function (ctx) {
