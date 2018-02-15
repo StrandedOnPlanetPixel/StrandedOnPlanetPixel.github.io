@@ -91,10 +91,17 @@ function distance(a, b) {
     return Math.sqrt(dx * dx + dy * dy);
 }
 
+<<<<<<< HEAD
 function collide(ent, otherEnt) { 
 	if(ent && otherEnt) {
 		return distance(ent, otherEnt) < ent.radius + otherEnt.radius;
 	}	
+=======
+function collide(ent, otherEnt) {
+	if(ent && otherEnt) {
+    	return distance(ent, otherEnt) < ent.radius + otherEnt.radius;
+	} 
+>>>>>>> master
 	return false;
 };
 
@@ -123,7 +130,7 @@ function moveEntityToTarget(ent, target) {
 		dx /= distance;
 		dy /= distance;
 	}   
- 	if(dx === dy) { 
+ 	if(Math.abs(dx) > Math.abs(dy)) { 
 		if(dx < 0) {
 			ent.dir = "left";
 			ent.animation = ent.leftAnimation;
@@ -144,7 +151,30 @@ function moveEntityToTarget(ent, target) {
 	ent.y += dy * ent.game.clockTick * ent.speed;
 }
 
-function attack(ent) {
+function attack(ent, target) {
+	var dx = target.x - ent.x;
+	var dy = target.y - ent.y; 
+	var distance = Math.sqrt(dx * dx + dy * dy);
+	 
+	if(distance) {  
+		dx /= distance;
+		dy /= distance;
+	} 
+
+	if(Math.abs(dx) > Math.abs(dy)) { 
+		if(dx < 0) {
+			ent.animation = ent.leftAttackAnimation;
+		} else {
+			ent.animation = ent.rightAttackAnimation;
+		} 
+	} else {	 
+		if(dx < 0 || dy > 0) {			
+			ent.animation = ent.downAttackAnimation;
+		} else {				
+			ent.animation = ent.upAttackAnimation;
+		}
+ 	} 
+ 	/**
 	if(this.dx === this.dy) { 
 		if(this.dx < 0) {
 			this.animation = this.leftAttackAnimation;
@@ -157,7 +187,7 @@ function attack(ent) {
 		} else {				
 			this.animation = this.upAttackAnimation;
 		}
- 	}  
+ 	} */ 
 }
 
 // no inheritance
@@ -194,7 +224,11 @@ function Player(game) {
 
 	this.game = game;
 	this.ctx = game.ctx; 
+<<<<<<< HEAD
 	Entity.call(this, game, (width / 2) - 25, (height / 2 ) + 25); 
+=======
+	Entity.call(this, game, (width / 2) - 25, (height / 2) + 25); 
+>>>>>>> master
 	this.radius = 24;   
 	this.x += this.radius;
 	this.y += this.radius;
@@ -310,7 +344,7 @@ Alien.prototype.update = function () {
     }
 
 	if(collide(this, closestEnt)) {
- 		attack(this);
+ 		attack(this, closestEnt);
 	} else {
 	  	moveEntityToTarget(this, closestEnt);
 	} 
@@ -379,7 +413,7 @@ Scavenger.prototype.update = function () {
     }
 
 	if(collide(this, closestEnt)) {
- 		attack(this); 
+ 		attack(this,closestEnt); 
 	} else {
 		moveEntityToTarget(this, closestEnt);
 	} 
@@ -398,6 +432,12 @@ function Rummager(game, enemy) {
 	this.upAnimation = new Animation(spritesheet,		0,    128,   64, 64, 0.1, 8, true,  false, 	0.75);
 	this.downAnimation = new Animation(spritesheet,		0,    192,   64, 64, 0.1, 8, true,  false,	0.75);    
 	
+	this.leftAttackAnimation = new Animation(spritesheet,		0,    0,     64, 64, 0.1, 8, true,  false,  0.75);
+	this.rightAttackAnimation = new Animation(spritesheet,	0,    64,    64, 64, 0.1, 8, true,  false,  0.75);
+	this.upAttackAnimation = new Animation(spritesheet,		0,    128,   64, 64, 0.1, 8, true,  false, 	0.75);
+	this.downAttackAnimation = new Animation(spritesheet,		0,    192,   64, 64, 0.1, 8, true,  false,	0.75);    
+	this.animation = this.upAnimation;
+
 	this.game = game;
 	this.ctx = game.ctx;  
 	Entity.call(this, game, Math.random() * width, height);
@@ -425,7 +465,13 @@ Rummager.prototype.update = function () {
 	for (var i = 0; i < this.game.friendlyEntities.length; i++) {
         var ent = this.game.friendlyEntities[i];
         if (this != ent && collide(this, ent)) {
+<<<<<<< HEAD
 	    	this.animation = this.upAnimation; 
+=======
+	    	
+        	// TODO
+	    	//this.animation = this.downAttackAnimation; 
+>>>>>>> master
         }  
     }
 
@@ -441,9 +487,10 @@ Rummager.prototype.update = function () {
     }
 
 	if(collide(this, {x: closestEnt.x, y: closestEnt.y, radius: this.visualRadius})) {
- 		this.animation = this.shootAnimation;
+ 		//this.animation = this.shootAnimation;
  		if(!this.lastBulletTime || (this.lastBulletTime < this.game.timer.gameTime - 1.5)) {
  			//record last shot time and create the bullet.
+ 			attack(this, closestEnt);
  			this.game.addEntity(new Bullet(this.game, this, closestEnt));
 	 		this.lastBulletTime = this.game.timer.gameTime; 
 	 	}
@@ -454,15 +501,8 @@ Rummager.prototype.update = function () {
 } 
 
 Rummager.prototype.draw = function () { 
-    if (this.down) {
-		this.downAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);
-	} else if (this.left) {
-		this.leftAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);
-	} else if (this.right) {
-		this.rightAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);
-	} else {
-		this.upAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);  
-	}
+    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);  
+	
 	Entity.prototype.draw.call(this); 
 }
 
@@ -693,11 +733,19 @@ function SpaceShip(game) {
 SpaceShip.prototype = new Entity();
 SpaceShip.prototype.constructor = SpaceShip;
 
+<<<<<<< HEAD
 SpaceShip.prototype.update = function () {  
 	if(collide(this, this.game.click)) {
 		console.log("you clicked on the space ship");
 		this.game.click = null;
 	} 
+=======
+SpaceShip.prototype.update = function () {
+	if(collide(this, this.game.click)){
+		console.log("you clicked on the SpaceShip");
+		this.game.click = null;
+	}
+>>>>>>> master
 }
 
 SpaceShip.prototype.draw = function (ctx) {
@@ -707,6 +755,7 @@ SpaceShip.prototype.draw = function (ctx) {
 
 var height = null;
 var width = null;
+
 var AM = new AssetManager(); 
 
 AM.queueDownload("img/map.png");
@@ -732,6 +781,7 @@ AM.downloadAll(function () {
 	width = canvas.width;
 
 	var gameEngine = new GameEngine(); 
+	var soundManager = new SoundManager();
 
 	gameEngine.init(ctx);
 	gameEngine.start()
@@ -786,5 +836,17 @@ AM.downloadAll(function () {
 
    
 
+<<<<<<< HEAD
+=======
+	gameEngine.addNpcEntity(spaceship, true);   
+	gameEngine.addNpcEntity(scav, false);   
+	gameEngine.addNpcEntity(robot, true);       
+	gameEngine.addNpcEntity(alien, false);       
+	gameEngine.addNpcEntity(rummager, false);      
+	gameEngine.addNpcEntity(player, true);  
+
+	soundManager.setupBackgroundMusic();
+	//soundManager.audioToggle = document.getElementById("audioToggle").addEventListener("click", soundManager.toggleBackgroundMusic); 
+>>>>>>> master
 	console.log("All Done!");
 });

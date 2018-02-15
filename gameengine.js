@@ -26,8 +26,14 @@ function GameEngine() {
     this.dayLength = null;
     this.width = null;
     this.height = null;
+<<<<<<< HEAD
     this.click = {x: 0, y: 0,radius: 0};
     this.mouse = {x: 0, y: 0,radius: 0};
+=======
+    this.click = null;
+    this.mouse = null;
+    this.showOutlines = false;
+>>>>>>> master
     this.keys = {
         up: false,
         down: false,
@@ -58,10 +64,16 @@ GameEngine.prototype.start = function () {
 }
 
 GameEngine.prototype.keyListener = function() {
+<<<<<<< HEAD
     var getXandY = function (e) {
         var x = e.clientX - that.ctx.canvas.getBoundingClientRect().left;
         var y = e.clientY - that.ctx.canvas.getBoundingClientRect().top;
          
+=======
+    var getXandY = function(e) {
+        var x = e.clientX - that.ctx.canvas.getBoundingClientRect().left;
+        var y = e.clientY - that.ctx.canvas.getBoundingClientRect().top;
+>>>>>>> master
         return {x: x, y: y, radius: 16};
     }
 
@@ -96,6 +108,10 @@ GameEngine.prototype.keyListener = function() {
         that.mouse = getXandY(e);  
     }, false);
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
 }
  
 GameEngine.prototype.addEntity = function(entity) {
@@ -169,7 +185,12 @@ GameEngine.prototype.update = function () {
 }
 
 GameEngine.prototype.loop = function () {
+<<<<<<< HEAD
     this.clockTick = this.timer.tick(); 
+=======
+    this.clockTick = this.timer.tick();
+    this.timeOfDay += this.clockTick;
+>>>>>>> master
     this.update();
     this.draw(); 
 } 

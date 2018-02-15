@@ -1,5 +1,7 @@
 To-Do:
 	fix alien side view (Amanda)
+		alien attack animation
+		
 	rummager animations (Taylor) 
 
 	fix controls (Amanda)
@@ -8,13 +10,17 @@ To-Do:
 	webpage (Zira)
 		display controls
 	
-    fix animation completes on button clicked (taylor)
+    fix animation completes on button clicked (Taylor)
+
+    start screen (Taylor)
+		so user clicks canvas
+		controls
 	
 	resource management (Amanda)
 		counters
 		cap on resources
 
-	display resources (Zira)
+	display resources (Taylor)
 		element above canvas
 		placeholder images
 		player health
@@ -34,15 +40,30 @@ To-Do:
 	levels (Zira)
 		this will be the bonus material needed
 	
-	start screen (Zira)
-		so user clicks canvas
-		controls
-	
 	audio (Zira)
+		sound manager
 		music
 		sound effects
+			Rummager shoot
+			Rummage death 
+			Scavenger attack (trash compactor, garbage truck)
+			Scavenger death (explosion)
+			Alien lightening bolt
+			Alien death (sploosh)
+			Player hit
+			Player attack
+			Robot hit
+			Robot power down
+			Space ship hit
 
+
+<<<<<<< HEAD
 	day/night cycle (Taylor) 
+=======
+	day/night cycle (Taylor)
+		day/night as entity
+		adjusting view
+>>>>>>> master
 		adjusting charge levels
 		baddies come out at night
 		only certain enemies come out at night (random?)
