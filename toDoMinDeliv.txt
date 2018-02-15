@@ -43,6 +43,7 @@ To-Do:
 		sound effects
 
 	day/night cycle (Taylor)
+		day/night as entity
 		adjusting view
 		adjusting charge levels
 		baddies come out at night

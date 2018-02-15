@@ -182,6 +182,7 @@ GameEngine.prototype.update = function () {
 
 GameEngine.prototype.loop = function () {
     this.clockTick = this.timer.tick();
+    this.timeOfDay += this.clockTick;
     this.update();
     this.draw(); 
 } 
