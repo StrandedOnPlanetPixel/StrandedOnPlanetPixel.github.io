@@ -1,0 +1,81 @@
+*, html {
+	color: white;
+	font-family: 'Orbitron', sans-serif;
+ }
+
+body { 
+	background: #383838;
+	padding: 25px;  
+	margin: 0; 
+	text-align:center;  
+}
+
+canvas {
+	border: 1px solid black;
+	background: #DDDDDD;
+}
+
+div {
+	display: block;
+    height: auto;
+}
+
+#audioToggle {
+	text-align: right;
+	padding-left: 
+}
+
+#gameHolder { 
+	text-align: center;
+	min-width: 1280px;
+	max-width: 1280px;
+	margin: auto; 
+}
+
+#resourceBar {
+	border: 1px solid black;
+	text-align: right; 
+	display: block;
+	height: 64px;
+	padding-left: 16px;
+	padding-right: 16px;
+	background: url("img/resourceBar.png");
+}
+
+#resourceBar img {
+	height: 32px;
+	width: 32px;   
+}
+
+#audioToggle {
+	padding-right: 10px;
+}
+
+#resourceBar p { 
+    margin: auto;  
+}
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; 
+}
+
+.resources {
+	padding-right: 16px;
+    float: left;
+    margin: 0 auto;
+}
+
+.soundControls {
+	padding-left: 16px;
+    float: right;
+    margin: 0 auto;
+}
+
+.soundControls img { 
+ 	cursor: pointer;
+}
+
+

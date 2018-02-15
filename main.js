@@ -89,19 +89,12 @@ function distance(a, b) {
     var dx = a.x - b.x;
     var dy = a.y - b.y;
     return Math.sqrt(dx * dx + dy * dy);
-}
-
-<<<<<<< HEAD
+};
+ 
 function collide(ent, otherEnt) { 
 	if(ent && otherEnt) {
 		return distance(ent, otherEnt) < ent.radius + otherEnt.radius;
-	}	
-=======
-function collide(ent, otherEnt) {
-	if(ent && otherEnt) {
-    	return distance(ent, otherEnt) < ent.radius + otherEnt.radius;
-	} 
->>>>>>> master
+	}	 
 	return false;
 };
 
@@ -173,21 +166,7 @@ function attack(ent, target) {
 		} else {				
 			ent.animation = ent.upAttackAnimation;
 		}
- 	} 
- 	/**
-	if(this.dx === this.dy) { 
-		if(this.dx < 0) {
-			this.animation = this.leftAttackAnimation;
-		} else {
-			this.animation = this.rightAttackAnimation;
-		} 
-	} else {	 
-		if(this.dx < 0 || this.dy > 0) {
-			this.animation = this.downAttackAnimation;
-		} else {				
-			this.animation = this.upAttackAnimation;
-		}
- 	} */ 
+ 	}  
 }
 
 // no inheritance
@@ -223,12 +202,8 @@ function Player(game) {
 	this.deadAnimation = new Animation(spritesheet,        448,	128,	64, 64, 0.1,	1, true,	false,	0.75);  
 
 	this.game = game;
-	this.ctx = game.ctx; 
-<<<<<<< HEAD
-	Entity.call(this, game, (width / 2) - 25, (height / 2 ) + 25); 
-=======
-	Entity.call(this, game, (width / 2) - 25, (height / 2) + 25); 
->>>>>>> master
+	this.ctx = game.ctx;  
+	Entity.call(this, game, (width / 2) - 25, (height / 2 ) + 25);  
 	this.radius = 24;   
 	this.x += this.radius;
 	this.y += this.radius;
@@ -274,9 +249,15 @@ Player.prototype.update = function () {
 		if(this.game.keys.program) {
  	 		this.animation = this.programAnimation;
 		}  
-		if(this.game.keys.attack) { 
-	 		this.animation = this.attackAnimation;
-		}
+		if(this.game.keys.attack) {
+ 			this.animation = this.attackAnimation;
+			for (var i = 0; i < this.game.hostileEntities.length; i++) {
+		        var ent = this.game.hostileEntities[i];
+		        if (this != ent && collide(this, ent) && this.game.keys.attack) {
+ 		 			ent.lives--;
+		        }  
+		    } 
+		}	
 	} else {
  		this.animation = this.deadAnimation;
 	} 
@@ -315,39 +296,47 @@ Alien.prototype = new Entity();
 Alien.prototype.constructor = Alien;
 
 Alien.prototype.update = function () {
-	if (collideLeft(this) || collideRight(this)) { 
-        if (collideLeft(this)) this.x = this.radius;
-        if (collideRight(this)) this.x = width - this.radius; 
-    }
+	if(this.dead) {
+		this.removeFromWorld = true;
+	} if(this.lives < 0) {
+		//dead
+		this.animation = this.dyingAnimation;
+		this.dead = true;
+ 	} else {
+ 		if (collideLeft(this) || collideRight(this)) { 
+	        if (collideLeft(this)) this.x = this.radius;
+	        if (collideRight(this)) this.x = width - this.radius; 
+	    }
 
-    if (collideTop(this) || collideBottom(this)) {
-        if (collideTop(this)) this.y = this.radius;
-        if (collideBottom(this)) this.y = height - this.radius; 
-    }
+	    if (collideTop(this) || collideBottom(this)) {
+	        if (collideTop(this)) this.y = this.radius;
+	        if (collideBottom(this)) this.y = height - this.radius; 
+	    }
 
-	for (var i = 0; i < this.game.friendlyEntities.length; i++) {
-        var ent = this.game.friendlyEntities[i];
-        if (this != ent && collide(this, ent)) {
-	    	this.animation = this.downAttackAnimation;
-        }  
-    }
+		for (var i = 0; i < this.game.friendlyEntities.length; i++) {
+	        var ent = this.game.friendlyEntities[i];
+	        if (this != ent && collide(this, ent)) {
+		    	this.animation = this.downAttackAnimation;
+	        }  
+	    }
 
-    var closestEnt = this.game.friendlyEntities[0];
-    for (var i = 0; i < this.game.friendlyEntities.length; i++) {
-       	var ent = this.game.friendlyEntities[i];
-        if (ent != this && collide(this, { x: ent.x, y: ent.y, radius: this.visualRadius })) {
-			var dist = distance(this, ent); 
-			if(dist < distance(this, closestEnt)) {
-				closestEnt = ent;
-			}
-        }  
-    }
+	    var closestEnt = this.game.friendlyEntities[0];
+	    for (var i = 0; i < this.game.friendlyEntities.length; i++) {
+	       	var ent = this.game.friendlyEntities[i];
+	        if (ent != this && collide(this, { x: ent.x, y: ent.y, radius: this.visualRadius })) {
+				var dist = distance(this, ent); 
+				if(dist < distance(this, closestEnt)) {
+					closestEnt = ent;
+				}
+	        }  
+	    }
 
-	if(collide(this, closestEnt)) {
- 		attack(this, closestEnt);
-	} else {
-	  	moveEntityToTarget(this, closestEnt);
-	} 
+		if(collide(this, closestEnt)) {
+	 		attack(this, closestEnt);
+		} else {
+		  	moveEntityToTarget(this, closestEnt);
+		} 
+	}
 	Entity.prototype.update.call(this);  
 } 
 
@@ -377,6 +366,7 @@ function Scavenger(game, enemy) {
 	this.lives = 200;
 	this.speed = 50;
 	this.visualRadius = 200;
+	this.dead = false;
 	Entity.call(this, game, Math.floor((Math.random() * this.game.width ) + 1), this.game.height);
 }
 
@@ -384,39 +374,47 @@ Scavenger.prototype = new Entity();
 Scavenger.prototype.constructor = Scavenger;
 
 Scavenger.prototype.update = function () {
-	if (collideLeft(this) || collideRight(this)) { 
-        if (collideLeft(this)) this.x = this.radius;
-        if (collideRight(this)) this.x = width - this.radius; 
-    }
+	if(this.dead) {
+		this.removeFromWorld = true;
+	} if(this.lives < 0) {
+		//dead
+		this.animation = this.dyingAnimation;
+		this.dead = true;
+ 	} else {
+		if (collideLeft(this) || collideRight(this)) { 
+	        if (collideLeft(this)) this.x = this.radius;
+	        if (collideRight(this)) this.x = width - this.radius; 
+	    }
 
-    if (collideTop(this) || collideBottom(this)) {
-        if (collideTop(this)) this.y = this.radius;
-        if (collideBottom(this)) this.y = height - this.radius; 
-    }
+	    if (collideTop(this) || collideBottom(this)) {
+	        if (collideTop(this)) this.y = this.radius;
+	        if (collideBottom(this)) this.y = height - this.radius; 
+	    }
 
-	for (var i = 0; i < this.game.friendlyEntities.length; i++) {
-        var ent = this.game.friendlyEntities[i];
-        if (this != ent && collide(this, ent)) {
-	    	this.animation = this.downAttackAnimation;
-        }  
-    }
+		for (var i = 0; i < this.game.friendlyEntities.length; i++) {
+	        var ent = this.game.friendlyEntities[i];
+	        if (this != ent && collide(this, ent)) {
+		    	this.animation = this.downAttackAnimation;
+	        }  
+	    }
 
-    var closestEnt = this.game.friendlyEntities[0];
-    for (var i = 0; i < this.game.friendlyEntities.length; i++) {
-       	var ent = this.game.friendlyEntities[i];
-        if (ent != this && collide(this, { x: ent.x, y: ent.y, radius: this.visualRadius })) {
-			var dist = distance(this, ent); 
-			if(dist < distance(this, closestEnt)) {
-				closestEnt = ent;
-			}
-        }  
-    }
+	    var closestEnt = this.game.friendlyEntities[0];
+	    for (var i = 0; i < this.game.friendlyEntities.length; i++) {
+	       	var ent = this.game.friendlyEntities[i];
+	        if (ent != this && collide(this, { x: ent.x, y: ent.y, radius: this.visualRadius })) {
+				var dist = distance(this, ent); 
+				if(dist < distance(this, closestEnt)) {
+					closestEnt = ent;
+				}
+	        }  
+	    }
 
-	if(collide(this, closestEnt)) {
- 		attack(this,closestEnt); 
-	} else {
-		moveEntityToTarget(this, closestEnt);
-	} 
+		if(collide(this, closestEnt)) {
+	 		attack(this,closestEnt); 
+		} else {
+			moveEntityToTarget(this, closestEnt);
+		} 
+	}
 	Entity.prototype.update.call(this);  
 } 
 
@@ -452,57 +450,56 @@ Rummager.prototype = new Entity();
 Rummager.prototype.constructor = Rummager;
 
 Rummager.prototype.update = function () {
-	if (collideLeft(this) || collideRight(this)) { 
-        if (collideLeft(this)) this.x = this.radius;
-        if (collideRight(this)) this.x = width - this.radius; 
-    }
-
-    if (collideTop(this) || collideBottom(this)) {
-        if (collideTop(this)) this.y = this.radius;
-        if (collideBottom(this)) this.y = height - this.radius; 
-    }
-
-	for (var i = 0; i < this.game.friendlyEntities.length; i++) {
-        var ent = this.game.friendlyEntities[i];
-        if (this != ent && collide(this, ent)) {
-<<<<<<< HEAD
-	    	this.animation = this.upAnimation; 
-=======
-	    	
-        	// TODO
-	    	//this.animation = this.downAttackAnimation; 
->>>>>>> master
-        }  
-    }
-
-    var closestEnt = this.game.friendlyEntities[0];
-    for (var i = 0; i < this.game.friendlyEntities.length; i++) {
-       	var ent = this.game.friendlyEntities[i];
-        if (ent != this && collide(this, { x: ent.x, y: ent.y, radius: this.visualRadius })) {
-			var dist = distance(this, ent); 
-			if(dist < distance(this, closestEnt)) {
-				closestEnt = ent;
-			}
-        }  
-    }
-
-	if(collide(this, {x: closestEnt.x, y: closestEnt.y, radius: this.visualRadius})) {
- 		//this.animation = this.shootAnimation;
- 		if(!this.lastBulletTime || (this.lastBulletTime < this.game.timer.gameTime - 1.5)) {
- 			//record last shot time and create the bullet.
- 			attack(this, closestEnt);
- 			this.game.addEntity(new Bullet(this.game, this, closestEnt));
-	 		this.lastBulletTime = this.game.timer.gameTime; 
-	 	}
+	if(this.lives < 0) {
+		//dead
+		this.removeFromWorld = true;
 	} else {
-		moveEntityToTarget(this, closestEnt);
-	} 
+		if (collideLeft(this) || collideRight(this)) { 
+	        if (collideLeft(this)) this.x = this.radius;
+	        if (collideRight(this)) this.x = width - this.radius; 
+	    }
+
+	    if (collideTop(this) || collideBottom(this)) {
+	        if (collideTop(this)) this.y = this.radius;
+	        if (collideBottom(this)) this.y = height - this.radius; 
+	    }
+
+		for (var i = 0; i < this.game.friendlyEntities.length; i++) {
+	        var ent = this.game.friendlyEntities[i];
+	        if (this != ent && collide(this, ent)) {
+	        	// TODO
+	 
+	        }  
+	    }
+
+	    var closestEnt = this.game.friendlyEntities[0];
+	    for (var i = 0; i < this.game.friendlyEntities.length; i++) {
+	       	var ent = this.game.friendlyEntities[i];
+	        if (ent != this && collide(this, { x: ent.x, y: ent.y, radius: this.visualRadius })) {
+				var dist = distance(this, ent); 
+				if(dist < distance(this, closestEnt)) {
+					closestEnt = ent;
+				}
+	        }  
+	    }
+
+		if(collide(this, {x: closestEnt.x, y: closestEnt.y, radius: this.visualRadius})) {
+	 		//this.animation = this.shootAnimation;
+	 		if(!this.lastBulletTime || (this.lastBulletTime < this.game.timer.gameTime - 1.5)) {
+	 			//record last shot time and create the bullet.
+	 			attack(this, closestEnt);
+	 			this.game.addEntity(new Bullet(this.game, this, closestEnt));
+		 		this.lastBulletTime = this.game.timer.gameTime; 
+		 	}
+		} else {
+			moveEntityToTarget(this, closestEnt);
+		} 
+	}
 	Entity.prototype.update.call(this);  
 } 
 
 Rummager.prototype.draw = function () { 
     this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);  
-	
 	Entity.prototype.draw.call(this); 
 }
 
@@ -538,7 +535,7 @@ Bullet.prototype.update = function() {
     for (var i = 0; i < this.game.friendlyEntities.length; i++) {
         var ent = this.game.friendlyEntities[i];
         if (this != ent && collide(this, ent)) {
- 	    	ent.lives -= 5;
+ 	    	ent.lives --;
      	    this.removeFromWorld = true;
         }  
     } 
@@ -732,20 +729,12 @@ function SpaceShip(game) {
 
 SpaceShip.prototype = new Entity();
 SpaceShip.prototype.constructor = SpaceShip;
-
-<<<<<<< HEAD
+ 
 SpaceShip.prototype.update = function () {  
 	if(collide(this, this.game.click)) {
 		console.log("you clicked on the space ship");
 		this.game.click = null;
-	} 
-=======
-SpaceShip.prototype.update = function () {
-	if(collide(this, this.game.click)){
-		console.log("you clicked on the SpaceShip");
-		this.game.click = null;
-	}
->>>>>>> master
+	}  
 }
 
 SpaceShip.prototype.draw = function (ctx) {
@@ -753,13 +742,79 @@ SpaceShip.prototype.draw = function (ctx) {
 	Entity.prototype.draw.call(this);
 }
 
+function Day(game) {
+	this.game = game;   
+	this.ctx = game.ctx;  
+	//function Animation(spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, reverse, scale) {
+   	this.duskImage = "img/dusk.png";  
+ 	this.eveningImage = "img/evening.png";  
+ 	this.midnightImage = "img/evening.png";
+ 	this.image = null;
+ 
+ 	this.elapsedTime = 0;
+ 	this.dayLength = 200; 
+ 	this.day = true;
+	this.lastSpawnTime = 0;
+	this.spawnRate = ((4 - this.game.level + 0.5)) * 10;
+	console.log(this.spawnRate);
+ 	Entity.call(this, game, 0, 0);
+ }
+
+Day.prototype = new Entity();
+Day.prototype.constructor = Day;
+ 
+Day.prototype.update = function () {  
+
+    this.elapsedTime += this.game.clockTick;
+ 
+    if(this.elapsedTime > this.dayLength) {
+		// nighttime has ended and now it is day
+ 		this.elapsedTime = 0;
+		this.image = null;
+		this.day = true;
+		console.log("day");
+ 	} else if(this.elapsedTime > (this.dayLength * 0.80)) {
+		this.image = this.midnightImage;
+ 	} else if(this.elapsedTime > (this.dayLength * 0.70)) {
+ 		this.image = this.eveningImage;	
+ 	} else if(this.elapsedTime > (this.dayLength * 0.60)) {
+ 		this.image = this.duskImage;	
+ 		this.day = false;
+ 	}  
+
+ 	if(!this.day) {	  
+ 		if(this.elapsedTime > (this.lastSpawnTime + this.spawnRate)) { 
+ 			this.lastSpawnTime = this.elapsedTime;
+		    var spawnType = Math.floor(Math.random() * Math.floor(3));
+	 		if(spawnType === 0) {
+	 		 	this.game.addNpcEntity(new Rummager(this.game), false);
+	 		} else if(spawnType === 1) {
+	 		 	this.game.addNpcEntity(new Alien(this.game), false);
+	 		} else if(spawnType === 2) {
+	 		 	this.game.addNpcEntity(new Scavenger(this.game), false);
+	 		} 
+
+	  	} 
+ 	} 
+}
+
+Day.prototype.draw = function (ctx) { 
+	if(this.image) {
+		ctx.drawImage(AM.getAsset(this.image), 0, 0);
+	}
+ 	Entity.prototype.draw.call(this);
+} 
+
+
 var height = null;
 var width = null;
 
 var AM = new AssetManager(); 
 
 AM.queueDownload("img/map.png");
-AM.queueDownload("img/day_night_shadow.png");
+AM.queueDownload("img/dusk.png");
+AM.queueDownload("img/evening.png");
+AM.queueDownload("img/midnight.png");
 AM.queueDownload("img/space_traveler.png");
 AM.queueDownload("img/scavenger.png");  
 AM.queueDownload("img/tree.png"); 
@@ -778,8 +833,7 @@ AM.downloadAll(function () {
 	var ctx = canvas.getContext("2d");
 
 	height = canvas.height;
-	width = canvas.width;
-
+	width = canvas.width; 
 	var gameEngine = new GameEngine(); 
 	var soundManager = new SoundManager();
 
@@ -791,14 +845,11 @@ AM.downloadAll(function () {
 
 	var player = new Player(gameEngine);
 	var map = new Background(gameEngine); 
+	var day = new Day(gameEngine);
 	var spaceship = new SpaceShip(gameEngine);  
 
 
-	gameEngine.addEntity(map);  
-	gameEngine.addNpcEntity(spaceship, true);    
-	gameEngine.addNpcEntity(player, true);  
- 	gameEngine.addNpcEntity(new Rummager(gameEngine), false);
-
+	gameEngine.addEntity(map);    
 	treeEnts = [new Tree(gameEngine, 64, 64), new Tree(gameEngine, 222, 55), new Tree(gameEngine, 130, 85), 
 				new Tree(gameEngine, 305, 70), new Tree(gameEngine, 85, 160), new Tree(gameEngine, 155, 193), 
 				new Tree(gameEngine, 305, 220)];
@@ -815,6 +866,8 @@ AM.downloadAll(function () {
 	for(var i = 0; i < berryEnts.length; i++) {
 		gameEngine.addBushEntity(berryEnts[i]);
 	}
+
+
 
 	treeEnts = [ new Tree(gameEngine, 56, 300), new Tree(gameEngine, 168, 275), new Tree(gameEngine, 269, 325), 
 				 new Tree(gameEngine, 65, 395), new Tree(gameEngine, 156, 425), new Tree(gameEngine, 265, 418), 
@@ -833,20 +886,12 @@ AM.downloadAll(function () {
 	for(var i = 0; i < buildingEnts.length; i++) {
 		gameEngine.addBuildingEntity(buildingEnts[i]);
 	}
-
    
 
-<<<<<<< HEAD
-=======
 	gameEngine.addNpcEntity(spaceship, true);   
-	gameEngine.addNpcEntity(scav, false);   
-	gameEngine.addNpcEntity(robot, true);       
-	gameEngine.addNpcEntity(alien, false);       
-	gameEngine.addNpcEntity(rummager, false);      
 	gameEngine.addNpcEntity(player, true);  
-
+	gameEngine.addEntity(day);
 	soundManager.setupBackgroundMusic();
 	//soundManager.audioToggle = document.getElementById("audioToggle").addEventListener("click", soundManager.toggleBackgroundMusic); 
->>>>>>> master
 	console.log("All Done!");
 });

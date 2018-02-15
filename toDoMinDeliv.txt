@@ -56,14 +56,10 @@ To-Do:
 			Robot power down
 			Space ship hit
 
-
-<<<<<<< HEAD
-	day/night cycle (Taylor) 
-=======
+ 
 	day/night cycle (Taylor)
 		day/night as entity
-		adjusting view
->>>>>>> master
+		adjusting view 
 		adjusting charge levels
 		baddies come out at night
 		only certain enemies come out at night (random?)

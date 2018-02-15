@@ -25,15 +25,13 @@ function GameEngine() {
     this.level = null;
     this.dayLength = null;
     this.width = null;
-    this.height = null;
-<<<<<<< HEAD
+    this.height = null; 
+
     this.click = {x: 0, y: 0,radius: 0};
     this.mouse = {x: 0, y: 0,radius: 0};
-=======
-    this.click = null;
-    this.mouse = null;
+  
     this.showOutlines = false;
->>>>>>> master
+ 
     this.keys = {
         up: false,
         down: false,
@@ -46,7 +44,7 @@ function GameEngine() {
 
 GameEngine.prototype.init = function (ctx) {
     this.ctx = ctx;
-    this.level = 2; // change this to "upgrade" the spaceship (0 to 4)
+    this.level = 4; // change this to "upgrade" the spaceship (0 to 4)
     this.width = this.ctx.canvas.width;
     this.height = this.ctx.canvas.height;
     this.keyListener();
@@ -64,17 +62,11 @@ GameEngine.prototype.start = function () {
 }
 
 GameEngine.prototype.keyListener = function() {
-<<<<<<< HEAD
-    var getXandY = function (e) {
-        var x = e.clientX - that.ctx.canvas.getBoundingClientRect().left;
-        var y = e.clientY - that.ctx.canvas.getBoundingClientRect().top;
-         
-=======
+ 
     var getXandY = function(e) {
         var x = e.clientX - that.ctx.canvas.getBoundingClientRect().left;
         var y = e.clientY - that.ctx.canvas.getBoundingClientRect().top;
->>>>>>> master
-        return {x: x, y: y, radius: 16};
+         return {x: x, y: y, radius: 16};
     }
 
     var that = this;
@@ -107,11 +99,6 @@ GameEngine.prototype.keyListener = function() {
     this.ctx.canvas.addEventListener("mousemove", function (e) {
         that.mouse = getXandY(e);  
     }, false);
-
-<<<<<<< HEAD
-=======
-
->>>>>>> master
 }
  
 GameEngine.prototype.addEntity = function(entity) {
@@ -184,13 +171,8 @@ GameEngine.prototype.update = function () {
     }
 }
 
-GameEngine.prototype.loop = function () {
-<<<<<<< HEAD
-    this.clockTick = this.timer.tick(); 
-=======
-    this.clockTick = this.timer.tick();
-    this.timeOfDay += this.clockTick;
->>>>>>> master
+GameEngine.prototype.loop = function () { 
+    this.clockTick = this.timer.tick();  
     this.update();
     this.draw(); 
 } 

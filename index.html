@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html style="height: 100%; font-family: 'Orbitron', sans-serif; color: white;">
+<html>
 	<head>
 		<meta charset="utf-8">
 		<title>stranded on Planet Pixel</title>
@@ -7,13 +7,28 @@
 	    <script type="text/javascript" src="assetmanager.js"></script>
 	    <script type="text/javascript" src="soundmanager.js"></script>
 	    <script type="text/javascript" src="main.js"></script>
+        <link rel="stylesheet" href="stylesheet.css">	
 	    <link href="https://fonts.googleapis.com/css?family=Orbitron" rel="stylesheet"> 
 	</head>
 
-	<body style="text-align:center; margin: 0; height: 100%; padding: 25px;  background: #383838;">
+	<body>
 		<h1>Stranded on Planet Pixel</h1>
-		<div><p id="audioToggle">pause sound</p></div>
-		<canvas id="gameWorld" tabindex="1" width="1280" height="640" style="background: #DDDDDD; "></canvas>
+		<div id="gameHolder">
+			<div id="resourceBar">
+				<ul>
+					<li class="resources"><p>Wood</p> <div> <img src="img/tree.png"/> 100</div> </li>
+					<li class="resources"><p>Ship Health</p> <div> <img src="img/ship.png"/> 100/100</div> </li>
+					<li class="resources"><p>Food</p> <div> <img src="img/bush.png"/> 100</div> </li>
+					<li class="resources"><p>Robots</p> <div> <img src="img/robot.png"/> 2</div> </li>
+
+
+					<li class="soundControls"><p>Sound</p> <img id="audioToggle" src="img/pause.png"/> </li>
+					<li class="soundControls"><p>Volume</p>  <img id="volumeDown" src="img/minus.png"/><img id="volumeUp" src="img/plus.png"/> </li>
+
+				</ul>
+			</div>
+			<canvas id="gameWorld" tabindex="1" width="1280" height="640"></canvas>
+		</div>
 		<p>Use wasd or the arrow keys to move</p>
 		<p>Good luck, and don't get attacked!</p>
 	</body>
