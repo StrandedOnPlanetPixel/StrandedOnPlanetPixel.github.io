@@ -697,6 +697,7 @@ AM.downloadAll(function () {
 	width = canvas.width;
 
 	var gameEngine = new GameEngine(); 
+	var soundManager = new SoundManager();
 
 	gameEngine.init(ctx);
 	gameEngine.start()
@@ -757,7 +758,8 @@ AM.downloadAll(function () {
 	gameEngine.addNpcEntity(rummager, false);      
 	gameEngine.addNpcEntity(player, true);  
 
-	setupSound();
+	//setupSound();
+	soundManager.setupBackgroundMusic();
 	console.log("All Done!");
 });
 
