@@ -735,6 +735,12 @@ SpaceShip.prototype.update = function () {
 		console.log("you clicked on the space ship");
 		this.game.click = null;
 	}  
+	if(collide(this, this.game.mouse)) {
+		console.log("you hovered over the space ship");
+ 		document.getElementById("gameWorld").style.cursor = "pointer"; 		
+	} else {
+ 		document.getElementById("gameWorld").style.cursor = ""; 		
+	}
 }
 
 SpaceShip.prototype.draw = function (ctx) {
