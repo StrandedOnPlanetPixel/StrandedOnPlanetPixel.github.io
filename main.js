@@ -429,7 +429,7 @@ Rummager.prototype.draw = function () {
 		this.rightAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);
 	} else {
 		this.upAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);  
-
+	}
 	Entity.prototype.draw.call(this); 
 }
 
@@ -671,6 +671,8 @@ SpaceShip.prototype.draw = function (ctx) {
 
 var height = null;
 var width = null;
+var backgroundSong = document.createElement("audio");
+
 var AM = new AssetManager(); 
 
 AM.queueDownload("img/map.png");
@@ -755,10 +757,22 @@ AM.downloadAll(function () {
 	gameEngine.addNpcEntity(rummager, false);      
 	gameEngine.addNpcEntity(player, true);  
 
-	var backgroundSong = document.createElement("audio");
-	backgroundSong.src = "audio/Module2Wav.wav";
-	backgroundSong.loop = "true";
-	backgroundSong.play();
- 
+	setupSound();
 	console.log("All Done!");
 });
+
+function setupSound() {
+	backgroundSong.src = "audio/Module2Wav.wav";
+	backgroundSong.loop = "true";
+	var audioToggle = document.getElementById("audioToggle").addEventListener("click", toggleSound); 
+}
+
+function toggleSound() {
+	if(backgroundSong.paused) {
+		console.log("playing sound");
+		backgroundSong.play();			
+	} else {
+		console.log("paused sound");
+		backgroundSong.pause();
+	}
+}
