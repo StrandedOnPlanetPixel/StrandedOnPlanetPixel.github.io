@@ -21,7 +21,6 @@ To-Do:
 		cap on resources
 
 	display resources (Taylor)
-		element above canvas
 		placeholder images
 		player health
 	
@@ -60,7 +59,6 @@ To-Do:
 	day/night cycle (Taylor)
  		adjusting view 
 		adjusting charge levels
-		baddies come out at night
 		only certain enemies come out at night (random?)
 
 	level object
