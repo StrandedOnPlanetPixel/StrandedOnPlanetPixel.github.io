@@ -1,8 +1,6 @@
 To-Do:
 	fix alien side view (Amanda)
-		alien attack animation
-		
-	rummager animations (Taylor) 
+		alien attack animation 
 
 	fix controls (Amanda)
 		mouse input for robot menus 

@@ -493,10 +493,10 @@ function Rummager(game, enemy) {
 	this.upAnimation = new Animation(spritesheet,       0,    128,   64, 64, 0.1, 8, true,  false,  0.75);
 	this.downAnimation = new Animation(spritesheet,     0,    192,   64, 64, 0.1, 8, true,  false,  0.75);    
 	
-	this.leftAttackAnimation = new Animation(spritesheet,       0,    0,     64, 64, 0.1, 8, true,  false,  0.75);
-	this.rightAttackAnimation = new Animation(spritesheet,  0,    64,    64, 64, 0.1, 8, true,  false,  0.75);
-	this.upAttackAnimation = new Animation(spritesheet,     0,    128,   64, 64, 0.1, 8, true,  false,  0.75);
-	this.downAttackAnimation = new Animation(spritesheet,       0,    192,   64, 64, 0.1, 8, true,  false,  0.75);    
+	this.leftAttackAnimation = new Animation(spritesheet,   64,   256,   64, 64, 0.1, 1, true,  false,  0.75);
+	this.rightAttackAnimation = new Animation(spritesheet,  128,  256,   64, 64, 0.1, 1, true,  false,  0.75);
+	this.upAttackAnimation = new Animation(spritesheet,     0,    128,   64, 64, 0.1, 1, true,  false,  0.75);
+	this.downAttackAnimation = new Animation(spritesheet,   0,    256,   64, 64, 0.1, 1, true,  false,  0.75);    
 	this.animation = this.upAnimation;
 
 	this.game = game;
@@ -820,7 +820,7 @@ function Day(game) {
 	this.image = null;
  
 	this.elapsedTime = 0;
-	this.dayLength = 100; 
+	this.dayLength = 50; 
 	this.day = true;
 	this.time = "2:00";
 	this.lastSpawnTime = 0;
@@ -838,7 +838,6 @@ Day.prototype.update = function () {
 		this.elapsedTime = 0;
 		this.image = null;
 		this.day = true;
-		console.log("day");
 	} else if(this.elapsedTime > (this.dayLength * 0.60) ){
 		this.image = this.midnightImage;
 	} else if(this.elapsedTime > (this.dayLength * 0.55) ){ // || this.elapsedTime > (this.dayLength * 0.90)) {
