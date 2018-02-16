@@ -70,4 +70,3 @@ SoundManager.prototype.playDeathSound = function(entity) {
         entity.deathSound.play();
     }
 };
-
