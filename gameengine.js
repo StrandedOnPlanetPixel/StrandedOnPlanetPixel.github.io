@@ -28,7 +28,7 @@ function GameEngine() {
 	this.height = null; 
 	
 	this.state = null; 
-
+	this.gameOver = false;
 	this.click = {x: 0, y: 0,radius: 0};
 	this.mouse = {x: 0, y: 0,radius: 0};
   
@@ -183,7 +183,7 @@ GameEngine.prototype.update = function () {
 
 GameEngine.prototype.loop = function () { 
 	this.clockTick = this.timer.tick();   
-	if(!this.paused) {
+	if(!this.paused && !this.gameOver) {
 		this.update();
 	}
 	this.draw();

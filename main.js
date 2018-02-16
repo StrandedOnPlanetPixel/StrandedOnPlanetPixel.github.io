@@ -863,7 +863,7 @@ Day.prototype.update = function () {
 	if(!this.day) {    
 		this.spawnRate = ((4 - this.game.state.level + 0.5)) * 10;
 		console.log(this.spawnRate);
-		if(this.elapsedTime > (this.lastSpawnTime + this.spawnRate)) { 
+		if(this.elapsedTime - this.spawnRate > (this.lastSpawnTime )) { 
 			this.lastSpawnTime = this.elapsedTime;
 			var spawnType = Math.floor(Math.random() * Math.floor(3));
 			if(spawnType === 0) {
@@ -872,8 +872,7 @@ Day.prototype.update = function () {
 				this.game.addNpcEntity(new Alien(this.game), false);
 			} else if(spawnType === 2) {
 				this.game.addNpcEntity(new Scavenger(this.game), false);
-			} 
-
+			}  
 		} 
 	}  
 };
@@ -890,7 +889,7 @@ function State(game, player, ship, day) {
 	this.ship = ship;
 	this.day = day;
 
-	this.level = 2; // change this to "upgrade" the spaceship (0 to 4)
+	this.level = 4; // change this to "upgrade" the spaceship (0 to 4)
 	
 	this.wood = 0;
 	this.food = 0;
@@ -945,7 +944,7 @@ function pause() {
 	if(gameEngine.paused) {
 		play();
 	} else {
-		gameEngine.pause(); 
+		gameEngine.pause();      
 		document.getElementById("playButton").style.display = "";
 		document.getElementById("playGameText").style.display = ""; 
 		document.getElementById("playGameText").innerHTML = "Resume";      
@@ -955,14 +954,14 @@ function pause() {
 };
 
 function gameOver() {
-	if(gameEngine.paused) {
-		play();
-	} else {
-		gameEngine.pause(); 
+	if(gameEngine.gameOver) { 
+ 		document.location.reload();
+ 	} else {
+		gameEngine.gameOver = true; 
 		document.getElementById("playButton").style.display = "";
 		document.getElementById("playGameText").style.display = ""; 
 		document.getElementById("playGameText").innerHTML = "Game Over";      
-		document.getElementById("playGameText").style.left = "42.5%"; 
+		document.getElementById("playGameText").style.left = "42.3%"; 
 		document.getElementById("gameWorld").style.opacity = "0.4";
 	} 
 };
@@ -1029,10 +1028,13 @@ AM.queueDownload("img/rummager.png");
 AM.queueDownload("img/alien.png");
 AM.queueDownload("img/bullet.png");
 
-AM.downloadAll(function () {
- 
+AM.downloadAll(startGame);
+
+function startGame() {  
 	canvas = document.getElementById("gameWorld");
 	var ctx = canvas.getContext("2d");
+
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 	document.getElementById("playButton").addEventListener("click", play);
 	document.getElementById("playGameText").addEventListener("click", play);      
@@ -1074,4 +1076,4 @@ AM.downloadAll(function () {
 	soundManager.setupBackgroundMusic();  
 
 	console.log("All Done!");
-});
+};
