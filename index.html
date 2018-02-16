@@ -17,17 +17,21 @@
 			<div id="resourceBar">
 				<ul>
 					<li class="resources"><p>Wood</p> <div> <img src="img/tree.png"/> 100</div> </li>
-					<li class="resources"><p>Ship Health</p> <div> <img src="img/ship.png"/> 100/100</div> </li>
 					<li class="resources"><p>Food</p> <div> <img src="img/bush.png"/> 100</div> </li>
+					<li class="resources"><p>Scrap</p> <div> <img src="img/metal.png"/> 100</div> </li>
+					<li class="resources"><p>Minerals</p> <div> <img src="img/metal.png"/> 100</div> </li>
 					<li class="resources"><p>Robots</p> <div> <img src="img/robot.png"/> 2</div> </li>
-
+					<li class="resources"><p>Ship Health</p> <div> <img src="img/ship.png"/> 100/100</div> </li>
 
 					<li class="soundControls"><p>Sound</p> <img id="audioToggle" src="img/pause.png"/> </li>
 					<li class="soundControls"><p>Volume</p>  <img id="volumeDown" src="img/minus.png"/><img id="volumeUp" src="img/plus.png"/> </li>
 
 				</ul>
 			</div>
-			<canvas id="gameWorld" tabindex="1" width="1280" height="640"></canvas>
+			<div id="canvasHolder"> 
+				<img id="playButton" src="img/playGame.png"/> <p id="playGameText">Play Game</p>
+				<canvas id="gameWorld" tabindex="1" width="1280" height="640"></canvas>
+			</div>
 		</div>
 		<p>Use wasd or the arrow keys to move</p>
 		<p>Good luck, and don't get attacked!</p>

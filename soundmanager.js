@@ -40,11 +40,18 @@ SoundManager.prototype.toggleBackgroundMusic = function() {
 
 SoundManager.prototype.volumeUp = function() {
 	// loop through each sound and increase sound????
-	console.log("volumeUp");
-
+ 	try {
+ 		backgroundSong.volume += 0.1;
+ 	} catch {
+		console.log("Max volume"); 
+ 	}
  }
 
 SoundManager.prototype.volumeDown= function() {
 	// loop through each sound and decrease sound???	
-	console.log("volumeDown");
+ 	try {
+ 		backgroundSong.volume -= 0.1;
+ 	} catch {
+		console.log("Sound Muted"); 
+ 	}
  }

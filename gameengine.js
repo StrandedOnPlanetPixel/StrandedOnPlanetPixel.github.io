@@ -10,7 +10,7 @@ window.requestAnimFrame = (function () {
 })(); 
 
 /** Game Engine **/
-function GameEngine() {
+function GameEngine() { 
     this.showOutlines = true;
 
     this.entities = [];
@@ -39,7 +39,7 @@ function GameEngine() {
         right: false,
         attack: false,
         program: false
-    };
+    }; 
 }
 
 GameEngine.prototype.init = function (ctx) {
@@ -54,12 +54,21 @@ GameEngine.prototype.init = function (ctx) {
 
 GameEngine.prototype.start = function () {
     console.log("starting game");   
+    this.paused = false;
+    this.timer.clockTick = (this.timer.clockTick - this.pausedTime);
     var that = this;
     (function gameLoop() {
         that.loop();
         requestAnimFrame(gameLoop, that.ctx.canvas);
     })();
 }
+
+GameEngine.prototype.pause = function () {
+    console.log("pausing game");       
+    this.pausedTime = this.timer.clockTick;
+    
+}
+
 
 GameEngine.prototype.keyListener = function() {
  
@@ -173,8 +182,11 @@ GameEngine.prototype.update = function () {
 
 GameEngine.prototype.loop = function () { 
     this.clockTick = this.timer.tick();  
-    this.update();
-    this.draw(); 
+    
+    if(!this.paused) {
+        this.update();
+        this.draw(); 
+    }
 } 
  
 /** Timer **/

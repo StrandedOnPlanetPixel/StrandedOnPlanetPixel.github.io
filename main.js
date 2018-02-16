@@ -740,6 +740,7 @@ SpaceShip.prototype.update = function () {
  		document.getElementById("gameWorld").style.cursor = "pointer"; 		
 	} else {
  		document.getElementById("gameWorld").style.cursor = ""; 		
+
 	}
 }
 
@@ -810,10 +811,32 @@ Day.prototype.draw = function (ctx) {
 	}
  	Entity.prototype.draw.call(this);
 } 
+  
+
+function play() {
+	canvas.focus();
+	gameEngine.start();
+    document.getElementById("playButton").style.display = "none";
+    document.getElementById("playGameText").style.display = "none";   
+    document.getElementById("playGameText").style.left = "42.5%"; 		
+    document.getElementById("gameWorld").style.opacity = "1";
+}
+
+function pause() {
+	gameEngine.pause(); 
+    document.getElementById("playButton").style.display = "";
+    document.getElementById("playGameText").style.display = ""; 
+    document.getElementById("playGameText").innerHTML = "Resume";      
+    document.getElementById("playGameText").style.left = "44.5%"; 
+    document.getElementById("gameWorld").style.opacity = "0.4";
+}
 
 
 var height = null;
 var width = null;
+var paused = true;
+var gameEngine = null;
+var canvas = null;
 
 var AM = new AssetManager(); 
 
@@ -835,16 +858,27 @@ AM.queueDownload("img/alien.png");
 AM.queueDownload("img/bullet.png");
 
 AM.downloadAll(function () {
-	var canvas = document.getElementById("gameWorld");
-	var ctx = canvas.getContext("2d");
+
+	canvas = document.getElementById("gameWorld");
+ 	var ctx = canvas.getContext("2d");
+
+	document.getElementById("playButton").addEventListener("click", play);
+	document.getElementById("playGameText").addEventListener("click", play);      
+    ctx.canvas.addEventListener("keydown", function(e) {
+        var keyPressed = String.fromCharCode(e.which); 
+        if(keyPressed === 'P' || e.which === 80) pause(); 
+        e.preventDefault(); 
+    }, false);  
+
 
 	height = canvas.height;
 	width = canvas.width; 
-	var gameEngine = new GameEngine(); 
+	gameEngine = new GameEngine(); 
 	var soundManager = new SoundManager();
 
-	gameEngine.init(ctx);
-	gameEngine.start()
+	gameEngine.init(ctx); 
+	gameEngine.start();
+	gameEngine.pause();
 
 	var numTrees = Math.floor(Math.random() * 21) + 30;
 	var numBuildings = Math.floor(Math.random() * 6) + 10;
@@ -854,8 +888,20 @@ AM.downloadAll(function () {
 	var day = new Day(gameEngine);
 	var spaceship = new SpaceShip(gameEngine);  
 
+	gameEngine.addEntity(map);  
+	addEnivironmentEntities(gameEngine);
 
-	gameEngine.addEntity(map);    
+	gameEngine.addNpcEntity(spaceship, true);   
+	gameEngine.addNpcEntity(player, true);  
+	gameEngine.addEntity(day);
+	
+	soundManager.setupBackgroundMusic();  
+
+	console.log("All Done!");
+});
+
+
+function addEnivironmentEntities(gameEngine) {  
 	treeEnts = [new Tree(gameEngine, 64, 64), new Tree(gameEngine, 222, 55), new Tree(gameEngine, 130, 85), 
 				new Tree(gameEngine, 305, 70), new Tree(gameEngine, 85, 160), new Tree(gameEngine, 155, 193), 
 				new Tree(gameEngine, 305, 220)];
@@ -893,11 +939,4 @@ AM.downloadAll(function () {
 		gameEngine.addBuildingEntity(buildingEnts[i]);
 	}
    
-
-	gameEngine.addNpcEntity(spaceship, true);   
-	gameEngine.addNpcEntity(player, true);  
-	gameEngine.addEntity(day);
-	soundManager.setupBackgroundMusic();
-	//soundManager.audioToggle = document.getElementById("audioToggle").addEventListener("click", soundManager.toggleBackgroundMusic); 
-	console.log("All Done!");
-});
+}

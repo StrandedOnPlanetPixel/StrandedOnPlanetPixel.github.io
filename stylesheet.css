@@ -10,9 +10,37 @@ body {
 	text-align:center;  
 }
 
-canvas {
+canvas { 
 	border: 1px solid black;
-	background: #DDDDDD;
+	background: black;
+    opacity: 0.4; 
+}
+
+#canvasHolder { 
+	position: relative;
+	top: 0;
+	left: 0;
+	z-index: 2;
+}
+
+
+#playButton { 
+	position: absolute;
+	top: 38%;
+	left: 40%;
+	width: 256px;
+	height: 128px;
+	cursor: pointer;
+	z-index: 3;
+}
+
+#playGameText {
+	position: absolute;
+	top: 39%;
+	left: 42.5%;
+	font-size: 32px;
+	cursor: pointer;
+	z-index: 4;
 }
 
 div {
@@ -54,6 +82,7 @@ div {
 #resourceBar p { 
     margin: auto;  
 }
+
 
 ul {
     list-style-type: none;
