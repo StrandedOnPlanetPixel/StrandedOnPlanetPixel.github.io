@@ -264,6 +264,7 @@ function Player(game) {
 	this.y += this.radius;
 	this.lives = 200;
 	this.speed = 150; 
+	this.lastAttackTime = 0;
 };
 
 Player.prototype = new Entity();
@@ -309,9 +310,14 @@ Player.prototype.update = function () {
 			this.animation = this.attackAnimation;
 			for (var i = 0; i < this.game.hostileEntities.length; i++) {
 				var ent = this.game.hostileEntities[i];
-				if (this != ent && collide(this, ent) && this.game.keys.attack) {
-					ent.lives--;
-				}  
+				if (this != ent && collide(this, ent) && this.game.keys.attack &&
+					(!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 1.5))) {
+						//record last shot time and create the bullet.
+						attack(this, closestEnt);
+						closestEnt.lives--;
+ 						this.lastAttackTime = this.game.timer.gameTime; 
+					
+ 				}  
 			} 
 		}   
 	} else {
@@ -346,6 +352,7 @@ function Alien(game, enemy) {
 	this.lives = 200;
 	this.speed = 50;
 	this.visualRadius = 200;
+	this.lastAttackTime = 0;
 };
 
 Alien.prototype = new Entity();
@@ -368,15 +375,7 @@ Alien.prototype.update = function () {
 			if (collideTop(this)) this.y = this.radius;
 			if (collideBottom(this)) this.y = height - this.radius; 
 		}
-
-		for (var i = 0; i < this.game.friendlyEntities.length; i++) {
-			var ent = this.game.friendlyEntities[i];
-			if (this != ent && collide(this, ent)) {
-				this.animation = this.downAttackAnimation;
-				ent.lives--;
-			}  
-		}
-
+ 
 		var closestEnt = this.game.friendlyEntities[0];
 		for (i = 0; i < this.game.friendlyEntities.length; i++) {
 			ent = this.game.friendlyEntities[i];
@@ -388,8 +387,13 @@ Alien.prototype.update = function () {
 			}  
 		}
 
-		if(collide(this, closestEnt)) {
-			attack(this, closestEnt);
+ 		if(collide(this, closestEnt)) {
+			if(!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 1.5)) {
+				//record last shot time and create the bullet.
+				attack(this, closestEnt);
+				closestEnt.lives--;
+ 				this.lastAttackTime = this.game.timer.gameTime; 
+			}  
 		} else {
 			moveEntityToTarget(this, closestEnt);
 		} 
@@ -424,6 +428,7 @@ function Scavenger(game, enemy) {
 	this.speed = 50;
 	this.visualRadius = 200;
 	this.dead = false;
+	this.lastAttackTime = 0;
 	Entity.call(this, game, Math.floor((Math.random() * this.game.width ) + 1), this.game.height);
 }
 
@@ -448,14 +453,6 @@ Scavenger.prototype.update = function () {
 			if (collideBottom(this)) this.y = height - this.radius; 
 		}
 
-		for (var i = 0; i < this.game.friendlyEntities.length; i++) {
-			var ent = this.game.friendlyEntities[i];
-			if (this != ent && collide(this, ent)) {
-				this.animation = this.downAttackAnimation;
-				ent.lives--;
-			}  
-		}
-
 		var closestEnt = this.game.friendlyEntities[0];
 		for (i = 0; i < this.game.friendlyEntities.length; i++) {
 			ent = this.game.friendlyEntities[i];
@@ -468,7 +465,12 @@ Scavenger.prototype.update = function () {
 		}
 
 		if(collide(this, closestEnt)) {
-			attack(this,closestEnt); 
+			if(!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 1.5)) {
+				//record last shot time and create the bullet.
+				attack(this, closestEnt);
+				closestEnt.lives--;
+ 				this.lastAttackTime = this.game.timer.gameTime; 
+			} 
 		} else {
 			moveEntityToTarget(this, closestEnt);
 		} 
