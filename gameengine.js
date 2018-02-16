@@ -28,6 +28,7 @@ function GameEngine() {
     this.environmentEntities = [];
     this.npcEntities = [];
     this.friendlyEntities = [];
+	this.rockEntities = [];
     this.treeEntities = [];
     this.bushEntities = [];
     this.buildingEntities = [];
@@ -36,8 +37,9 @@ function GameEngine() {
     this.level = null;
     this.width = null;
     this.height = null;
-    this.click = null;
-    this.mouse = null;
+    this.click = {x: 0, y: 0,radius: 0};
+	this.mouse = {x: 0, y: 0,radius: 0};
+  
     this.showOutlines = false;
     this.keys = {
         up: false,
@@ -69,6 +71,13 @@ GameEngine.prototype.start = function () {
 }
 
 GameEngine.prototype.keyListener = function() {
+	
+	var getXandY = function(e) {
+        var x = e.clientX - that.ctx.canvas.getBoundingClientRect().left;
+        var y = e.clientY - that.ctx.canvas.getBoundingClientRect().top;
+         return {x: x, y: y, radius: 16};
+    };
+	
     var that = this;
     this.ctx.canvas.addEventListener("keydown", function(e) {
         var keyPressed = String.fromCharCode(e.which); 
@@ -92,6 +101,13 @@ GameEngine.prototype.keyListener = function() {
         e.preventDefault(); 
     }, false);  
 
+	this.ctx.canvas.addEventListener("click", function (e) {
+        that.click = getXandY(e);  
+    }, false);
+
+    this.ctx.canvas.addEventListener("mousemove", function (e) {
+        that.mouse = getXandY(e);  
+    }, false);
 }
  
 GameEngine.prototype.addEntity = function(entity) {
@@ -108,6 +124,13 @@ GameEngine.prototype.addNpcEntity = function(entity, friendly) {
     } else {
         this.hostileEntities.push(entity);
     }
+}
+
+GameEngine.prototype.addRockEntity = function(entity) {
+    console.log('added rock entity');
+    this.entities.push(entity);
+    this.rockEntities.push(entity);
+    this.environmentEntities.push(entity);
 }
 
 GameEngine.prototype.addTreeEntity = function(entity) {
