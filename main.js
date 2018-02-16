@@ -143,7 +143,7 @@ function moveEntityToTarget(ent, target) {
 	} 
 	ent.x += dx * ent.game.clockTick * ent.speed;
 	ent.y += dy * ent.game.clockTick * ent.speed;
-}
+};
 
 function attack(ent, target) {
 	var dx = target.x - ent.x;
@@ -168,10 +168,7 @@ function attack(ent, target) {
 			ent.animation = ent.upAttackAnimation;
 		}
 	}  
- 	var dx = a.x - b.x;
-	var dy = a.y - b.y;
-	return Math.sqrt(dx * dx + dy * dy);
-}
+};
  
 function collide(ent, otherEnt) { 
 	if(ent && otherEnt) {
@@ -265,7 +262,7 @@ function Player(game) {
 	this.radius = 24;   
 	this.x += this.radius;
 	this.y += this.radius;
-	this.lives = 10;
+	this.lives = 200;
 	this.speed = 150; 
 };
 
@@ -328,7 +325,6 @@ Player.prototype.draw = function () {
 	Entity.prototype.draw.call(this); 
 };
  
-
 function Alien(game, enemy) {  
 	var spritesheet = AM.getAsset("img/alien.png");
 	this.animation = new Animation(spritesheet,             256,    192,     64, 64, 0.1, 4, true,  false,  0.75);
@@ -377,6 +373,7 @@ Alien.prototype.update = function () {
 			var ent = this.game.friendlyEntities[i];
 			if (this != ent && collide(this, ent)) {
 				this.animation = this.downAttackAnimation;
+				ent.lives--;
 			}  
 		}
 
@@ -455,6 +452,7 @@ Scavenger.prototype.update = function () {
 			var ent = this.game.friendlyEntities[i];
 			if (this != ent && collide(this, ent)) {
 				this.animation = this.downAttackAnimation;
+				ent.lives--;
 			}  
 		}
 
@@ -524,18 +522,10 @@ Rummager.prototype.update = function () {
 			if (collideBottom(this)) this.y = height - this.radius; 
 		}
 
-		for (var i = 0; i < this.game.friendlyEntities.length; i++) {
-			var ent = this.game.friendlyEntities[i];
-			if (this != ent && collide(this, ent)) {
-				// TODO
-	 
-			}  
-		}
-
 		var closestEnt = this.game.friendlyEntities[0];
 		for (var i = 0; i < this.game.friendlyEntities.length; i++) {
 			var ent = this.game.friendlyEntities[i];
-			if (ent != this && collide(this, { x: ent.x, y: ent.y, radius: this.visualRadius })) {
+			if (ent != this && collide(this, { x: ent.x, y: ent.y, radius: this.visualRadius})) {
 				var dist = distance(this, ent); 
 				if(dist < distance(this, closestEnt)) {
 					closestEnt = ent;
@@ -866,14 +856,14 @@ Day.prototype.update = function () {
 
 		} 
 	} 
-}
+};
 
 Day.prototype.draw = function (ctx) { 
 	if(this.image) {
 		ctx.drawImage(AM.getAsset(this.image), 0, 0);
 	}
 	Entity.prototype.draw.call(this);
-}
+};
 
 function State(game, player) {
 	this.player = player;
@@ -888,7 +878,7 @@ function State(game, player) {
 	this.robotCount = 0;
 
 	this.shipHealth = 0;
- 
+ 	this.playerMaxLives = this.player.lives;
 };
 
 State.prototype = new Entity();
@@ -897,14 +887,17 @@ State.prototype.constructor = State;
 State.prototype.update = function () {  
 	document.getElementById("woodCount").innerHTML = "<img src=\"img/tree.png\"/>" + this.wood;
 	document.getElementById("foodCount").innerHTML = "<img src=\"img/bush.png\"/>" + this.food; 
-	document.getElementById("metalCount").innerHTML = "<img src=\"img/metal.png\"/>" + this.metal; 
+	document.getElementById("metalCount").innerHTML = "<img src=\"img/metal.png\"/>" + this.scrap; 
 	document.getElementById("mineralCount").innerHTML = "<img src=\"img/rock.png\"/>" + this.minerals; 
-}
+	document.getElementById("robotCount").innerHTML = "<img src=\"img/robot.png\"/>" + this.robotCount; 
+	document.getElementById("shipHealth").innerHTML = "<img src=\"img/ship.png\"/>" + this.shipHealth; 
+ 	document.getElementById("playerHealth").style.width = "" + 100* (this.player.lives / this.playerMaxLives) + "%";
+	document.getElementById("playerHealth").innerHTML = this.player.lives + "/" + this.playerMaxLives; 
+};
 
 State.prototype.draw = function (ctx) {  
 };
   
-
 function play() {
 	canvas.focus();
 	gameEngine.start();
@@ -912,7 +905,7 @@ function play() {
 	document.getElementById("playGameText").style.display = "none";   
 	document.getElementById("playGameText").style.left = "42.5%";       
 	document.getElementById("gameWorld").style.opacity = "1";
-}
+};
 
 function pause() {
 	gameEngine.pause(); 
@@ -921,7 +914,43 @@ function pause() {
 	document.getElementById("playGameText").innerHTML = "Resume";      
 	document.getElementById("playGameText").style.left = "44.5%"; 
 	document.getElementById("gameWorld").style.opacity = "0.4";
-}
+};
+
+function addEnivironmentEntities(gameEngine) {  
+	var treeEnts = [new Tree(gameEngine, 64, 64), new Tree(gameEngine, 222, 55), new Tree(gameEngine, 130, 85), 
+				new Tree(gameEngine, 305, 70), new Tree(gameEngine, 85, 160), new Tree(gameEngine, 155, 193), 
+				new Tree(gameEngine, 305, 220)];
+
+	for(var i = 0; i < treeEnts.length; i++) {
+		gameEngine.addTreeEntity(treeEnts[i]);
+	}
+
+	var berryEnts = [new BerryBush(gameEngine, 325, 135), new BerryBush(gameEngine, 238, 150), new BerryBush(gameEngine, 215, 253),
+				 new BerryBush(gameEngine, 44, 233), new BerryBush(gameEngine, 115, 340), new BerryBush(gameEngine, 315, 342),
+				 new BerryBush(gameEngine, 178, 365), new BerryBush(gameEngine, 245, 435), new BerryBush(gameEngine, 25, 535),
+				 new BerryBush(gameEngine, 95, 500), new BerryBush(gameEngine, 165, 615), new BerryBush(gameEngine, 279, 504)];
+	for(i = 0; i < berryEnts.length; i++) {
+		gameEngine.addBushEntity(berryEnts[i]);
+	} 
+
+	treeEnts = [ new Tree(gameEngine, 56, 300), new Tree(gameEngine, 168, 275), new Tree(gameEngine, 269, 325), 
+				 new Tree(gameEngine, 65, 395), new Tree(gameEngine, 156, 425), new Tree(gameEngine, 265, 418), 
+				 new Tree(gameEngine, 99, 565), new Tree(gameEngine, 198, 530), new Tree(gameEngine, 275, 590)];
+
+	for(i = 0; i < treeEnts.length; i++) {
+		gameEngine.addTreeEntity(treeEnts[i]);
+	}
+
+	var buildingEnts = [ new Building(gameEngine, 1082, -10), new Building(gameEngine, 1222, 60), new Building(gameEngine, 1130, 102),
+					 new Building(gameEngine, 1225, 195), new Building(gameEngine, 1105, 235), new Building(gameEngine, 1200, 295),
+					 new Building(gameEngine, 1140, 351), new Building(gameEngine, 1255, 400), new Building(gameEngine, 1165, 450),
+					 new Building(gameEngine, 1195, 493), new Building(gameEngine, 1235, 563)];
+
+	for(i = 0; i < buildingEnts.length; i++) {
+		gameEngine.addBuildingEntity(buildingEnts[i]);
+	}
+   
+};
 
 
 var height = null;
@@ -974,11 +1003,12 @@ AM.downloadAll(function () {
 	gameEngine.start();
 	gameEngine.pause();
 
-	var state = new State(gameEngine);
 	var player = new Player(gameEngine);
 	var map = new Background(gameEngine); 
 	var day = new Day(gameEngine);
 	var spaceship = new SpaceShip(gameEngine);  
+	
+	var state = new State(gameEngine, player);
 
 	gameEngine.state = state;
 	gameEngine.addEntity(state);
@@ -994,40 +1024,3 @@ AM.downloadAll(function () {
 
 	console.log("All Done!");
 });
-
-
-function addEnivironmentEntities(gameEngine) {  
-	var treeEnts = [new Tree(gameEngine, 64, 64), new Tree(gameEngine, 222, 55), new Tree(gameEngine, 130, 85), 
-				new Tree(gameEngine, 305, 70), new Tree(gameEngine, 85, 160), new Tree(gameEngine, 155, 193), 
-				new Tree(gameEngine, 305, 220)];
-
-	for(var i = 0; i < treeEnts.length; i++) {
-		gameEngine.addTreeEntity(treeEnts[i]);
-	}
-
-	var berryEnts = [new BerryBush(gameEngine, 325, 135), new BerryBush(gameEngine, 238, 150), new BerryBush(gameEngine, 215, 253),
-				 new BerryBush(gameEngine, 44, 233), new BerryBush(gameEngine, 115, 340), new BerryBush(gameEngine, 315, 342),
-				 new BerryBush(gameEngine, 178, 365), new BerryBush(gameEngine, 245, 435), new BerryBush(gameEngine, 25, 535),
-				 new BerryBush(gameEngine, 95, 500), new BerryBush(gameEngine, 165, 615), new BerryBush(gameEngine, 279, 504)];
-	for(i = 0; i < berryEnts.length; i++) {
-		gameEngine.addBushEntity(berryEnts[i]);
-	} 
-
-	treeEnts = [ new Tree(gameEngine, 56, 300), new Tree(gameEngine, 168, 275), new Tree(gameEngine, 269, 325), 
-				 new Tree(gameEngine, 65, 395), new Tree(gameEngine, 156, 425), new Tree(gameEngine, 265, 418), 
-				 new Tree(gameEngine, 99, 565), new Tree(gameEngine, 198, 530), new Tree(gameEngine, 275, 590)];
-
-	for(i = 0; i < treeEnts.length; i++) {
-		gameEngine.addTreeEntity(treeEnts[i]);
-	}
-
-	var buildingEnts = [ new Building(gameEngine, 1082, -10), new Building(gameEngine, 1222, 60), new Building(gameEngine, 1130, 102),
-					 new Building(gameEngine, 1225, 195), new Building(gameEngine, 1105, 235), new Building(gameEngine, 1200, 295),
-					 new Building(gameEngine, 1140, 351), new Building(gameEngine, 1255, 400), new Building(gameEngine, 1165, 450),
-					 new Building(gameEngine, 1195, 493), new Building(gameEngine, 1235, 563)];
-
-	for(i = 0; i < buildingEnts.length; i++) {
-		gameEngine.addBuildingEntity(buildingEnts[i]);
-	}
-   
-}
