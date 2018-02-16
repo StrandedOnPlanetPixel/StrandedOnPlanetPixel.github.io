@@ -771,7 +771,7 @@ function SpaceShip(game) {
 	this.ctx = game.ctx; 
 	this.spritesheet = "img/spaceship.png";
 	this.size = 160;
-	this.image = new Animation(AM.getAsset(this.spritesheet), (this.game.level * this.size), 0, 160, 160, 0.1, 1, true, false, 1);  
+	this.image = new Animation(AM.getAsset(this.spritesheet), (0 * this.size), 0, 160, 160, 0.1, 1, true, false, 1);  
 	this.radius = 77;
 	this.lives = 500;
 	Entity.call(this, game, width / 2, height / 2);
@@ -785,7 +785,8 @@ SpaceShip.prototype = new Entity();
 SpaceShip.prototype.constructor = SpaceShip;
  
 SpaceShip.prototype.update = function () {  
- 
+ 	this.image = new Animation(AM.getAsset(this.spritesheet), (this.game.state.level * this.size), 0, 160, 160, 0.1, 1, true, false, 1);  
+
 	if(collide(this, this.game.click)) {
 		console.log("you clicked on the space ship");
 		this.game.click = null;
@@ -817,9 +818,8 @@ function Day(game) {
 	this.dayLength = 200; 
 	this.day = true;
 	this.lastSpawnTime = 0;
-	this.spawnRate = ((4 - this.game.level + 0.5)) * 10;
-	console.log(this.spawnRate);
-	Entity.call(this, game, 0, 0);
+	this.spawnRate = ((4 - 0 + 0.5) * 10);
+ 	Entity.call(this, game, 0, 0);
 };
 
 Day.prototype = new Entity();
@@ -844,6 +844,8 @@ Day.prototype.update = function () {
 	}  
 
 	if(!this.day) {   
+		this.spawnRate = ((4 - this.game.state.level + 0.5)) * 10;
+
 		if(this.elapsedTime > (this.lastSpawnTime + this.spawnRate)) { 
 			this.lastSpawnTime = this.elapsedTime;
 			var spawnType = Math.floor(Math.random() * Math.floor(3));
@@ -866,9 +868,10 @@ Day.prototype.draw = function (ctx) {
 	Entity.prototype.draw.call(this);
 };
 
-function State(game, player, ship) {
+function State(game, player, ship, day) {
 	this.player = player;
 	this.ship = ship;
+	this.day = day;
 
 	this.level = 0; // change this to "upgrade" the spaceship (0 to 4)
 	
@@ -887,6 +890,11 @@ State.prototype = new Entity();
 State.prototype.constructor = State;
  
 State.prototype.update = function () {  
+	if(this.day.day) {
+		document.getElementById("time").innerHTML =  "<img src=\"img/time.png\"/> Day"; 
+	} else {
+		document.getElementById("time").innerHTML =  "<img src=\"img/time.png\"/> Night"; 
+	}
 	document.getElementById("woodCount").innerHTML = "<img src=\"img/tree.png\"/>" + this.wood;
 	document.getElementById("foodCount").innerHTML = "<img src=\"img/bush.png\"/>" + this.food; 
 	document.getElementById("metalCount").innerHTML = "<img src=\"img/metal.png\"/>" + this.scrap; 
@@ -1013,7 +1021,7 @@ AM.downloadAll(function () {
 	var day = new Day(gameEngine);
 	var spaceship = new SpaceShip(gameEngine);  
 	
-	var state = new State(gameEngine, player, spaceship);
+	var state = new State(gameEngine, player, spaceship, day);
 
 	gameEngine.state = state;
 	gameEngine.addEntity(state);
