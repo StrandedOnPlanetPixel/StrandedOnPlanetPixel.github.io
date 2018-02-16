@@ -43,19 +43,22 @@ To-Do:
 		sound manager
 		music
 		sound effects
-			Rummager shoot
-			Rummage death 
-			Scavenger attack (trash compactor, garbage truck)
-			Scavenger death (explosion)
-			Alien lightening bolt
+			Rummager death 
+			Rummager damage
+			Scavenger attack
+			Scavenger damage
 			Alien death (sploosh)
-			Player hit
 			Player attack
+<<<<<<< HEAD
 			Robot hit
 			Robot power down
 			Space ship hit
 
  
+=======
+			Robot attack
+
+>>>>>>> master
 	day/night cycle (Taylor)
  		adjusting view 
 		adjusting charge levels
