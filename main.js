@@ -168,6 +168,7 @@ function attack(ent, target) {
 			ent.animation = ent.upAttackAnimation;
 		}
 	}  
+	target.lives -= ent.damage;
 };
  
 function collide(ent, otherEnt) { 
@@ -264,6 +265,7 @@ function Player(game) {
 	this.y += this.radius;
 	this.lives = 200;
 	this.speed = 150; 
+	this.damage = 10;
 	this.lastAttackTime = 0;
 };
 
@@ -311,12 +313,13 @@ Player.prototype.update = function () {
 			for (var i = 0; i < this.game.hostileEntities.length; i++) {
 				var ent = this.game.hostileEntities[i];
 				if (this != ent && collide(this, ent) && this.game.keys.attack &&
-					(!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 1.5))) {
+					(!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 0.5))) {
 						//record last shot time and create the bullet.
-						attack(this, ent);
-						ent.lives--;
+						console.log(ent);
+ 						console.log(ent.lives);
+ 						ent.lives -= this.damage;
+ 						console.log(ent.lives);
  						this.lastAttackTime = this.game.timer.gameTime; 
-					
  				}  
 			} 
 		}   
@@ -349,8 +352,9 @@ function Alien(game, enemy) {
 	this.enemy = enemy;
 	Entity.call(this, game, Math.random() * width, height);
 	this.radius = 24;
-	this.lives = 200;
+	this.lives = 150;
 	this.speed = 50;
+	this.damage = 2;
 	this.visualRadius = 200;
 	this.lastAttackTime = 0;
 };
@@ -391,7 +395,6 @@ Alien.prototype.update = function () {
 			if(!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 1.5)) {
 				//record last shot time and create the bullet.
 				attack(this, closestEnt);
-				closestEnt.lives--;
  				this.lastAttackTime = this.game.timer.gameTime; 
 			}  
 		} else {
@@ -424,7 +427,8 @@ function Scavenger(game, enemy) {
 	this.enemy = enemy;
 	Entity.call(this, game, Math.random() * width, height);
 	this.radius = 24;
-	this.lives = 200;
+	this.lives = 150;
+	this.damage = 3;
 	this.speed = 50;
 	this.visualRadius = 200;
 	this.dead = false;
@@ -468,8 +472,7 @@ Scavenger.prototype.update = function () {
 			if(!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 1.5)) {
 				//record last shot time and create the bullet.
 				attack(this, closestEnt);
-				closestEnt.lives--;
- 				this.lastAttackTime = this.game.timer.gameTime; 
+  				this.lastAttackTime = this.game.timer.gameTime; 
 			} 
 		} else {
 			moveEntityToTarget(this, closestEnt);
@@ -500,7 +503,8 @@ function Rummager(game, enemy) {
 	this.ctx = game.ctx;  
 	Entity.call(this, game, Math.random() * width, height);
 	this.radius = 24;
-	this.lives = 200;
+	this.lives = 100;
+	this.damage = 0; // has zero close attack (real damage comes from bullets)
 	this.speed = 50;
 	this.visualRadius = 200;
 	this.lastBulletTime = 0;
@@ -569,6 +573,7 @@ function Bullet(game, parent, target) {
 	this.ctx = game.ctx; 
 	Entity.call(this, game, parent.x, parent.y);
 	this.radius = 6; 
+	this.damage = 5;
 	this.speed = 75; 
 }
 
@@ -587,7 +592,7 @@ Bullet.prototype.update = function() {
 	for (var i = 0; i < this.game.friendlyEntities.length; i++) {
 		var ent = this.game.friendlyEntities[i];
 		if (this != ent && collide(this, ent)) {
-			ent.lives --;
+			ent.lives -= this.damage;
 			this.removeFromWorld = true;
 		}  
 	} 
@@ -794,11 +799,9 @@ SpaceShip.prototype.update = function () {
 		this.game.click = null;
 	}  
 	if(collide(this, this.game.mouse)) {
-		console.log("you hovered over the space ship");
-		document.getElementById("gameWorld").style.cursor = "pointer";      
+ 		document.getElementById("gameWorld").style.cursor = "pointer";      
 	} else {
-		document.getElementById("gameWorld").style.cursor = "";         
-
+		document.getElementById("gameWorld").style.cursor = "";          
 	}
 }; 
 
@@ -817,8 +820,9 @@ function Day(game) {
 	this.image = null;
  
 	this.elapsedTime = 0;
-	this.dayLength = 200; 
+	this.dayLength = 100; 
 	this.day = true;
+	this.time = "2:00";
 	this.lastSpawnTime = 0;
 	this.spawnRate = ((4 - 0 + 0.5) * 10);
  	Entity.call(this, game, 0, 0);
@@ -829,25 +833,36 @@ Day.prototype.constructor = Day;
  
 Day.prototype.update = function () {  
 	this.elapsedTime += this.game.clockTick;
- 
 	if(this.elapsedTime > this.dayLength) {
 		// nighttime has ended and now it is day
 		this.elapsedTime = 0;
 		this.image = null;
 		this.day = true;
 		console.log("day");
-	} else if(this.elapsedTime > (this.dayLength * 0.60)) {
+	} else if(this.elapsedTime > (this.dayLength * 0.60) ){
 		this.image = this.midnightImage;
-	} else if(this.elapsedTime > (this.dayLength * 0.55) || this.elapsedTime > (this.dayLength * 0.90)) {
+	} else if(this.elapsedTime > (this.dayLength * 0.55) ){ // || this.elapsedTime > (this.dayLength * 0.90)) {
 		this.image = this.eveningImage; 
-	} else if(this.elapsedTime > (this.dayLength * 0.50) || this.elapsedTime > (this.dayLength * 0.95)) {
+	} else if(this.elapsedTime > (this.dayLength * 0.50) ){ //|| this.elapsedTime > (this.dayLength * 0.95)) {
 		this.image = this.duskImage;    
 		this.day = false;
 	}  
 
-	if(!this.day) {   
-		this.spawnRate = ((4 - this.game.state.level + 0.5)) * 10;
+	var t = Math.floor(this.elapsedTime); 
+ 	var min = (t % 60);
+ 	var hr = Math.floor(t / 60) + 2; // clock offset
+ 	if(hr >= 13) {	
+ 		hr -= 12;
+ 	} 
+	if(Math.floor(min / 10) === 0) {
+		this.time = hr + ":0" + min;
+	} else {
+		this.time = hr + ":" + min;
+	}
 
+	if(!this.day) {    
+		this.spawnRate = ((4 - this.game.state.level + 0.5)) * 10;
+		console.log(this.spawnRate);
 		if(this.elapsedTime > (this.lastSpawnTime + this.spawnRate)) { 
 			this.lastSpawnTime = this.elapsedTime;
 			var spawnType = Math.floor(Math.random() * Math.floor(3));
@@ -860,7 +875,7 @@ Day.prototype.update = function () {
 			} 
 
 		} 
-	} 
+	}  
 };
 
 Day.prototype.draw = function (ctx) { 
@@ -875,7 +890,7 @@ function State(game, player, ship, day) {
 	this.ship = ship;
 	this.day = day;
 
-	this.level = 0; // change this to "upgrade" the spaceship (0 to 4)
+	this.level = 2; // change this to "upgrade" the spaceship (0 to 4)
 	
 	this.wood = 0;
 	this.food = 0;
@@ -892,22 +907,26 @@ State.prototype = new Entity();
 State.prototype.constructor = State;
  
 State.prototype.update = function () {  
-	if(this.day.day) {
-		document.getElementById("time").innerHTML =  "<img src=\"img/time.png\"/> Day"; 
+	if(this.ship.lives < 0 || this.player.lives < 0) {
+		gameOver();
 	} else {
-		document.getElementById("time").innerHTML =  "<img src=\"img/time.png\"/> Night"; 
-	}
-	document.getElementById("woodCount").innerHTML = "<img src=\"img/tree.png\"/>" + this.wood;
-	document.getElementById("foodCount").innerHTML = "<img src=\"img/bush.png\"/>" + this.food; 
-	document.getElementById("metalCount").innerHTML = "<img src=\"img/metal.png\"/>" + this.scrap; 
-	document.getElementById("mineralCount").innerHTML = "<img src=\"img/rock.png\"/>" + this.minerals; 
-	document.getElementById("robotCount").innerHTML = "<img src=\"img/robot.png\"/>" + this.robotCount; 
- 
- 	document.getElementById("shipHealth").style.width = "" + 100* (this.ship.lives / this.shipMaxHealth) + "%";
-	document.getElementById("shipHealth").innerHTML = this.ship.lives + "/" + this.shipMaxHealth; 
+		if(this.day.day) {
+			document.getElementById("time").innerHTML =  "<img src=\"img/time.png\"/>" + this.day.time; 
+		} else {
+			document.getElementById("time").innerHTML =  "<img src=\"img/time.png\"/>" + this.day.time; 
+		}
+		document.getElementById("woodCount").innerHTML = "<img src=\"img/tree.png\"/>" + this.wood;
+		document.getElementById("foodCount").innerHTML = "<img src=\"img/bush.png\"/>" + this.food; 
+		document.getElementById("metalCount").innerHTML = "<img src=\"img/metal.png\"/>" + this.scrap; 
+		document.getElementById("mineralCount").innerHTML = "<img src=\"img/rock.png\"/>" + this.minerals; 
+		document.getElementById("robotCount").innerHTML = "<img src=\"img/robot.png\"/>" + this.robotCount; 
+	 
+	 	document.getElementById("shipHealth").style.width = "" + 100 * (this.ship.lives / this.shipMaxHealth) + "%";
+		document.getElementById("shipHealth").innerHTML = this.ship.lives + "/" + this.shipMaxHealth; 
 
- 	document.getElementById("playerHealth").style.width = "" + 100* (this.player.lives / this.playerMaxLives) + "%";
-	document.getElementById("playerHealth").innerHTML = this.player.lives + "/" + this.playerMaxLives; 
+	 	document.getElementById("playerHealth").style.width = "" + 100 * (this.player.lives / this.playerMaxLives) + "%";
+		document.getElementById("playerHealth").innerHTML = this.player.lives + "/" + this.playerMaxLives; 
+	}
 };
 
 State.prototype.draw = function (ctx) {  
@@ -923,12 +942,29 @@ function play() {
 };
 
 function pause() {
-	gameEngine.pause(); 
-	document.getElementById("playButton").style.display = "";
-	document.getElementById("playGameText").style.display = ""; 
-	document.getElementById("playGameText").innerHTML = "Resume";      
-	document.getElementById("playGameText").style.left = "44.5%"; 
-	document.getElementById("gameWorld").style.opacity = "0.4";
+	if(gameEngine.paused) {
+		play();
+	} else {
+		gameEngine.pause(); 
+		document.getElementById("playButton").style.display = "";
+		document.getElementById("playGameText").style.display = ""; 
+		document.getElementById("playGameText").innerHTML = "Resume";      
+		document.getElementById("playGameText").style.left = "44.5%"; 
+		document.getElementById("gameWorld").style.opacity = "0.4";
+	}
+};
+
+function gameOver() {
+	if(gameEngine.paused) {
+		play();
+	} else {
+		gameEngine.pause(); 
+		document.getElementById("playButton").style.display = "";
+		document.getElementById("playGameText").style.display = ""; 
+		document.getElementById("playGameText").innerHTML = "Game Over";      
+		document.getElementById("playGameText").style.left = "42.5%"; 
+		document.getElementById("gameWorld").style.opacity = "0.4";
+	} 
 };
 
 function addEnivironmentEntities(gameEngine) {  
