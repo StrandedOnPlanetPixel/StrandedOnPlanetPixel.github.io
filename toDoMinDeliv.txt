@@ -11,19 +11,11 @@ To-Do:
 		display controls
 	
     fix animation completes on button clicked (Taylor)
-
-    start screen (Taylor)
-		so user clicks canvas
-		controls
 	
 	resource management (Amanda)
 		counters
 		cap on resources
-
-	display resources (Taylor)
-		placeholder images
-		player health
-	
+ 	
 	menus for our robots (Amanda)
 		simple menu with images as buttons for each resource type
 		display robot health
@@ -49,21 +41,10 @@ To-Do:
 			Scavenger damage
 			Alien death (sploosh)
 			Player attack
-<<<<<<< HEAD
-			Robot hit
-			Robot power down
-			Space ship hit
-
+			Robot attack 
+	
+	adjusting charge levels (Taylor) 
  
-=======
-			Robot attack
-
->>>>>>> master
-	day/night cycle (Taylor)
- 		adjusting view 
-		adjusting charge levels
-		only certain enemies come out at night (random?)
-
 	level object
 
 	checks for win and lose

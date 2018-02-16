@@ -773,6 +773,7 @@ function SpaceShip(game) {
 	this.size = 160;
 	this.image = new Animation(AM.getAsset(this.spritesheet), (this.game.level * this.size), 0, 160, 160, 0.1, 1, true, false, 1);  
 	this.radius = 77;
+	this.lives = 500;
 	Entity.call(this, game, width / 2, height / 2);
  
 	this.image.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);
@@ -865,8 +866,9 @@ Day.prototype.draw = function (ctx) {
 	Entity.prototype.draw.call(this);
 };
 
-function State(game, player) {
+function State(game, player, ship) {
 	this.player = player;
+	this.ship = ship;
 
 	this.level = 0; // change this to "upgrade" the spaceship (0 to 4)
 	
@@ -877,7 +879,7 @@ function State(game, player) {
 
 	this.robotCount = 0;
 
-	this.shipHealth = 0;
+	this.shipMaxHealth = this.ship.lives;
  	this.playerMaxLives = this.player.lives;
 };
 
@@ -890,7 +892,10 @@ State.prototype.update = function () {
 	document.getElementById("metalCount").innerHTML = "<img src=\"img/metal.png\"/>" + this.scrap; 
 	document.getElementById("mineralCount").innerHTML = "<img src=\"img/rock.png\"/>" + this.minerals; 
 	document.getElementById("robotCount").innerHTML = "<img src=\"img/robot.png\"/>" + this.robotCount; 
-	document.getElementById("shipHealth").innerHTML = "<img src=\"img/ship.png\"/>" + this.shipHealth; 
+ 
+ 	document.getElementById("shipHealth").style.width = "" + 100* (this.ship.lives / this.shipMaxHealth) + "%";
+	document.getElementById("shipHealth").innerHTML = this.ship.lives + "/" + this.shipMaxHealth; 
+
  	document.getElementById("playerHealth").style.width = "" + 100* (this.player.lives / this.playerMaxLives) + "%";
 	document.getElementById("playerHealth").innerHTML = this.player.lives + "/" + this.playerMaxLives; 
 };
@@ -1008,7 +1013,7 @@ AM.downloadAll(function () {
 	var day = new Day(gameEngine);
 	var spaceship = new SpaceShip(gameEngine);  
 	
-	var state = new State(gameEngine, player);
+	var state = new State(gameEngine, player, spaceship);
 
 	gameEngine.state = state;
 	gameEngine.addEntity(state);
