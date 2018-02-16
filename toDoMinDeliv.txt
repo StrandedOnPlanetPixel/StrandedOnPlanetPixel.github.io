@@ -44,18 +44,13 @@ To-Do:
 		sound manager
 		music
 		sound effects
-			Rummager shoot (rummager_attack.mp3)
-			Rummage death 
+			Rummager death 
+			Rummager damage
 			Scavenger attack
-			Scavenger death (explosion)
-			Alien lightening bolt
+			Scavenger damage
 			Alien death (sploosh)
-			Player hit (space_traveler_damage.mp3)
 			Player attack
-			Robot hit 
-			Robot power down
-			Space ship hit (ship_damage.mp3)
-
+			Robot attack
 
 	day/night cycle (Taylor)
 		day/night as entity
