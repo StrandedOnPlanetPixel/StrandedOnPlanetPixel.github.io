@@ -42,16 +42,16 @@ SoundManager.prototype.volumeUp = function() {
 	// loop through each sound and increase sound????
  	try {
  		backgroundSong.volume += 0.1;
- 	} catch {
+ 	} catch(err) {
 		console.log("Max volume"); 
  	}
  }
 
-SoundManager.prototype.volumeDown= function() {
+SoundManager.prototype.volumeDown = function() {
 	// loop through each sound and decrease sound???	
  	try {
  		backgroundSong.volume -= 0.1;
- 	} catch {
+ 	} catch(err) {
 		console.log("Sound Muted"); 
  	}
  }
