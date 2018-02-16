@@ -313,8 +313,8 @@ Player.prototype.update = function () {
 				if (this != ent && collide(this, ent) && this.game.keys.attack &&
 					(!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 1.5))) {
 						//record last shot time and create the bullet.
-						attack(this, closestEnt);
-						closestEnt.lives--;
+						attack(this, ent);
+						ent.lives--;
  						this.lastAttackTime = this.game.timer.gameTime; 
 					
  				}  
