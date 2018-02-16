@@ -17,6 +17,7 @@ function GameEngine() {
 	this.environmentEntities = [];
 	this.npcEntities = [];
 	this.friendlyEntities = [];
+	this.rockEntities = [];
 	this.treeEntities = [];
 	this.bushEntities = [];
 	this.buildingEntities = [];
@@ -127,6 +128,13 @@ GameEngine.prototype.addNpcEntity = function(entity, friendly) {
     }
 };
 
+GameEngine.prototype.addRockEntity = function(entity) {
+    console.log('added rock entity');
+    this.entities.push(entity);
+    this.rockEntities.push(entity);
+    this.environmentEntities.push(entity);
+}
+
 GameEngine.prototype.addTreeEntity = function(entity) {
     console.log('added tree entity');
     this.entities.push(entity);
@@ -147,6 +155,11 @@ GameEngine.prototype.addBuildingEntity = function(entity) {
     this.buildingEntities.push(entity);
     this.environmentEntities.push(entity);
 };
+
+GameEngine.prototype.getBuildingEntity = function(){
+	return this.buildingEntities[1];
+};
+	
 
 GameEngine.prototype.addEnvironmentEntity = function(entity) {
     console.log('added an environment entity');    
