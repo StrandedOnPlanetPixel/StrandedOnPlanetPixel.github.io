@@ -49,8 +49,8 @@ GameEngine.prototype.init = function (ctx) {
     this.height = this.ctx.canvas.height;
     this.keyListener();
     this.timer = new Timer();
-    console.log('game initialized');
-}
+    console.log("game initialized");
+};
 
 GameEngine.prototype.start = function () {
     console.log("starting game");   
@@ -61,13 +61,13 @@ GameEngine.prototype.start = function () {
         that.loop();
         requestAnimFrame(gameLoop, that.ctx.canvas);
     })();
-}
+};
 
 GameEngine.prototype.pause = function () {
     console.log("pausing game");       
     this.pausedTime = this.timer.clockTick;
     
-}
+};
 
 
 GameEngine.prototype.keyListener = function() {
@@ -76,7 +76,7 @@ GameEngine.prototype.keyListener = function() {
         var x = e.clientX - that.ctx.canvas.getBoundingClientRect().left;
         var y = e.clientY - that.ctx.canvas.getBoundingClientRect().top;
          return {x: x, y: y, radius: 16};
-    }
+    };
 
     var that = this;
     this.ctx.canvas.addEventListener("keydown", function(e) {
@@ -113,7 +113,7 @@ GameEngine.prototype.keyListener = function() {
 GameEngine.prototype.addEntity = function(entity) {
     console.log('added entity');
     this.entities.push(entity);
-}
+};
 
 GameEngine.prototype.addNpcEntity = function(entity, friendly) {
     console.log('added npc entity');
@@ -124,34 +124,34 @@ GameEngine.prototype.addNpcEntity = function(entity, friendly) {
     } else {
         this.hostileEntities.push(entity);
     }
-}
+};
 
 GameEngine.prototype.addTreeEntity = function(entity) {
     console.log('added tree entity');
     this.entities.push(entity);
     this.treeEntities.push(entity);
     this.environmentEntities.push(entity);
-}   
+};   
 
 GameEngine.prototype.addBushEntity = function(entity) {
     console.log('added bush entity');
     this.entities.push(entity);
     this.bushEntities.push(entity);
     this.environmentEntities.push(entity);
-}   
+};   
 
 GameEngine.prototype.addBuildingEntity = function(entity) {
     console.log('added building entity');
     this.entities.push(entity);
     this.buildingEntities.push(entity);
     this.environmentEntities.push(entity);
-} 
+};
 
 GameEngine.prototype.addEnvironmentEntity = function(entity) {
     console.log('added an environment entity');    
     this.entities.push(entity);
     this.environmentEntities.push(entity);
-}
+};
 
 
 GameEngine.prototype.draw = function () {
@@ -161,7 +161,7 @@ GameEngine.prototype.draw = function () {
         this.entities[i].draw(this.ctx);
     } 
     this.ctx.restore();
-}
+};
 
 GameEngine.prototype.update = function () {
     var entitiesCount = this.entities.length;
@@ -178,7 +178,7 @@ GameEngine.prototype.update = function () {
             this.entities.splice(i, 1);
         }
     }
-}
+};
 
 GameEngine.prototype.loop = function () { 
     this.clockTick = this.timer.tick();  
@@ -187,7 +187,7 @@ GameEngine.prototype.loop = function () {
         this.update();
         this.draw(); 
     }
-} 
+};
  
 /** Timer **/
 function Timer() {
@@ -204,7 +204,7 @@ Timer.prototype.tick = function () {
     var gameDelta = Math.min(wallDelta, this.maxStep);
     this.gameTime += gameDelta;
     return gameDelta;
-}
+};
 
 /** Entity **/
 function Entity(game, x, y) {
@@ -215,7 +215,7 @@ function Entity(game, x, y) {
 }
 
 Entity.prototype.update = function () {
-}
+};
 
 Entity.prototype.draw = function (ctx) {
     if (this.game.showOutlines && this.radius) {
@@ -232,7 +232,7 @@ Entity.prototype.draw = function (ctx) {
             this.game.ctx.closePath();
         }
     }
-}
+};
 
 Entity.prototype.rotateAndCache = function (image, angle) {
     var offscreenCanvas = document.createElement('canvas');
@@ -247,4 +247,4 @@ Entity.prototype.rotateAndCache = function (image, angle) {
     offscreenCtx.drawImage(image, -(image.width / 2), -(image.height / 2));
     offscreenCtx.restore();
     return offscreenCanvas;
-}
+};
