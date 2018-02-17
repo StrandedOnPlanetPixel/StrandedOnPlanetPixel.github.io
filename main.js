@@ -243,13 +243,14 @@ Background.prototype.draw = function (ctx) {
 
 function Player(game) {
  	var spritesheet = AM.getAsset("img/space_traveler.png");
+    //(spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, reverse, scale)
 	this.animation = new Animation(spritesheet,             0,  448,    64, 64, 0.1,    8, true,    false,  0.75);
 	this.stillAnimation = new Animation(spritesheet,        0,  256,    64, 64, 0.1,    1, true,    false,  0.75);
 	this.upAnimation = new Animation(spritesheet,           0,  448,    64, 64, 0.095,  8, true,    false,  0.75);
 	this.downAnimation = new Animation(spritesheet,         0,  256,    64, 64, 0.095,  8, true,    false,  0.75);
 	this.rightAnimation = new Animation(spritesheet,        0,  384,    64, 64, 0.095,  8, true,    false,  0.75);
 	this.leftAnimation = new Animation(spritesheet,         0,  320,    64, 64, 0.095,  8, true,    false,  0.75);    
-	this.attackAnimation = new Animation(spritesheet,       0,  0,      64, 64, 0.1,    8, true,    false,  0.75);    
+	this.attackAnimation = new Animation(spritesheet,       0,  0,      64, 64, 0.1,    8, false,    false,  0.75);    
 	this.frontAttackAnimation = new Animation(spritesheet,  0,  0,      64, 64, 0.1,    8, true,    false,  0.75);    
 	this.leftAttackAnimation = new Animation(spritesheet,   0,  0,      64, 64, 0.1,    8, true,    false,  0.75);    
 	this.rightAttackAnimation = new Animation(spritesheet,  0,  64,     64, 64, 0.1,    8, true,    false,  0.75);
@@ -267,6 +268,8 @@ function Player(game) {
 	this.speed = 150; 
 	this.damage = 10;
 	this.lastAttackTime = 0;
+    this.attackFrameCounter = 0;
+    this.isAttacking = false;
 };
 
 Player.prototype = new Entity();
@@ -285,6 +288,72 @@ Player.prototype.update = function () {
 	}
 	
 	if(this.lives > 0) {
+
+        if (this.isAttacking) {
+            console.log(this.isAttacking + ' ' + this.attackFrameCounter);
+            this.attackFrameCounter += 1;
+            this.isAttacking = true;
+            this.animation = this.attackAnimation;
+            for (var i = 0; i < this.game.hostileEntities.length; i++) {
+                var ent = this.game.hostileEntities[i];
+                if (this != ent && collide(this, ent) && this.game.keys.attack &&
+                    (!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 0.5))) {
+                        ent.lives -= this.damage; 
+                        this.lastAttackTime = this.game.timer.gameTime; 
+                }  
+            }
+
+            if (this.attackFrameCounter > 95) {
+                this.attackFrameCounter = 0;
+                this.isAttacking = false;
+            }
+        } else{
+            if(this.game.keys.up) {
+                this.attackAnimation = this.frontAttackAnimation;
+                this.animation = this.upAnimation;
+                this.y -= this.game.clockTick * this.speed;  
+            } else if (this.game.keys.down) {  
+                this.attackAnimation = this.frontAttackAnimation;
+                this.animation = this.downAnimation;
+                this.y += this.game.clockTick * this.speed;
+            } else if (this.game.keys.left) {
+                this.attackAnimation = this.leftAttackAnimation;
+                this.animation = this.leftAnimation; 
+                this.x -= this.game.clockTick * this.speed;   
+            } else if (this.game.keys.right) {
+                this.attackAnimation = this.rightAttackAnimation;
+                this.animation = this.rightAnimation;    
+                this.x += this.game.clockTick * this.speed;      
+            } else {
+                this.attackAnimation = this.frontAttackAnimation;
+                this.animation = this.stillAnimation;    
+            } 
+            if(this.game.keys.program) {
+                this.animation = this.programAnimation;
+                for (var i = 0; i < this.game.programmableEntities.length; i++) {
+                    var ent = this.game.programmableEntities[i];
+                    if (this != ent && collide(this, ent)) { 
+                        console.log("Programing " + ent);  
+                        ent.setTask();
+                    }  
+                } 
+            }
+            if(this.game.keys.attack) {
+                console.log("attack pressed");
+                this.isAttacking = true;
+                this.attackFrameCounter += 1;
+                this.animation = this.attackAnimation;
+                for (var i = 0; i < this.game.hostileEntities.length; i++) {
+                    var ent = this.game.hostileEntities[i];
+                    if (this != ent && collide(this, ent) && this.game.keys.attack &&
+                        (!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 0.5))) {
+                            ent.lives -= this.damage; 
+                            this.lastAttackTime = this.game.timer.gameTime; 
+                    }  
+                } 
+            } 
+        }
+        /*
 		if(this.game.keys.up) {
 			this.attackAnimation = this.frontAttackAnimation;
 			this.animation = this.upAnimation;
@@ -314,8 +383,9 @@ Player.prototype.update = function () {
 					ent.setTask();
  				}  
 			} 
-		}  
-		if(this.game.keys.attack) {
+		}  */
+		/*if(this.game.keys.attack) {
+            this.isAttacking = true;
 			this.animation = this.attackAnimation;
 			for (var i = 0; i < this.game.hostileEntities.length; i++) {
 				var ent = this.game.hostileEntities[i];
@@ -325,7 +395,7 @@ Player.prototype.update = function () {
  						this.lastAttackTime = this.game.timer.gameTime; 
  				}  
 			} 
-		}   
+		} */  
 	} else {
 		this.animation = this.deadAnimation;
 	} 

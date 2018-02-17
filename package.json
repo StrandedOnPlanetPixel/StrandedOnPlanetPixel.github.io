@@ -1,0 +1,26 @@
+{
+  "name": "StrandedOnPlanetPixel.github.io",
+  "version": "1.0.0",
+  "description": "Amanda Aldrich <br> Zira Cook <br> Taylor Riccetti <br>",
+  "main": "main.js",
+  "dependencies": {
+    "eslint": "^4.17.0"
+  },
+  "devDependencies": {
+    "eslint-config-google": "^0.9.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/StrandedOnPlanetPixel/StrandedOnPlanetPixel.github.io.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/StrandedOnPlanetPixel/StrandedOnPlanetPixel.github.io/issues"
+  },
+  "homepage": "https://github.com/StrandedOnPlanetPixel/StrandedOnPlanetPixel.github.io#readme"
+}
