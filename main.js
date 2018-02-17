@@ -307,6 +307,8 @@ Player.prototype.update = function () {
 		} 
 		if(this.game.keys.program) {
 			this.animation = this.programAnimation;
+			
+			this.game.removeProgramButtons();	
 			for (var i = 0; i < this.game.programmableEntities.length; i++) {
 				var ent = this.game.programmableEntities[i];
 				if (this != ent && collide(this, ent)) { 
@@ -884,7 +886,7 @@ function ProgramButton(game, x, y, task, robot) {
 	} else { // charge?
 		this.image = AM.getAsset("img/plus.png"); 
 	}
-	
+
 	this.animation = new Animation(this.image, 0, 0, 32, 32, 0.1, 1, true, false, 1);
 
  	Entity.call(this, game, x, y);
@@ -991,8 +993,8 @@ function Rock(game, x, y) {
 	this.image = new Animation(AM.getAsset("img/rock"+ (Math.floor(Math.random() * 2) + 1) + ".png"), 0, 0, 32, 32, 0.1, 1, true, false, 1);
 	this.game = game;   
 	this.ctx = game.ctx;     
-	Entity.call(this, game, x, y);  
-	this.radius = 30; 
+	Entity.call(this, game, x, y);   
+	this.radius = 16; 
 	this.task = 4;
 }
 
@@ -1060,8 +1062,7 @@ SpaceShip.prototype.draw = function (ctx) {
 function Day(game) { 
 	this.game = game;   
 	this.ctx = game.ctx;  
-	//function Animation(spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, reverse, scale) {
-	this.duskImage = "img/dusk.png";  
+ 	this.duskImage = "img/dusk.png";  
 	this.eveningImage = "img/evening.png";  
 	this.midnightImage = "img/evening.png";
 	this.image = null;
@@ -1087,9 +1088,9 @@ Day.prototype.update = function () {
 		this.day = true;
 	} else if(this.elapsedTime > (this.dayLength * 0.60) ){
 		this.image = this.midnightImage;
-	} else if(this.elapsedTime > (this.dayLength * 0.55) ){ // || this.elapsedTime > (this.dayLength * 0.90)) {
+	} else if(this.elapsedTime > (this.dayLength * 0.55) || this.elapsedTime > (this.dayLength * 0.90)) {
 		this.image = this.eveningImage; 
-	} else if(this.elapsedTime > (this.dayLength * 0.50) ){ //|| this.elapsedTime > (this.dayLength * 0.95)) {
+	} else if(this.elapsedTime > (this.dayLength * 0.50) || this.elapsedTime > (this.dayLength * 0.95)) {
 		this.image = this.duskImage;    
 		this.day = false;
 	}  
@@ -1110,7 +1111,7 @@ Day.prototype.update = function () {
 
 	if(!this.day) {    
 		this.spawnRate = (this.game.state.level + 0.5) * 10; 
-		if(this.elapsedTime + this.spawnRate > (this.lastSpawnTime )) { 
+		if(this.elapsedTime - this.spawnRate > (this.lastSpawnTime )) { 
 			this.lastSpawnTime = this.elapsedTime;
 			var spawnType = Math.floor(Math.random() * Math.floor(3));
 			if(spawnType === 0) {
