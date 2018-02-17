@@ -995,7 +995,7 @@ function Day(game) {
 	this.image = null;
  
 	this.elapsedTime = 0;
-	this.dayLength = 50; 
+	this.dayLength = 200; 
 	this.day = true;
 	this.time = "2:00";
 	this.lastSpawnTime = 0;
@@ -1023,11 +1023,13 @@ Day.prototype.update = function () {
 	}  
 
 	var t = Math.floor(this.elapsedTime); 
- 	var min = (t % 60);
- 	var hr = Math.floor(t / 2) + 2; // clock offset
+ 	var min = (t % 40);
+ 	var hr = Math.floor(t / 20) - 4; // clock offset
  	if(hr >= 13) {	
  		hr -= 12;
- 	} 
+ 	} else if(hr <= 0) {
+ 		hr = 12 + hr;
+ 	}
 	if(Math.floor(min / 10) === 0) {
 		this.time = hr + ":0" + min;
 	} else {
@@ -1035,8 +1037,8 @@ Day.prototype.update = function () {
 	}
 
 	if(!this.day) {    
-		this.spawnRate = ((4 - this.game.state.level + 0.5)) * 10; 
-		if(this.elapsedTime - this.spawnRate > (this.lastSpawnTime )) { 
+		this.spawnRate = (this.game.state.level + 0.5) * 10; 
+		if(this.elapsedTime + this.spawnRate > (this.lastSpawnTime )) { 
 			this.lastSpawnTime = this.elapsedTime;
 			var spawnType = Math.floor(Math.random() * Math.floor(3));
 			if(spawnType === 0) {
@@ -1062,7 +1064,7 @@ function State(game, player, ship, day) {
 	this.ship = ship;
 	this.day = day;
 
-	this.level = 0; // change this to "upgrade" the spaceship (0 to 4)
+	this.level = 1; // change this to "upgrade" the spaceship (0 to 4)
 	
 	this.wood = 0;
 	this.food = 0;
