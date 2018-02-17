@@ -48,12 +48,12 @@ function GameEngine() {
 }
 
 GameEngine.prototype.init = function (ctx) {
-    this.ctx = ctx;
-    this.width = this.ctx.canvas.width;
-    this.height = this.ctx.canvas.height;
-    this.keyListener();
-    this.timer = new Timer();
-    console.log("game initialized");
+	this.ctx = ctx;
+	this.width = this.ctx.canvas.width;
+	this.height = this.ctx.canvas.height;
+	this.keyListener();
+	this.timer = new Timer();
+	console.log("game initialized");
 };
 
 GameEngine.prototype.start = function () {
@@ -83,132 +83,144 @@ GameEngine.prototype.removeProgramButtons = function () {
 
 GameEngine.prototype.keyListener = function() {
 	var getXandY = function(e) {
-        var x = e.clientX - that.ctx.canvas.getBoundingClientRect().left;
-        var y = e.clientY - that.ctx.canvas.getBoundingClientRect().top;
-         return {x: x, y: y, radius: 16};
-    };
+		var x = e.clientX - that.ctx.canvas.getBoundingClientRect().left;
+		var y = e.clientY - that.ctx.canvas.getBoundingClientRect().top;
+		 return {x: x, y: y, radius: 1};
+	};
 
-    var that = this;
-    this.ctx.canvas.addEventListener("keydown", function(e) {
-        var keyPressed = String.fromCharCode(e.which); 
-        if(keyPressed === 'W' || e.which === 38) that.keys.up = true;
-        if(keyPressed === 'A' || e.which === 37) that.keys.left = true;  
-        if(keyPressed === 'D' || e.which === 39) that.keys.right = true;  
-        if(keyPressed === 'S' || e.which === 40) that.keys.down = true; 
-        if(keyPressed === ' ') that.keys.attack = true; 
-        if(keyPressed === 'Q') that.keys.program = true; 
-        e.preventDefault(); 
-    }, false);  
+	var that = this;
+	this.ctx.canvas.addEventListener("keydown", function(e) {
+		var keyPressed = String.fromCharCode(e.which); 
+		if(keyPressed === 'W' || e.which === 38) that.keys.up = true;
+		if(keyPressed === 'A' || e.which === 37) that.keys.left = true;  
+		if(keyPressed === 'D' || e.which === 39) that.keys.right = true;  
+		if(keyPressed === 'S' || e.which === 40) that.keys.down = true; 
+		if(keyPressed === ' ') that.keys.attack = true; 
+		if(keyPressed === 'Q') that.keys.program = true; 
+		e.preventDefault(); 
+	}, false);  
 
-    this.ctx.canvas.addEventListener("keyup", function(e) {
-        var keyReleased = String.fromCharCode(e.which); 
-        if(keyReleased === 'W' || e.which === 38) that.keys.up = false;
-        if(keyReleased === 'A' || e.which === 37) that.keys.left = false;  
-        if(keyReleased === 'D' || e.which === 39) that.keys.right = false;  
-        if(keyReleased === 'S' || e.which === 40) that.keys.down = false; 
-        if(keyReleased === ' ') that.keys.attack = false; 
-        if(keyReleased === 'Q') that.keys.program = false; 
-        e.preventDefault(); 
-    }, false);  
+	this.ctx.canvas.addEventListener("keyup", function(e) {
+		var keyReleased = String.fromCharCode(e.which); 
+		if(keyReleased === 'W' || e.which === 38) that.keys.up = false;
+		if(keyReleased === 'A' || e.which === 37) that.keys.left = false;  
+		if(keyReleased === 'D' || e.which === 39) that.keys.right = false;  
+		if(keyReleased === 'S' || e.which === 40) that.keys.down = false; 
+		if(keyReleased === ' ') that.keys.attack = false; 
+		if(keyReleased === 'Q') that.keys.program = false; 
+		e.preventDefault(); 
+	}, false);  
 
-    this.ctx.canvas.addEventListener("click", function (e) {
-        that.click = getXandY(e);  
-    }, false);
+	this.ctx.canvas.addEventListener("click", function (e) {
+		that.click = getXandY(e);  
+	}, false);
 
-    this.ctx.canvas.addEventListener("mousemove", function (e) {
-        that.mouse = getXandY(e);  
-    }, false);
+	this.ctx.canvas.addEventListener("mousemove", function (e) {
+		that.mouse = getXandY(e);  
+	}, false);
 };
-    
+	
 GameEngine.prototype.addEntity = function(entity) {
-    console.log('added entity');
-    this.entities.push(entity);
+	console.log('added entity');
+	this.entities.push(entity);
 };
 
 GameEngine.prototype.addProgramButtonEntity = function(entity) { 
-    this.entities.push(entity);
-    this.programmableButtonEntities.push(entity);
+	this.entities.push(entity);
+	this.programmableButtonEntities.push(entity);
 };
 
 GameEngine.prototype.addNpcEntity = function(entity, friendly) {
-    console.log('added npc entity');
-    this.entities.push(entity);
-    this.npcEntities.push(entity);
-    if(friendly) {
-        this.friendlyEntities.push(entity);
-    } else {
-        this.hostileEntities.push(entity);
-    }
+	console.log('added npc entity');
+	this.entities.push(entity);
+	this.npcEntities.push(entity);
+	if(friendly) {
+		this.friendlyEntities.push(entity);
+	} else {
+		this.hostileEntities.push(entity);
+	}
 };
 
 GameEngine.prototype.addProgrammableEntity = function(entity) {
-    console.log('added programmable entity');
-    this.entities.push(entity);
-    this.npcEntities.push(entity); 
-    this.friendlyEntities.push(entity); 
-    this.programmableEntities.push(entity);
+	console.log('added programmable entity');
+	this.entities.push(entity);
+	this.npcEntities.push(entity); 
+	this.friendlyEntities.push(entity); 
+	this.programmableEntities.push(entity);
 };
 
 
 GameEngine.prototype.addRockEntity = function(entity) {
-    console.log('added rock entity');
-    this.entities.push(entity);
-    this.rockEntities.push(entity);
-    this.environmentEntities.push(entity);
+	console.log('added rock entity');
+	this.entities.push(entity);
+	this.rockEntities.push(entity);
+	this.environmentEntities.push(entity);
 }
 
 GameEngine.prototype.addTreeEntity = function(entity) {
-    console.log('added tree entity');
-    this.entities.push(entity);
-    this.treeEntities.push(entity);
-    this.environmentEntities.push(entity);
+	console.log('added tree entity');
+	this.entities.push(entity);
+	this.treeEntities.push(entity);
+	this.environmentEntities.push(entity);
 };   
 
 GameEngine.prototype.addBushEntity = function(entity) {
-    console.log('added bush entity');
-    this.entities.push(entity);
-    this.bushEntities.push(entity);
-    this.environmentEntities.push(entity);
+	console.log('added bush entity');
+	this.entities.push(entity);
+	this.bushEntities.push(entity);
+	this.environmentEntities.push(entity);
 };   
 
 GameEngine.prototype.addBuildingEntity = function(entity) {
-    console.log('added building entity');
-    this.entities.push(entity);
-    this.buildingEntities.push(entity);
-    this.environmentEntities.push(entity);
+	console.log('added building entity');
+	this.entities.push(entity);
+	this.buildingEntities.push(entity);
+	this.environmentEntities.push(entity);
 };
 	
 GameEngine.prototype.addEnvironmentEntity = function(entity) {
-    console.log('added an environment entity');    
-    this.entities.push(entity);
-    this.environmentEntities.push(entity);
+	console.log('added an environment entity');    
+	this.entities.push(entity);
+	this.environmentEntities.push(entity);
 };
 
 
 GameEngine.prototype.draw = function () {
-    this.ctx.clearRect(0, 0, this.width, this.height);
-    this.ctx.save();
-    for (var i = 0; i < this.entities.length; i++) {
-        this.entities[i].draw(this.ctx);
-    } 
-    this.ctx.restore();
+	this.ctx.clearRect(0, 0, this.width, this.height);
+	this.ctx.save();
+	for (var i = 0; i < this.entities.length; i++) {
+		this.entities[i].draw(this.ctx);
+	} 
+	this.ctx.restore();
 };
 
 GameEngine.prototype.update = function () {
-    var entitiesCount = this.entities.length;
+	var entitiesCount = this.entities.length;
 
-    for (var i = 0; i < entitiesCount; i++) {
-        var entity = this.entities[i];
-        if (!entity.removeFromWorld) {
-            entity.update();
-        }
-    }
+	for (var i = 0; i < entitiesCount; i++) {
+		var entity = this.entities[i];
+		if (!entity.removeFromWorld) {
+			entity.update();
+		}
+	}
 
-    for (var i = this.entities.length - 1; i >= 0; --i) {
-        if (this.entities[i].removeFromWorld) {
-            this.entities.splice(i, 1);
-        }
-    }
+	for (var i = this.entities.length - 1; i >= 0; --i) {
+		if (this.entities[i].removeFromWorld) {
+			this.entities.splice(i, 1); 
+		}
+	}
+
+	for (var i = this.friendlyEntities.length - 1; i >= 0; --i) {
+		if (this.friendlyEntities[i].removeFromWorld) {
+			this.friendlyEntities.splice(i, 1); 
+		}
+	}
+
+	for (var i = this.hostileEntities.length - 1; i >= 0; --i) {
+		if (this.hostileEntities[i].removeFromWorld) {
+			this.hostileEntities.splice(i, 1); 
+		}
+	}
 };
 
 GameEngine.prototype.loop = function () { 
@@ -231,9 +243,9 @@ Timer.prototype.tick = function () {
 	var wallDelta = (wallCurrent - this.wallLastTimestamp) / 1000;
 	this.wallLastTimestamp = wallCurrent;
   
-    var gameDelta = Math.min(wallDelta, this.maxStep);
-    this.gameTime += gameDelta;
-    return gameDelta;
+	var gameDelta = Math.min(wallDelta, this.maxStep);
+	this.gameTime += gameDelta;
+	return gameDelta;
 }; 
 
 /** Entity **/
