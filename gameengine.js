@@ -22,6 +22,7 @@ function GameEngine() {
 	this.bushEntities = [];
 	this.buildingEntities = [];
 	this.hostileEntities = [];
+	this.programmableEntities = [];
 	this.ctx = null;
 	this.level = null;
 	this.dayLength = null;
@@ -127,6 +128,15 @@ GameEngine.prototype.addNpcEntity = function(entity, friendly) {
         this.hostileEntities.push(entity);
     }
 };
+
+GameEngine.prototype.addProgrammableEntity = function(entity) {
+    console.log('added programmable entity');
+    this.entities.push(entity);
+    this.npcEntities.push(entity); 
+    this.friendlyEntities.push(entity); 
+    this.programmableEntities.push(entity);
+};
+
 
 GameEngine.prototype.addRockEntity = function(entity) {
     console.log('added rock entity');

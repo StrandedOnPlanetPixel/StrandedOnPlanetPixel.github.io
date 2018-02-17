@@ -307,6 +307,13 @@ Player.prototype.update = function () {
 		} 
 		if(this.game.keys.program) {
 			this.animation = this.programAnimation;
+			for (var i = 0; i < this.game.programmableEntities.length; i++) {
+				var ent = this.game.programmableEntities[i];
+				if (this != ent && collide(this, ent)) { 
+					console.log("Programing " + ent);  
+					ent.setTask();
+ 				}  
+			} 
 		}  
 		if(this.game.keys.attack) {
 			this.animation = this.attackAnimation;
@@ -314,11 +321,7 @@ Player.prototype.update = function () {
 				var ent = this.game.hostileEntities[i];
 				if (this != ent && collide(this, ent) && this.game.keys.attack &&
 					(!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 0.5))) {
-						//record last shot time and create the bullet.
-						console.log(ent);
- 						console.log(ent.lives);
- 						ent.lives -= this.damage;
- 						console.log(ent.lives);
+ 						ent.lives -= this.damage; 
  						this.lastAttackTime = this.game.timer.gameTime; 
  				}  
 			} 
@@ -662,7 +665,7 @@ function RobotTier1(game) { //spriteSheet, startX, startY, frameWidth, frameHeig
 	this.pDUpAnimation = new Animation(spriteSheet, 0, 896, 64, 64, 0.1, 6, true, false, 0.75);
 	this.pDDownAnimation = new Animation(spriteSheet, 384, 768, 64, 64, 0.1, 6, true, false, 0.75);
 	this.pDRightAnimation = new Animation(spriteSheet, 0, 960, 64, 64, 0.1, 6, true, false, 0.75);
-	this,pDLeftAnimation = new Animation(spriteSheet, 384, 896, 64, 64, 0.1, 6, true, false, 0.75);
+	this.pDLeftAnimation = new Animation(spriteSheet, 384, 896, 64, 64, 0.1, 6, true, false, 0.75);
 	
 	//Dying animation
 	this.dyingUpAnimation = new Animation(spriteSheet, 512, 576, 64, 64, 0.1, 4, true, false, 0.75);
@@ -688,14 +691,28 @@ function RobotTier1(game) { //spriteSheet, startX, startY, frameWidth, frameHeig
 	this.y += this.radius;
 	this.taskEntity = null;	
 	this.directions = ["left", "right", "up", "down"];
- 	this.tasks = ["repair", "gatherBerry", "gatherScrap", "defend", "mine", "log", "charge", "dying"]; /* ,"charge" ??? Do we need?*/ 
+ 	this.tasks = ["repair", "gatherBerry", "gatherScrap", "defend", "mine", "log", "charge", "dying"];
 	this.task = this.tasks[0];
 	this.dead = false; 
-	this.life = 200; //robots life?
+	this.lives = 200; 
 }
 
 RobotTier1.prototype = new Entity();
 RobotTier1.prototype.constructor = RobotTier1;
+
+
+RobotTier1.prototype.setTask = function() {
+	// sets the task of the robot
+	//display menu 
+	var menuX = this.x - 10;
+	var menuY = this.y - 32;
+	for(var i = 0; i < this.tasks.length; i++) {
+		menuX += 40; 
+		console.log(this.tasks[i]);
+		this.game.addEntity(new ProgramButton(this.game, menuX, menuY, this.tasks[i], this));
+	}
+ };
+
 
 RobotTier1.prototype.update = function() {
 	if (collideLeft(this)) {
@@ -778,6 +795,63 @@ RobotTier1.prototype.update = function() {
 
 RobotTier1.prototype.draw = function(){
  	this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);  
+	Entity.prototype.draw.call(this);
+};
+
+function ProgramButton(game, x, y, task, robot) {
+	this.game = game;   
+	this.ctx = game.ctx;     
+	this.robot = robot;
+	this.task = task;
+	if (this.task === this.robot.tasks[0] ) { // repair
+		this.image = AM.getAsset("img/ship.png"); 
+	} else if (this.task === this.robot.tasks[1]) { //gather berry
+		this.image = AM.getAsset("img/bushIcon.png");
+	} else if (this.task === this.robot.tasks[2]) { //gather scrap
+		this.image = AM.getAsset("img/metal.png");
+	} else if (this.task === this.robot.tasks[5]) { //logging
+		this.image = AM.getAsset("img/treeIcon.png");
+	} else if (this.task === this.robot.tasks[4]) { //mining 
+		this.image = AM.getAsset("img/rock1.png");
+	} else {
+		this.image = AM.getAsset("img/plus.png");
+
+	}
+	this.animation = new Animation(this.image, 0, 0, 32, 32, 0.1, 1, true, false, 1);
+
+ 	Entity.call(this, game, x, y);
+ 	this.radius = 24;
+}
+
+ProgramButton.prototype = new Entity();
+ProgramButton.prototype.constructor = ProgramButton;
+ 
+ProgramButton.prototype.update = function () {  
+	if(collide(this, this.game.click)) {
+		console.log("you clicked on a programm button");
+		this.game.click = null;
+		this.robot.task = this.task;
+		if (this.task === this.robot.tasks[0] ) { // repair
+			this.robot.taskEntity = this.game.state.ship;
+		} else if (this.task === this.robot.tasks[1]) { //gather berry
+			this.robot.taskEntity = this.game.bushEntities[Math.floor(Math.random() * this.game.bushEntities.length)];
+		} else if (this.task === this.robot.tasks[2]) { //gather scrap
+			this.robot.taskEntity = this.game.buildingEntities[Math.floor(Math.random() * this.game.buildingEntities.length)];
+		} else if (this.task === this.robot.tasks[5]) { //logging
+			this.robot.taskEntity = this.game.treeEntities[Math.floor(Math.random() * this.game.treeEntities.length)];
+		} else if (this.task === this.robot.tasks[4]) { //mining 
+			this.robot.taskEntity = this.game.rockEntities[Math.floor(Math.random() * this.game.rockEntities.length)];
+		}
+	} 
+	if(collide(this, this.game.mouse)) {
+ 		document.getElementById("gameWorld").style.cursor = "pointer";      
+	} else {
+		document.getElementById("gameWorld").style.cursor = "";          
+	}
+};
+
+ProgramButton.prototype.draw = function (ctx) { 
+	this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);
 	Entity.prototype.draw.call(this);
 };
 
@@ -952,8 +1026,7 @@ Day.prototype.update = function () {
 	}
 
 	if(!this.day) {    
-		this.spawnRate = ((4 - this.game.state.level + 0.5)) * 10;
-		console.log(this.spawnRate);
+		this.spawnRate = ((4 - this.game.state.level + 0.5)) * 10; 
 		if(this.elapsedTime - this.spawnRate > (this.lastSpawnTime )) { 
 			this.lastSpawnTime = this.elapsedTime;
 			var spawnType = Math.floor(Math.random() * Math.floor(3));
@@ -1109,7 +1182,11 @@ AM.queueDownload("img/midnight.png");
 AM.queueDownload("img/space_traveler.png");
 AM.queueDownload("img/scavenger.png");  
 AM.queueDownload("img/tree.png"); 
+AM.queueDownload("img/treeIcon.png"); 
+AM.queueDownload("img/metal.png"); 
+AM.queueDownload("img/ship.png"); 
 AM.queueDownload("img/bush.png"); 
+AM.queueDownload("img/bushIcon.png"); 
 AM.queueDownload("img/building1.png"); 
 AM.queueDownload("img/building2.png"); 
 AM.queueDownload("img/building3.png"); 
@@ -1120,6 +1197,7 @@ AM.queueDownload("img/alien.png");
 AM.queueDownload("img/bullet.png");
 AM.queueDownload("img/rock1.png");
 AM.queueDownload("img/rock2.png");
+AM.queueDownload("img/plus.png");
 
 AM.downloadAll(startGame);
 
@@ -1165,7 +1243,7 @@ function startGame() {
 
 	gameEngine.addNpcEntity(spaceship, true);   
 	gameEngine.addNpcEntity(player, true);  
-	gameEngine.addNpcEntity(robot2, true);
+	gameEngine.addProgrammableEntity(robot2, true);
 	gameEngine.addEntity(day);
 	
 	soundManager.setupBackgroundMusic();  
