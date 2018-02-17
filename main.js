@@ -1349,11 +1349,11 @@ function startGame() {
 	gameEngine.addEntity(map);  
 	addEnivironmentEntities(gameEngine);
  
+	gameEngine.addEntity(day);
 
 	gameEngine.addNpcEntity(spaceship, true);   
 	gameEngine.addNpcEntity(player, true);  
 	gameEngine.addProgrammableEntity(robot2, true);
-	gameEngine.addEntity(day);
 	
 	soundManager.setupBackgroundMusic();  
 
