@@ -1151,8 +1151,8 @@ function startGame() {
 	var player = new Player(gameEngine);
 	var map = new Background(gameEngine); 
 	var day = new Day(gameEngine);
-	var spaceship = new SpaceShip(gameEngine);  
-	var robot2 = new RobotTier1(gameEngine, buildingEnts[1]);
+	var spaceship = new SpaceShip(gameEngine); 
+	var robot2 = new RobotTier1(gameEngine, gameEngine.buildingEntities.get(1));
 	
 	var state = new State(gameEngine, player, spaceship, day);
 

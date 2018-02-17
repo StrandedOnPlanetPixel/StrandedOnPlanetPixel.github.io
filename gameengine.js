@@ -155,12 +155,7 @@ GameEngine.prototype.addBuildingEntity = function(entity) {
     this.buildingEntities.push(entity);
     this.environmentEntities.push(entity);
 };
-
-GameEngine.prototype.getBuildingEntity = function(){
-	return this.buildingEntities[1];
-};
 	
-
 GameEngine.prototype.addEnvironmentEntity = function(entity) {
     console.log('added an environment entity');    
     this.entities.push(entity);
@@ -262,3 +257,11 @@ Entity.prototype.rotateAndCache = function (image, angle) {
 	return offscreenCanvas;
 };
  
+ 
+Array.prototype.get = function(index) {
+  return this[index];
+}
+
+Array.prototype.set = function(index, value) {
+  this[index] = value;
+}
