@@ -113,10 +113,15 @@ ul {
     text-align: center; 
 } 
 
-.resources {
+.resources, .addTo {
 	padding-right: 16px;
     float: left;
     margin: 0 auto;
+}
+
+
+#addRobot:hover {
+
 }
 
 .soundControls {
@@ -125,6 +130,6 @@ ul {
     margin: 0 auto;
 }
 
-.soundControls img { 
+.soundControls img, .addTo { 
  	cursor: pointer;
 } 

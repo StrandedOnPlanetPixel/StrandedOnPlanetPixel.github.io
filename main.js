@@ -1144,7 +1144,7 @@ function State(game, player, ship, day) {
 	this.scrap = 0;
 	this.minerals = 0;
 
-	this.robotCount = 0;
+	this.robotCount = 1;
 
 	this.shipMaxHealth = this.ship.lives;
  	this.playerMaxLives = this.player.lives;
@@ -1212,6 +1212,22 @@ function gameOver() {
 		document.getElementById("playGameText").style.left = "42.3%"; 
 		document.getElementById("gameWorld").style.opacity = "0.4";
 	} 
+};
+
+function eatFood() {
+	if(gameEngine.state.food >= 1) {
+		gameEngine.state.food--;
+		gameEngine.state.player.lives++;
+	}
+};
+
+function addRobot() {
+	if(gameEngine.state.scrap >= 2 && gameEngine.state.minerals >= 2) {
+		gameEngine.state.scrap -= 2;
+		gameEngine.state.minerals -= 2;  
+		gameEngine.state.robotCount++;
+		gameEngine.addProgrammableEntity(new RobotTier1(gameEngine, gameEngine.state.day), true);
+	}
 };
 
 function addEnivironmentEntities(gameEngine) {  
@@ -1297,7 +1313,9 @@ function startGame() {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 	document.getElementById("playButton").addEventListener("click", play);
-	document.getElementById("playGameText").addEventListener("click", play);      
+	document.getElementById("playGameText").addEventListener("click", play); 
+	document.getElementById("addRobot").addEventListener("click", addRobot);
+	document.getElementById("heal").addEventListener("click", eatFood);      
 	ctx.canvas.addEventListener("keydown", function(e) {
 		var keyPressed = String.fromCharCode(e.which); 
 		if(keyPressed === 'P' || e.which === 80) pause(); 
