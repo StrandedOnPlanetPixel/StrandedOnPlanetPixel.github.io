@@ -937,8 +937,6 @@ RobotTier1.prototype.update = function() {
 		if(collide(this, this.taskEntity)){ 
 			// fix repair directions;
 			if (this.task === this.tasks[0] ) { // repair
-				if(this.game.state.scrap >= 10 && this.game.state.wood >= 20
-				 && this.game.state.minerals >= 10){
 				if(this.game.state.scrap >= 5 && this.game.state.wood >= 20
 					&& this.game.state.minerals >= 5){
 					if(this.game.state.ship.lives === this.game.state.shipMaxHealth){
