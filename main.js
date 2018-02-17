@@ -938,7 +938,7 @@ RobotTier1.prototype.update = function() {
 						
 						this.game.state.shipMaxHealth += 100;
 						this.game.state.scrap -= 5;
-						this.game.state.wood -= 20;
+						this.game.state.wood -= 10;
 						this.game.state.minerals -= 5;
 						
 						this.game.state.level += 1;
