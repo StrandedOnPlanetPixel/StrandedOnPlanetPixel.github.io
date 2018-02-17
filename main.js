@@ -875,14 +875,16 @@ function ProgramButton(game, x, y, task, robot) {
 		this.image = AM.getAsset("img/bushIcon.png");
 	} else if (this.task === this.robot.tasks[2]) { //gather scrap
 		this.image = AM.getAsset("img/metal.png");
-	} else if (this.task === this.robot.tasks[5]) { //logging
-		this.image = AM.getAsset("img/treeIcon.png");
+	} else if (this.task === this.robot.tasks[3]) { //defending
+		this.image = AM.getAsset("img/plus.png");
 	} else if (this.task === this.robot.tasks[4]) { //mining 
 		this.image = AM.getAsset("img/rock1.png");
-	} else {
-		this.image = AM.getAsset("img/plus.png");
-
+	} else if (this.task === this.robot.tasks[5]) { //logging
+		this.image = AM.getAsset("img/treeIcon.png");
+	} else { // charge?
+		this.image = AM.getAsset("img/plus.png"); 
 	}
+	
 	this.animation = new Animation(this.image, 0, 0, 32, 32, 0.1, 1, true, false, 1);
 
  	Entity.call(this, game, x, y);
@@ -930,6 +932,8 @@ ProgramButton.prototype.update = function () {
 		} else if (this.task === this.robot.tasks[4]) { //mining 
 			this.robot.taskEntity = this.game.rockEntities[Math.floor(Math.random() * this.game.rockEntities.length)];
 		}
+		console.log(this.task);
+
 		this.game.removeProgramButtons();		
 		document.getElementById("gameWorld").style.cursor = "";     
 
