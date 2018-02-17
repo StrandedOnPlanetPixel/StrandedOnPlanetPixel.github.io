@@ -1360,18 +1360,20 @@ State.prototype.draw = function (ctx) {
 };
   
 function play() {
-	canvas.focus();
-	gameEngine.start();
-	document.getElementById("playButton").style.display = "none";
-	document.getElementById("playGameText").style.display = "none";   
-	document.getElementById("playGameText").style.left = "42.5%";       
-	document.getElementById("gameWorld").style.opacity = "1";
+	if(!gameEngine.gameOver) {
+		canvas.focus();
+		gameEngine.start();
+		document.getElementById("playButton").style.display = "none";
+		document.getElementById("playGameText").style.display = "none";   
+		document.getElementById("playGameText").style.left = "42.5%";       
+		document.getElementById("gameWorld").style.opacity = "1";
+	}
 };
 
 function pause() {
 	if(gameEngine.paused) {
 		play();
-	} else {
+	} else if(!gameEngine.gameOver) {
 		gameEngine.pause();      
 		document.getElementById("playButton").style.display = "";
 		document.getElementById("playGameText").style.display = ""; 
