@@ -310,8 +310,7 @@ Player.prototype.update = function () {
 			for (var i = 0; i < this.game.programmableEntities.length; i++) {
 				var ent = this.game.programmableEntities[i];
 				if (this != ent && collide(this, ent)) { 
-					console.log("Programing " + ent);  
-					ent.setTask();
+ 					ent.setTask();
  				}  
 			} 
 		}  
@@ -685,13 +684,13 @@ function RobotTier1(game) { //spriteSheet, startX, startY, frameWidth, frameHeig
 	this.speed = 75;  
 	this.game = game;
 	this.ctx = game.ctx; 
-	Entity.call(this, game, (width / 2) - 25, (height / 2 ) + 25);  
+	Entity.call(this, game, (width / 2) + 10, (height / 2 ) + 28);  
 	this.radius = 24;   
 	this.x += this.radius;
 	this.y += this.radius;
 	this.taskEntity = null;	
 	this.directions = ["left", "right", "up", "down"];
- 	this.tasks = ["repair", "gatherBerry", "gatherScrap", "defend", "mine", "log", "charge", "dying"];
+ 	this.tasks = ["repair", "gatherBerry", "gatherScrap", "defend", "mine", "log", "charge"];
 	this.task = this.tasks[0];
 	this.dead = false; 
 	this.lives = 200; 
@@ -704,11 +703,10 @@ RobotTier1.prototype.constructor = RobotTier1;
 RobotTier1.prototype.setTask = function() {
 	// sets the task of the robot
 	//display menu 
-	var menuX = this.x - 10;
+	var menuX = this.x - 150;
 	var menuY = this.y - 32;
 	for(var i = 0; i < this.tasks.length; i++) {
-		menuX += 40; 
-		console.log(this.tasks[i]);
+		menuX += 40;  
 		this.game.addProgramButtonEntity(new ProgramButton(this.game, menuX, menuY, this.tasks[i], this));
 	}
  };
@@ -820,15 +818,35 @@ function ProgramButton(game, x, y, task, robot) {
 	this.animation = new Animation(this.image, 0, 0, 32, 32, 0.1, 1, true, false, 1);
 
  	Entity.call(this, game, x, y);
- 	this.radius = 24;
+ 	this.radius = 16;
 }
 
 ProgramButton.prototype = new Entity();
 ProgramButton.prototype.constructor = ProgramButton;
  
 ProgramButton.prototype.update = function () {  
-	if(collide(this, this.game.click)) {
-		console.log("you clicked on a programm button");
+	if (collideLeft(this)) {
+		this.x += 40; 
+		this.y += 40;
+	}	
+	if (collideRight(this)) {  
+		this.x -= 40;
+		this.y += 40;
+    }
+
+    if (collideTop(this)) { 
+		this.y += 40;
+    }
+
+    if(collideBottom(this)) { 
+		this.y -= 40;
+    }
+	if(collide(this, this.game.mouse)) {
+ 		document.getElementById("gameWorld").style.cursor = "pointer";      
+	} else {
+		document.getElementById("gameWorld").style.cursor = "";          
+	}
+	if(collide(this, this.game.click)) { 
 		this.game.click = null;
 		this.robot.task = this.task;
 		if (this.task === this.robot.tasks[0] ) { // repair
@@ -842,14 +860,10 @@ ProgramButton.prototype.update = function () {
 		} else if (this.task === this.robot.tasks[4]) { //mining 
 			this.robot.taskEntity = this.game.rockEntities[Math.floor(Math.random() * this.game.rockEntities.length)];
 		}
-		this.game.removeProgramButtons();
-	} 
-
-	if(collide(this, this.game.mouse)) {
- 		document.getElementById("gameWorld").style.cursor = "pointer";      
-	} else {
+		this.game.removeProgramButtons();		
 		document.getElementById("gameWorld").style.cursor = "";          
-	}
+
+	}  
 };
 
 ProgramButton.prototype.draw = function (ctx) { 
@@ -961,16 +975,6 @@ SpaceShip.prototype.constructor = SpaceShip;
  
 SpaceShip.prototype.update = function () {  
  	this.image = new Animation(AM.getAsset(this.spritesheet), (this.game.state.level * this.size), 0, 160, 160, 0.1, 1, true, false, 1);  
-
-	if(collide(this, this.game.click)) {
-		console.log("you clicked on the space ship");
-		this.game.click = null;
-	}  
-	if(collide(this, this.game.mouse)) {
- 		document.getElementById("gameWorld").style.cursor = "pointer";      
-	} else {
-		document.getElementById("gameWorld").style.cursor = "";          
-	}
 }; 
 
 SpaceShip.prototype.draw = function (ctx) {
@@ -1236,6 +1240,7 @@ function startGame() {
 	var robot2 = new RobotTier1(gameEngine);
 	
 	var state = new State(gameEngine, player, spaceship, day);
+ 
 
 	gameEngine.state = state;
 	gameEngine.addEntity(state);
