@@ -709,7 +709,7 @@ RobotTier1.prototype.setTask = function() {
 	for(var i = 0; i < this.tasks.length; i++) {
 		menuX += 40; 
 		console.log(this.tasks[i]);
-		this.game.addEntity(new ProgramButton(this.game, menuX, menuY, this.tasks[i], this));
+		this.game.addProgramButtonEntity(new ProgramButton(this.game, menuX, menuY, this.tasks[i], this));
 	}
  };
 
@@ -842,7 +842,7 @@ ProgramButton.prototype.update = function () {
 		} else if (this.task === this.robot.tasks[4]) { //mining 
 			this.robot.taskEntity = this.game.rockEntities[Math.floor(Math.random() * this.game.rockEntities.length)];
 		}
-		this.removeFromWorld = true;
+		this.game.removeProgramButtons();
 	} 
 
 	if(collide(this, this.game.mouse)) {

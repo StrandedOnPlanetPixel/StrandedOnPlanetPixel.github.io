@@ -23,6 +23,7 @@ function GameEngine() {
 	this.buildingEntities = [];
 	this.hostileEntities = [];
 	this.programmableEntities = [];
+	this.programmableButtonEntities = [];
 	this.ctx = null;
 	this.level = null;
 	this.dayLength = null;
@@ -74,6 +75,12 @@ GameEngine.prototype.pause = function () {
 	this.paused = true;    
 };
 
+GameEngine.prototype.removeProgramButtons = function () {
+	for(var i = 0; i < this.programmableButtonEntities.length; i++) {
+		this.programmableButtonEntities[i].removeFromWorld = true;
+	}
+};
+
 GameEngine.prototype.keyListener = function() {
 	var getXandY = function(e) {
         var x = e.clientX - that.ctx.canvas.getBoundingClientRect().left;
@@ -116,6 +123,11 @@ GameEngine.prototype.keyListener = function() {
 GameEngine.prototype.addEntity = function(entity) {
     console.log('added entity');
     this.entities.push(entity);
+};
+
+GameEngine.prototype.addProgramButtonEntity = function(entity) { 
+    this.entities.push(entity);
+    this.programmableButtonEntities.push(entity);
 };
 
 GameEngine.prototype.addNpcEntity = function(entity, friendly) {
