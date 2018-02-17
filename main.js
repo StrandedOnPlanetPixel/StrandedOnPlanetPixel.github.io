@@ -243,7 +243,6 @@ Background.prototype.draw = function (ctx) {
 
 function Player(game) {
  	var spritesheet = AM.getAsset("img/space_traveler.png");
-	this.animation = new Animation(spritesheet,             0,  448,    64, 64, 0.1,    8, true,    false,  0.75);
 	this.stillAnimation = new Animation(spritesheet,        0,  256,    64, 64, 0.1,    1, true,    false,  0.75);
 	this.upAnimation = new Animation(spritesheet,           0,  448,    64, 64, 0.095,  8, true,    false,  0.75);
 	this.downAnimation = new Animation(spritesheet,         0,  256,    64, 64, 0.095,  8, true,    false,  0.75);
@@ -256,6 +255,7 @@ function Player(game) {
 	this.programAnimation = new Animation(spritesheet,      0,  192,    64, 64, 0.1,    8, true,    false,  0.75);
 	this.dyingAnimation = new Animation(spritesheet,        0,  128,    64, 64, 0.1,    8, false,   false,  0.75); 
 	this.deadAnimation = new Animation(spritesheet,        448, 128,    64, 64, 0.1,    1, true,    false,  0.75);  
+	this.animation = this.stillAnimation;
 
 	this.game = game;
 	this.ctx = game.ctx;  
@@ -310,8 +310,7 @@ Player.prototype.update = function () {
 			for (var i = 0; i < this.game.programmableEntities.length; i++) {
 				var ent = this.game.programmableEntities[i];
 				if (this != ent && collide(this, ent)) { 
-					console.log("Programing " + ent);  
-					ent.setTask();
+ 					ent.setTask();
  				}  
 			} 
 		}  
@@ -685,7 +684,7 @@ function RobotTier1(game, day) { //spriteSheet, startX, startY, frameWidth, fram
 	this.speed = 75;  
 	this.game = game;
 	this.ctx = game.ctx; 
-	Entity.call(this, game, (width / 2) - 25, (height / 2 ) + 25);  
+	Entity.call(this, game, (width / 2) + 10, (height / 2 ) + 28);  
 	this.radius = 24;   
 	this.x += this.radius;
 	this.y += this.radius;
@@ -709,11 +708,10 @@ RobotTier1.prototype.constructor = RobotTier1;
 RobotTier1.prototype.setTask = function() {
 	// sets the task of the robot
 	//display menu 
-	var menuX = this.x - 10;
+	var menuX = this.x - 150;
 	var menuY = this.y - 32;
 	for(var i = 0; i < this.tasks.length; i++) {
-		menuX += 40; 
-		console.log(this.tasks[i]);
+		menuX += 40;  
 		this.game.addProgramButtonEntity(new ProgramButton(this.game, menuX, menuY, this.tasks[i], this));
 	}
 	
@@ -888,15 +886,37 @@ function ProgramButton(game, x, y, task, robot) {
 	this.animation = new Animation(this.image, 0, 0, 32, 32, 0.1, 1, true, false, 1);
 
  	Entity.call(this, game, x, y);
- 	this.radius = 24;
+ 	this.radius = 16;
 }
 
 ProgramButton.prototype = new Entity();
 ProgramButton.prototype.constructor = ProgramButton;
  
 ProgramButton.prototype.update = function () {  
-	if(collide(this, this.game.click)) {
-		console.log("you clicked on a programm button");
+	if (collideLeft(this)) {
+		this.x += 40; 
+		this.y += 40;
+	}	
+	if (collideRight(this)) {  
+		this.x -= 40;
+		this.y += 40;
+    }
+
+    if (collideTop(this)) { 
+		this.y += 40;
+    }
+
+    if(collideBottom(this)) { 
+		this.y -= 40;
+    }
+
+	if(collide(this, this.game.mouse)) {
+ 		document.getElementById("gameWorld").style.cursor = "pointer";      
+	} else {
+		document.getElementById("gameWorld").style.cursor = "";          
+	}
+
+	if(collide(this, this.game.click)) { 
 		this.game.click = null;
 		this.robot.task = this.task;
 		if (this.task === this.robot.tasks[0] ) { // repair
@@ -910,14 +930,11 @@ ProgramButton.prototype.update = function () {
 		} else if (this.task === this.robot.tasks[4]) { //mining 
 			this.robot.taskEntity = this.game.rockEntities[Math.floor(Math.random() * this.game.rockEntities.length)];
 		}
-		this.game.removeProgramButtons();
-	} 
+		this.game.removeProgramButtons();		
+		document.getElementById("gameWorld").style.cursor = "";     
 
-	if(collide(this, this.game.mouse)) {
- 		document.getElementById("gameWorld").style.cursor = "pointer";      
-	} else {
-		document.getElementById("gameWorld").style.cursor = "";          
-	}
+
+	}  
 };
 
 ProgramButton.prototype.draw = function (ctx) { 
@@ -1029,16 +1046,6 @@ SpaceShip.prototype.constructor = SpaceShip;
  
 SpaceShip.prototype.update = function () {  
  	this.image = new Animation(AM.getAsset(this.spritesheet), (this.game.state.level * this.size), 0, 160, 160, 0.1, 1, true, false, 1);  
-
-	if(collide(this, this.game.click)) {
-		console.log("you clicked on the space ship");
-		this.game.click = null;
-	}  
-	if(collide(this, this.game.mouse)) {
- 		document.getElementById("gameWorld").style.cursor = "pointer";      
-	} else {
-		document.getElementById("gameWorld").style.cursor = "";          
-	}
 }; 
 
 SpaceShip.prototype.draw = function (ctx) {
@@ -1056,7 +1063,7 @@ function Day(game) {
 	this.image = null;
  
 	this.elapsedTime = 0;
-	this.dayLength = 50; 
+	this.dayLength = 200; 
 	this.day = true;
 	this.time = "2:00";
 	this.lastSpawnTime = 0;
@@ -1084,11 +1091,13 @@ Day.prototype.update = function () {
 	}  
 
 	var t = Math.floor(this.elapsedTime); 
- 	var min = (t % 60);
- 	var hr = Math.floor(t / 60) + 2; // clock offset
+ 	var min = (t % 40);
+ 	var hr = Math.floor(t / 20) - 4; // clock offset
  	if(hr >= 13) {	
  		hr -= 12;
- 	} 
+ 	} else if(hr <= 0) {
+ 		hr = 12 + hr;
+ 	}
 	if(Math.floor(min / 10) === 0) {
 		this.time = hr + ":0" + min;
 	} else {
@@ -1096,8 +1105,8 @@ Day.prototype.update = function () {
 	}
 
 	if(!this.day) {    
-		this.spawnRate = ((4 - this.game.state.level + 0.5)) * 10; 
-		if(this.elapsedTime - this.spawnRate > (this.lastSpawnTime )) { 
+		this.spawnRate = (this.game.state.level + 0.5) * 10; 
+		if(this.elapsedTime + this.spawnRate > (this.lastSpawnTime )) { 
 			this.lastSpawnTime = this.elapsedTime;
 			var spawnType = Math.floor(Math.random() * Math.floor(3));
 			if(spawnType === 0) {
@@ -1123,7 +1132,7 @@ function State(game, player, ship, day) {
 	this.ship = ship;
 	this.day = day;
 
-	this.level = 0; // change this to "upgrade" the spaceship (0 to 4)
+	this.level = 1; // change this to "upgrade" the spaceship (0 to 4)
 	
 	this.wood = 0;
 	this.food = 0;
@@ -1310,6 +1319,7 @@ function startGame() {
 	var robot2 = new RobotTier1(gameEngine, day);
 	
 	var state = new State(gameEngine, player, spaceship, day);
+ 
 
 	gameEngine.state = state;
 	gameEngine.addEntity(state);
