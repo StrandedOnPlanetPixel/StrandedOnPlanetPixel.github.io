@@ -246,6 +246,7 @@ function Player(game) {
  	var spritesheet = AM.getAsset("img/space_traveler.png");
     //(spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, reverse, scale)
 	this.animation = new Animation(spritesheet,             0,  448,    64, 64, 0.1,    8, true,    false,  0.75);
+
 	this.stillAnimation = new Animation(spritesheet,        0,  256,    64, 64, 0.1,    1, true,    false,  0.75);
 	this.upAnimation = new Animation(spritesheet,           0,  448,    64, 64, 0.095,  8, true,    false,  0.75);
 	this.downAnimation = new Animation(spritesheet,         0,  256,    64, 64, 0.095,  8, true,    false,  0.75);
@@ -258,6 +259,7 @@ function Player(game) {
 	this.programAnimation = new Animation(spritesheet,      0,  192,    64, 64, 0.1,    8, true,    false,  0.75);
 	this.dyingAnimation = new Animation(spritesheet,        0,  128,    64, 64, 0.1,    8, false,   false,  0.75); 
 	this.deadAnimation = new Animation(spritesheet,        448, 128,    64, 64, 0.1,    1, true,    false,  0.75);  
+	this.animation = this.stillAnimation;
 
     this.name = "Player";
 	this.game = game;
@@ -440,7 +442,7 @@ Alien.prototype.constructor = Alien;
 Alien.prototype.update = function () { 
  	if(this.dead) {
 		this.removeFromWorld = true;
-	} if(this.lives < 0) {
+	} if(this.lives <= 0) {
 		//dead
 		this.animation = this.dyingAnimation;
 		this.dead = true;
@@ -689,7 +691,7 @@ Bullet.prototype.draw = function() {
 	Entity.prototype.draw.call(this);
 };
 
-function RobotTier1(game) { //spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, scale
+function RobotTier1(game, day) { //spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, scale
 	var spriteSheet = AM.getAsset("img/robotSpriteSheet1.png"); 
 	this.stillAnimation = new Animation(spriteSheet, 0, 0, 64, 64, 0.1, 1, true, false, 0.75);
 
@@ -760,16 +762,21 @@ function RobotTier1(game) { //spriteSheet, startX, startY, frameWidth, frameHeig
 	this.speed = 75;  
 	this.game = game;
 	this.ctx = game.ctx; 
-	Entity.call(this, game, (width / 2) - 25, (height / 2 ) + 25);  
+	Entity.call(this, game, (width / 2) + 10, (height / 2 ) + 28);  
 	this.radius = 24;   
 	this.x += this.radius;
 	this.y += this.radius;
 	this.taskEntity = null;	
 	this.directions = ["left", "right", "up", "down"];
- 	this.tasks = ["repair", "gatherBerry", "gatherScrap", "defend", "mine", "log", "charge", "dying"];
+ 	this.tasks = ["repair", "gatherBerry", "gatherScrap", "defend", "mine", "log", "charge"];
 	this.task = this.tasks[0];
 	this.dead = false; 
 	this.lives = 200; 
+	this.elapsedTime = 0;
+	this.workspeed = 10;
+	this.chargespeed = 2;
+	this.charge = 100;
+	this.day = day;
 }
 
 RobotTier1.prototype = new Entity();
@@ -779,17 +786,33 @@ RobotTier1.prototype.constructor = RobotTier1;
 RobotTier1.prototype.setTask = function() {
 	// sets the task of the robot
 	//display menu 
-	var menuX = this.x - 10;
+	var menuX = this.x - 150;
 	var menuY = this.y - 32;
 	for(var i = 0; i < this.tasks.length; i++) {
-		menuX += 40; 
-		console.log(this.tasks[i]);
+		menuX += 40;  
 		this.game.addProgramButtonEntity(new ProgramButton(this.game, menuX, menuY, this.tasks[i], this));
 	}
+	
  };
 
 
 RobotTier1.prototype.update = function() {
+	
+	if(!this.day){
+		this.elapsedTime += this.game.clockTick;
+		if(this.elapsedTime > this.chargespeed) {
+			this.charge -= 1;
+			this.elapsedTime = 0;
+		}
+		
+	} else if (this.day && this.charge < 100){
+		this.elapsedTime += this.game.clockTick;
+		if(this.elapsedTime > this.chargespeed) {
+			this.charge += 1;
+			this.elapsedTime = 0;
+		}
+	}
+	
 	if (collideLeft(this)) {
 		this.x += this.radius;
 		
@@ -805,6 +828,33 @@ RobotTier1.prototype.update = function() {
     if(collideBottom(this)) { 
 		this.y -= this.radius;
     }
+	
+	if(this.lives <= 0){
+		if(this.dir === this.directions[3]){
+			this.animation = this.dyingDownAnimation;
+		} else if(this.dir === this.directions[0]){
+			this.animation = this.dyingLeftAnimation;		
+		} else if(this.dir === this.directions[1]){
+			this.animation = this.dyingRightAnimation;		
+		} else{
+			this.animation = this.dyingUpAnimation;
+		}
+		this.removeFromWorld = true;
+	}
+	
+	if(this.charge <= 0){
+		if(this.dir === this.directions[3]){
+			this.animation = this.pDDownAnimation;
+		} else if(this.dir === this.directions[0]){
+			this.animation = this.pDLeftAnimation;		
+		} else if(this.dir === this.directions[1]){
+			this.animation = this.pDRightAnimation;		
+		} else{
+			this.animation = this.pDUpAnimation;
+		}
+
+	}		
+	
 	if(this.taskEntity) { // if the robot has been programmed
    		// If the robot reaches its target entity 
 		if(collide(this, this.taskEntity)){ 
@@ -820,6 +870,11 @@ RobotTier1.prototype.update = function() {
 					this.animation = this.repairUpAnimation;		
 				}				
 			} else if (this.task === this.tasks[1]) { //gather berry
+				this.elapsedTime += this.game.clockTick;
+				if(this.elapsedTime > this.workspeed) {
+					this.game.state.food += 1;
+					this.elapsedTime = 0;
+				}
 				if(this.dir === this.directions[3]){
 					this.animation = this.gatherBerryDownAnimation;
 				} else if(this.dir === this.directions[0]){
@@ -830,7 +885,11 @@ RobotTier1.prototype.update = function() {
 					this.animation = this.gatherBerryUpAnimation;		
 				}
 			} else if (this.task === this.tasks[2]) { //gather scrap
-				this.game.state.scrap += 1;
+				this.elapsedTime += this.game.clockTick;
+				if(this.elapsedTime > this.workspeed) {
+					this.game.state.scrap += 1;
+					this.elapsedTime = 0;
+				}
 				if(this.dir === this.directions[3]){
 					this.animation = this.gatherScrapDownAnimation;
 				} else if(this.dir === this.directions[0]){
@@ -841,6 +900,11 @@ RobotTier1.prototype.update = function() {
 					this.animation = this.gatherScrapUpAnimation;
 				}
 			} else if (this.task === this.tasks[5]) { //logging
+				this.elapsedTime += this.game.clockTick;
+				if(this.elapsedTime > this.workspeed) {
+					this.game.state.wood += 1;
+					this.elapsedTime = 0;
+				}
 				if(this.dir === this.directions[3]){
 					this.animation = this.loggingDownAnimation;
 				} else if(this.dir === this.directions[0]){
@@ -851,6 +915,11 @@ RobotTier1.prototype.update = function() {
 					this.animation = this.loggingUpAnimation;
 				}
 			} else if (this.task === this.tasks[4]) { //mining
+				this.elapsedTime += this.game.clockTick;
+				if(this.elapsedTime > this.workspeed) {
+					this.game.state.minerals += 1;
+					this.elapsedTime = 0;
+				}
 				if(this.dir === this.directions[3]){
 					this.animation = this.mineDownAnimation;
 				} else if(this.dir === this.directions[0]){
@@ -884,26 +953,50 @@ function ProgramButton(game, x, y, task, robot) {
 		this.image = AM.getAsset("img/bushIcon.png");
 	} else if (this.task === this.robot.tasks[2]) { //gather scrap
 		this.image = AM.getAsset("img/metal.png");
-	} else if (this.task === this.robot.tasks[5]) { //logging
-		this.image = AM.getAsset("img/treeIcon.png");
+	} else if (this.task === this.robot.tasks[3]) { //defending
+		this.image = AM.getAsset("img/plus.png");
 	} else if (this.task === this.robot.tasks[4]) { //mining 
 		this.image = AM.getAsset("img/rock1.png");
-	} else {
-		this.image = AM.getAsset("img/plus.png");
-
+	} else if (this.task === this.robot.tasks[5]) { //logging
+		this.image = AM.getAsset("img/treeIcon.png");
+	} else { // charge?
+		this.image = AM.getAsset("img/plus.png"); 
 	}
+
 	this.animation = new Animation(this.image, 0, 0, 32, 32, 0.1, 1, true, false, 1);
 
  	Entity.call(this, game, x, y);
- 	this.radius = 24;
+ 	this.radius = 16;
 }
 
 ProgramButton.prototype = new Entity();
 ProgramButton.prototype.constructor = ProgramButton;
  
 ProgramButton.prototype.update = function () {  
-	if(collide(this, this.game.click)) {
-		console.log("you clicked on a programm button");
+	if (collideLeft(this)) {
+		this.x += 40; 
+		this.y += 40;
+	}	
+	if (collideRight(this)) {  
+		this.x -= 40;
+		this.y += 40;
+    }
+
+    if (collideTop(this)) { 
+		this.y += 40;
+    }
+
+    if(collideBottom(this)) { 
+		this.y -= 40;
+    }
+
+	if(collide(this, this.game.mouse)) {
+ 		document.getElementById("gameWorld").style.cursor = "pointer";      
+	} else {
+		document.getElementById("gameWorld").style.cursor = "";          
+	}
+
+	if(collide(this, this.game.click)) { 
 		this.game.click = null;
 		this.robot.task = this.task;
 		if (this.task === this.robot.tasks[0] ) { // repair
@@ -917,14 +1010,13 @@ ProgramButton.prototype.update = function () {
 		} else if (this.task === this.robot.tasks[4]) { //mining 
 			this.robot.taskEntity = this.game.rockEntities[Math.floor(Math.random() * this.game.rockEntities.length)];
 		}
-		this.game.removeProgramButtons();
-	} 
+		console.log(this.task);
 
-	if(collide(this, this.game.mouse)) {
- 		document.getElementById("gameWorld").style.cursor = "pointer";      
-	} else {
-		document.getElementById("gameWorld").style.cursor = "";          
-	}
+		this.game.removeProgramButtons();		
+		document.getElementById("gameWorld").style.cursor = "";     
+
+
+	}  
 };
 
 ProgramButton.prototype.draw = function (ctx) { 
@@ -977,8 +1069,8 @@ function Rock(game, x, y) {
 	this.image = new Animation(AM.getAsset("img/rock"+ (Math.floor(Math.random() * 2) + 1) + ".png"), 0, 0, 32, 32, 0.1, 1, true, false, 1);
 	this.game = game;   
 	this.ctx = game.ctx;     
-	Entity.call(this, game, x, y);  
-	this.radius = 30; 
+	Entity.call(this, game, x, y);   
+	this.radius = 16; 
 	this.task = 4;
 }
 
@@ -1036,16 +1128,6 @@ SpaceShip.prototype.constructor = SpaceShip;
  
 SpaceShip.prototype.update = function () {  
  	this.image = new Animation(AM.getAsset(this.spritesheet), (this.game.state.level * this.size), 0, 160, 160, 0.1, 1, true, false, 1);  
-
-	if(collide(this, this.game.click)) {
-		console.log("you clicked on the space ship");
-		this.game.click = null;
-	}  
-	if(collide(this, this.game.mouse)) {
- 		document.getElementById("gameWorld").style.cursor = "pointer";      
-	} else {
-		document.getElementById("gameWorld").style.cursor = "";          
-	}
 }; 
 
 SpaceShip.prototype.draw = function (ctx) {
@@ -1056,14 +1138,13 @@ SpaceShip.prototype.draw = function (ctx) {
 function Day(game) { 
 	this.game = game;   
 	this.ctx = game.ctx;  
-	//function Animation(spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, reverse, scale) {
-	this.duskImage = "img/dusk.png";  
+ 	this.duskImage = "img/dusk.png";  
 	this.eveningImage = "img/evening.png";  
 	this.midnightImage = "img/evening.png";
 	this.image = null;
  
 	this.elapsedTime = 0;
-	this.dayLength = 50; 
+	this.dayLength = 200; 
 	this.day = true;
 	this.time = "2:00";
 	this.lastSpawnTime = 0;
@@ -1083,19 +1164,21 @@ Day.prototype.update = function () {
 		this.day = true;
 	} else if(this.elapsedTime > (this.dayLength * 0.60) ){
 		this.image = this.midnightImage;
-	} else if(this.elapsedTime > (this.dayLength * 0.55) ){ // || this.elapsedTime > (this.dayLength * 0.90)) {
+	} else if(this.elapsedTime > (this.dayLength * 0.55) || this.elapsedTime > (this.dayLength * 0.90)) {
 		this.image = this.eveningImage; 
-	} else if(this.elapsedTime > (this.dayLength * 0.50) ){ //|| this.elapsedTime > (this.dayLength * 0.95)) {
+	} else if(this.elapsedTime > (this.dayLength * 0.50) || this.elapsedTime > (this.dayLength * 0.95)) {
 		this.image = this.duskImage;    
 		this.day = false;
 	}  
 
 	var t = Math.floor(this.elapsedTime); 
- 	var min = (t % 60);
- 	var hr = Math.floor(t / 60) + 2; // clock offset
+ 	var min = (t % 40);
+ 	var hr = Math.floor(t / 20) - 4; // clock offset
  	if(hr >= 13) {	
  		hr -= 12;
- 	} 
+ 	} else if(hr <= 0) {
+ 		hr = 12 + hr;
+ 	}
 	if(Math.floor(min / 10) === 0) {
 		this.time = hr + ":0" + min;
 	} else {
@@ -1103,7 +1186,7 @@ Day.prototype.update = function () {
 	}
 
 	if(!this.day) {    
-		this.spawnRate = ((4 - this.game.state.level + 0.5)) * 10; 
+		this.spawnRate = (this.game.state.level + 0.5) * 10; 
 		if(this.elapsedTime - this.spawnRate > (this.lastSpawnTime )) { 
 			this.lastSpawnTime = this.elapsedTime;
 			var spawnType = Math.floor(Math.random() * Math.floor(3));
@@ -1130,14 +1213,14 @@ function State(game, player, ship, day) {
 	this.ship = ship;
 	this.day = day;
 
-	this.level = 0; // change this to "upgrade" the spaceship (0 to 4)
+	this.level = 1; // change this to "upgrade" the spaceship (0 to 4)
 	
 	this.wood = 0;
 	this.food = 0;
 	this.scrap = 0;
 	this.minerals = 0;
 
-	this.robotCount = 0;
+	this.robotCount = 1;
 
 	this.shipMaxHealth = this.ship.lives;
  	this.playerMaxLives = this.player.lives;
@@ -1207,6 +1290,22 @@ function gameOver() {
 	} 
 };
 
+function eatFood() {
+	if(gameEngine.state.food >= 1) {
+		gameEngine.state.food--;
+		gameEngine.state.player.lives++;
+	}
+};
+
+function addRobot() {
+	if(gameEngine.state.scrap >= 2 && gameEngine.state.minerals >= 2) {
+		gameEngine.state.scrap -= 2;
+		gameEngine.state.minerals -= 2;  
+		gameEngine.state.robotCount++;
+		gameEngine.addProgrammableEntity(new RobotTier1(gameEngine, gameEngine.state.day), true);
+	}
+};
+
 function addEnivironmentEntities(gameEngine) {  
 	var treeEnts = [new Tree(gameEngine, 64, 64), new Tree(gameEngine, 222, 55), new Tree(gameEngine, 130, 85), 
 				new Tree(gameEngine, 305, 70), new Tree(gameEngine, 85, 160), new Tree(gameEngine, 155, 193), 
@@ -1239,6 +1338,11 @@ function addEnivironmentEntities(gameEngine) {
 
 	for(i = 0; i < buildingEnts.length; i++) {
 		gameEngine.addBuildingEntity(buildingEnts[i]);
+	}
+	
+	rockEnts = [new Rock(gameEngine, 600, 105), new Rock(gameEngine, 660, 105), new Rock(gameEngine, 660, 115), new Rock(gameEngine, 605, 115)];
+	for(var i = 0; i < rockEnts.length; i++) {
+		gameEngine.addRockEntity(rockEnts[i]);
 	}
    
 };
@@ -1287,7 +1391,9 @@ function startGame() {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 	document.getElementById("playButton").addEventListener("click", play);
-	document.getElementById("playGameText").addEventListener("click", play);      
+	document.getElementById("playGameText").addEventListener("click", play); 
+	document.getElementById("addRobot").addEventListener("click", addRobot);
+	document.getElementById("heal").addEventListener("click", eatFood);      
 	ctx.canvas.addEventListener("keydown", function(e) {
 		var keyPressed = String.fromCharCode(e.which); 
 		if(keyPressed === 'P' || e.which === 80) pause(); 
@@ -1306,21 +1412,23 @@ function startGame() {
 	var player = new Player(gameEngine);
 	var map = new Background(gameEngine); 
 	var day = new Day(gameEngine);
+	var spaceship = new SpaceShip(gameEngine); 
 	var spaceship = new SpaceShip(gameEngine);  
-	var robot2 = new RobotTier1(gameEngine);
+	var robot2 = new RobotTier1(gameEngine, day);
 	
 	var state = new State(gameEngine, player, spaceship, day);
+ 
 
 	gameEngine.state = state;
 	gameEngine.addEntity(state);
 	gameEngine.addEntity(map);  
 	addEnivironmentEntities(gameEngine);
  
+	gameEngine.addEntity(day);
 
 	gameEngine.addNpcEntity(spaceship, true);   
 	gameEngine.addNpcEntity(player, true);  
 	gameEngine.addProgrammableEntity(robot2, true);
-	gameEngine.addEntity(day);
 	
 	soundManager.setupBackgroundMusic();  
 
