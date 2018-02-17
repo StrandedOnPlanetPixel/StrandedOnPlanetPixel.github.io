@@ -3,12 +3,12 @@
 	<head>
 		<meta charset="utf-8">
 		<title>stranded on Planet Pixel</title>
-	    <script type="text/javascript" src="gameengine.js"></script>
-	    <script type="text/javascript" src="assetmanager.js"></script>
-	    <script type="text/javascript" src="soundmanager.js"></script>
-	    <script type="text/javascript" src="main.js"></script>
-        <link rel="stylesheet" href="stylesheet.css">	
-	    <link href="https://fonts.googleapis.com/css?family=Orbitron" rel="stylesheet"> 
+		<script type="text/javascript" src="gameengine.js"></script>
+		<script type="text/javascript" src="assetmanager.js"></script>
+		<script type="text/javascript" src="soundmanager.js"></script>
+		<script type="text/javascript" src="main.js"></script>
+		<link rel="stylesheet" href="stylesheet.css">	
+		<link href="https://fonts.googleapis.com/css?family=Orbitron" rel="stylesheet"> 
 	</head>
 
 	<body>
@@ -20,12 +20,12 @@
 					<li class="resources"><p>Food</p> <div id="foodCount"> <img src="img/bush.png"/>0</div> </li>
 					<li class="resources"><p>Scrap</p> <div id="metalCount"> <img src="img/metal.png"/>0</div> </li>
 					<li class="resources"><p>Minerals</p> <div id="mineralCount"> <img src="img/rock1.png"/>0</div> </li>
-					<li class="resources"><p>Robots</p> <div id="robotCount"> <img src="img/robot.png"/>0</div> </li>
+					<li class="resources"><p>Robots</p> <div id="robotCount"><img src="img/robot.png"/>0</div> </li>
 					<li class="resources"><p>Ship Health</p> <div id="myProgress"> <div id="shipHealth">0/0</div> </div> </li>
 					<li class="resources"><p>Player Health</p> <div id="myProgress"> <div id="playerHealth">0/0</div> </div> </li>
 					<li class="resources"><p>Time</p> <div id="time"> <img src="img/time.png"/> 8:00 </div></li>
 					
-					<li class="addTo"><p>Build Robot</p> <div id="addRobot"> <img src="img/plus.png"/></div> </li>
+					<li class="addTo"><p>Build Robot</p> <div id="addRobot"> <img src="img/plus.png"/><img src="img/robot.png" alt="controls"></div> </li>
 					<li class="addTo"><p>Eat Food</p> <div id="heal"> <img src="img/bush.png"/></div></li>
 
 					<li class="soundControls"><p>Sound</p><img id="audioToggle" src="img/pause.png"/> </li>
@@ -37,12 +37,18 @@
 				<img id="playButton" src="img/playGame.png"/> <p id="playGameText">Play Game</p>
 				<canvas id="gameWorld" tabindex="1" width="1280" height="640"></canvas>
 			</div>
-		</div>
-		<div>
-			<p>Controls</p> 
-			<img src="img/controls.png" alt="controls">
-		</div>
-		<p>Good luck, and don't get attacked!</p>
+			<div class="resources" >
+				<p>Legend</p> 
+				<p><img src="img/robot.png" alt="controls"> = 5<img src="img/tree.png" > + 5<img src="img/metal.png"> + 5<img src="img/rock1.png"></p>
+				<p><img src="img/ship.png" alt="controls"> = 10<img src="img/tree.png" > + 5<img src="img/metal.png"> + 5<img src="img/rock1.png"></p>
+			</div>
+			<div class="soundControls"> 
+				<p>Controls</p> 
+				<img src="img/controls.png" alt="controls">
+			</div>
+			<p>Good luck, and don't get attacked!</p>
+
+		</div> 
 	</body>
 
 </html>

@@ -15,7 +15,7 @@ function Animation(spriteSheet, startX, startY, frameWidth, frameHeight, frameDu
 };
 
 Animation.prototype.drawFrame = function (tick, ctx, x, y, radius) {
- 	var scaleBy = this.scale || 1;
+	var scaleBy = this.scale || 1;
 	this.elapsedTime += tick;
 	if (this.loop) {
 		if (this.isDone()) {
@@ -76,7 +76,7 @@ Animation.prototype.drawTime = function (tick, ctx, x, y) {
 				  this.frameWidth * scaleBy,
 				  this.frameHeight * scaleBy);
 };
- 	 
+	 
 
 Animation.prototype.currentFrame = function () {
 	return Math.floor(this.elapsedTime / this.frameDuration);
@@ -87,7 +87,7 @@ Animation.prototype.isDone = function () {
 };
 
 function distance(a, b) {
- 	var dx = a.x - b.x;
+	var dx = a.x - b.x;
 	var dy = a.y - b.y;
 	return Math.sqrt(dx * dx + dy * dy);
 };
@@ -133,12 +133,12 @@ function moveEntityToTarget(ent, target) {
 			ent.animation = ent.rightAnimation;
 		} 
 	} else {     
-		if(dx < 0 || dy > 0) {          
-			ent.dir = "down";
-			ent.animation = ent.downAnimation;
-		} else {                
+		if(dx < 0 || dy > 0) {       
 			ent.dir = "up"; 
-			ent.animation = ent.upAnimation;
+			ent.animation = ent.upAnimation;   
+		} else {               
+			ent.dir = "down";
+			ent.animation = ent.downAnimation; 
 		}
 	} 
 	ent.x += dx * ent.game.clockTick * ent.speed;
@@ -169,7 +169,7 @@ function attack(ent, target) {
 		}
 	}  
 	target.lives -= ent.damage;
-    soundManager.playDamageSound(target);
+	soundManager.playDamageSound(target);
 };
  
 function collide(ent, otherEnt) { 
@@ -213,12 +213,12 @@ function moveEntityToTarget(ent, target) {
 			ent.animation = ent.rightAnimation;
 		} 
 	} else {     
-		if(dx < 0 || dy > 0) {          
-			ent.dir = "down";
-			ent.animation = ent.downAnimation;
-		} else {                
+		if(dx < 0 || dy > 0) {                 
 			ent.dir = "up"; 
 			ent.animation = ent.upAnimation;
+		} else {   
+			ent.dir = "down";
+			ent.animation = ent.downAnimation;      
 		}
 	} 
 	ent.x += dx * ent.game.clockTick * ent.speed;
@@ -243,8 +243,8 @@ Background.prototype.draw = function (ctx) {
 };
 
 function Player(game) {
- 	var spritesheet = AM.getAsset("img/space_traveler.png");
-    //(spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, reverse, scale)
+	var spritesheet = AM.getAsset("img/space_traveler.png");
+	//(spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, reverse, scale)
 	this.animation = new Animation(spritesheet,             0,  448,    64, 64, 0.1,    8, true,    false,  0.75);
 
 	this.stillAnimation = new Animation(spritesheet,        0,  256,    64, 64, 0.1,    1, true,    false,  0.75);
@@ -261,7 +261,7 @@ function Player(game) {
 	this.deadAnimation = new Animation(spritesheet,        448, 128,    64, 64, 0.1,    1, true,    false,  0.75);  
 	this.animation = this.stillAnimation;
 
-    this.name = "Player";
+	this.name = "Player";
 	this.game = game;
 	this.ctx = game.ctx;  
 	Entity.call(this, game, (width / 2) - 25, (height / 2 ) + 25);  
@@ -309,7 +309,6 @@ Player.prototype.update = function () {
 	}
 	
 	if(this.lives > 0) {
-
         if (this.isAttacking) {
             this.attackFrameCounter += 1;
             this.animation = this.attackAnimation;
@@ -401,19 +400,19 @@ Player.prototype.update = function () {
             }
         } 
 	} else {
-        if (this.deathFrameCounter == 0) {
-            this.isDying = true;
-        }
-        if (this.isDying) {
-            this.animation = this.dyingAnimation;
-            this.deathFrameCounter += 1;
+		if (this.deathFrameCounter == 0) {
+			this.isDying = true;
+		}
+		if (this.isDying) {
+			this.animation = this.dyingAnimation;
+			this.deathFrameCounter += 1;
 
-            if(this.deathFrameCounter > ticksPerAnimation) {
-                this.isDying = false;
-            }
-        } else {
-            this.animation = this.deadAnimation;
-        }
+			if(this.deathFrameCounter > ticksPerAnimation) {
+				this.isDying = false;
+			}
+		} else {
+			this.animation = this.deadAnimation;
+		}
 	} 
 	Entity.prototype.update.call(this); 
 };
@@ -436,7 +435,7 @@ function Alien(game, enemy) {
 	this.leftAttackAnimation = new Animation(spritesheet,   0,    192,  64, 64, 0.1, 4, true, false,   0.75); 
 	this.dyingAnimation = new Animation(spritesheet,        0,    0, 64, 64, 0.1, 8, false,  false,  0.75);    
 	
-    this.name = "Alien";
+	this.name = "Alien";
 	this.game = game;
 	this.ctx = game.ctx; 
 	this.enemy = enemy;
@@ -462,7 +461,7 @@ Alien.prototype = new Entity();
 Alien.prototype.constructor = Alien;
 
 Alien.prototype.update = function () { 
- 	if(this.dead) {
+	if(this.dead) {
 		this.removeFromWorld = true;
 	} if(this.lives <= 0) {
 		//dead
@@ -490,11 +489,11 @@ Alien.prototype.update = function () {
 			}  
 		}
 
- 		if(collide(this, closestEnt)) {
+		if(collide(this, closestEnt)) {
 			if(!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 1.5)) {
 				//record last shot time and create the bullet.
 				attack(this, closestEnt);
- 				this.lastAttackTime = this.game.timer.gameTime; 
+				this.lastAttackTime = this.game.timer.gameTime; 
 			}  
 		} else {
 			moveEntityToTarget(this, closestEnt);
@@ -521,7 +520,7 @@ function Scavenger(game, enemy) {
 	this.leftAttackAnimation = new Animation(spritesheet,   512,    0,  64, 64, 0.1, 4, true, false,   0.75); 
 	this.dyingAnimation = new Animation(spritesheet,        256,    64, 64, 64, 0.1, 4, false,  false,  0.75);    
 
-    this.name = "Scavenger";
+	this.name = "Scavenger";
 	this.game = game;
 	this.ctx = game.ctx; 
 	this.enemy = enemy;
@@ -577,7 +576,7 @@ Scavenger.prototype.update = function () {
 			if(!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 1.5)) {
 				//record last shot time and create the bullet.
 				attack(this, closestEnt);
-  				this.lastAttackTime = this.game.timer.gameTime; 
+				this.lastAttackTime = this.game.timer.gameTime; 
 			} 
 		} else {
 			moveEntityToTarget(this, closestEnt);
@@ -604,7 +603,7 @@ function Rummager(game, enemy) {
 	this.downAttackAnimation = new Animation(spritesheet,   0,    256,   64, 64, 0.1, 1, true,  false,  0.75);    
 	this.animation = this.upAnimation;
 
-    this.name = "Rummager";
+	this.name = "Rummager";
 	this.game = game;
 	this.ctx = game.ctx;  
 	Entity.call(this, game, Math.random() * width, height);
@@ -705,7 +704,7 @@ Bullet.prototype.update = function() {
 		if (this != ent && collide(this, ent)) {
 			ent.lives -= this.damage;
 			this.removeFromWorld = true;
-            soundManager.playDamageSound(ent);
+			soundManager.playDamageSound(ent);
 		}  
 	} 
 
@@ -788,7 +787,7 @@ function RobotTier1(game, day) { //spriteSheet, startX, startY, frameWidth, fram
 	this.animation = this.stillAnimation;
 
 	//add rest
-    this.name = "Robot";
+	this.name = "Robot";
 	this.speed = 75;  
 	this.game = game;
 	this.ctx = game.ctx; 
@@ -796,14 +795,14 @@ function RobotTier1(game, day) { //spriteSheet, startX, startY, frameWidth, fram
 	this.radius = 24;   
 	this.x += this.radius;
 	this.y += this.radius;
-	this.taskEntity = null;	
+	this.taskEntity = null; 
 	this.directions = ["left", "right", "up", "down"];
- 	this.tasks = ["repair", "gatherBerry", "gatherScrap", "defend", "mine", "log", "charge"];
+	this.tasks = ["repair", "gatherBerry", "gatherScrap", "defend", "mine", "log", "charge"];
 	this.task = this.tasks[0];
 	this.dead = false; 
 	this.lives = 200; 
 	this.elapsedTime = 0;
-	this.workspeed = 10;
+	this.workspeed = 5;
 	this.chargespeed = 2;
 	this.charge = 100;
 	this.day = day;
@@ -858,59 +857,98 @@ RobotTier1.prototype.update = function() {
 	if (collideLeft(this)) {
 		this.x += this.radius;
 		
-	}	
+	}   
 	if (collideRight(this)) {  
 		this.x -= this.radius;
-    }
+	}
 
-    if (collideTop(this)) { 
+	if (collideTop(this)) { 
 		this.y += this.radius;
-    }
+	}
 
-    if(collideBottom(this)) { 
+	if(collideBottom(this)) { 
 		this.y -= this.radius;
-    }
+	}
 	
 	if(this.lives <= 0){
+
+		
+		this.animation = this.dyingUpAnimation;
+
 		if(this.dir === this.directions[3]){
 			this.animation = this.dyingDownAnimation;
 		} else if(this.dir === this.directions[0]){
-			this.animation = this.dyingLeftAnimation;		
+			this.animation = this.dyingLeftAnimation;       
 		} else if(this.dir === this.directions[1]){
-			this.animation = this.dyingRightAnimation;		
+			this.animation = this.dyingRightAnimation;      
 		} else{
 			this.animation = this.dyingUpAnimation;
 		}
+
 		this.removeFromWorld = true;
+	}
+	
+	var closestEnt = this.game.hostileEntities[0];
+	for (i = 0; i < this.game.hostileEntities.length; i++) {
+		ent = this.game.hostileEntities[i];
+		if (ent != this && collide(this, { x: ent.x, y: ent.y, radius: this.visualRadius })) {
+			var dist = distance(this, ent); 
+			if(dist < distance(this, closestEnt)) {
+				closestEnt = ent;
+			}
+		}  
+	}
+
+ 	if(collide(this, closestEnt)) {
+		if(!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 1.5)) {
+			//record last shot time and create the bullet.
+			attack(this, closestEnt);
+ 			this.lastAttackTime = this.game.timer.gameTime; 
+		}  
 	}
 	
 	if(this.charge <= 0){
 		if(this.dir === this.directions[3]){
 			this.animation = this.pDDownAnimation;
 		} else if(this.dir === this.directions[0]){
-			this.animation = this.pDLeftAnimation;		
+			this.animation = this.pDLeftAnimation;      
 		} else if(this.dir === this.directions[1]){
-			this.animation = this.pDRightAnimation;		
+			this.animation = this.pDRightAnimation;     
 		} else{
 			this.animation = this.pDUpAnimation;
 		}
 
-	}		
+	}       
 	
 	if(this.taskEntity) { // if the robot has been programmed
-   		// If the robot reaches its target entity 
+		// If the robot reaches its target entity 
 		if(collide(this, this.taskEntity)){ 
 			// fix repair directions;
 			if (this.task === this.tasks[0] ) { // repair
+				if(this.game.state.scrap >= 50 && this.game.state.wood >= 30 && this.game.state.minerals >= 30){
+					if( this.game.state.ship.lives === this.game.state.shipMaxHealth){
+						this.game.state.level += 1;
+						this.game.state.ship.lives = 100;
+						this.game.state.shipMaxHealth += 100;
+						this.game.state.scrap -= 50;
+						this.game.state.wood -= 30;
+						this.game.state.minerals -= 30;
+					}
+					else if(this.game.state.scrap >= 25 && this.game.state.wood >= 25 && this.game.state.shipMaxHealth > this.state.ship.level){
+						this.game.state.ship.lives += 25;
+						this.game.state.scrap -= 25;
+						this.game.state.wood -= 25;
+					}
+				}
 				if(this.dir === this.directions[3]){
 					this.animation = this.repairDownAnimation;
 				} else if(this.dir === this.directions[0]){
-					this.animation = this.repairLeftAnimation;		
+					this.animation = this.repairLeftAnimation;      
 				} else if(this.dir === this.directions[1]){
-					this.animation = this.repairRightAnimation;		
+					this.animation = this.repairRightAnimation;     
 				} else {
-					this.animation = this.repairUpAnimation;		
-				}				
+					this.animation = this.repairUpAnimation;        
+				}               
 			} else if (this.task === this.tasks[1]) { //gather berry
 				this.elapsedTime += this.game.clockTick;
 				if(this.elapsedTime > this.workspeed) {
@@ -920,11 +958,11 @@ RobotTier1.prototype.update = function() {
 				if(this.dir === this.directions[3]){
 					this.animation = this.gatherBerryDownAnimation;
 				} else if(this.dir === this.directions[0]){
-					this.animation = this.gatherBerryLeftAnimation;		
+					this.animation = this.gatherBerryLeftAnimation;     
 				} else if(this.dir === this.directions[1]){
-					this.animation = this.gatherBerryRightAnimation;		
+					this.animation = this.gatherBerryRightAnimation;        
 				} else{
-					this.animation = this.gatherBerryUpAnimation;		
+					this.animation = this.gatherBerryUpAnimation;       
 				}
 			} else if (this.task === this.tasks[2]) { //gather scrap
 				this.elapsedTime += this.game.clockTick;
@@ -935,9 +973,9 @@ RobotTier1.prototype.update = function() {
 				if(this.dir === this.directions[3]){
 					this.animation = this.gatherScrapDownAnimation;
 				} else if(this.dir === this.directions[0]){
-					this.animation = this.gatherScrapLeftAnimation;		
+					this.animation = this.gatherScrapLeftAnimation;     
 				} else if(this.dir === this.directions[1]){
-					this.animation = this.gatherScrapRightAnimation;		
+					this.animation = this.gatherScrapRightAnimation;        
 				} else{
 					this.animation = this.gatherScrapUpAnimation;
 				}
@@ -950,9 +988,9 @@ RobotTier1.prototype.update = function() {
 				if(this.dir === this.directions[3]){
 					this.animation = this.loggingDownAnimation;
 				} else if(this.dir === this.directions[0]){
-					this.animation = this.loggingLeftAnimation;		
+					this.animation = this.loggingLeftAnimation;     
 				} else if(this.dir === this.directions[1]){
-					this.animation = this.loggingRightAnimation;		
+					this.animation = this.loggingRightAnimation;        
 				} else{
 					this.animation = this.loggingUpAnimation;
 				}
@@ -965,14 +1003,14 @@ RobotTier1.prototype.update = function() {
 				if(this.dir === this.directions[3]){
 					this.animation = this.mineDownAnimation;
 				} else if(this.dir === this.directions[0]){
-					this.animation = this.mineLeftAnimation;		
+					this.animation = this.mineLeftAnimation;        
 				} else if(this.dir === this.directions[1]){
-					this.animation = this.mineRightAnimation;		
+					this.animation = this.mineRightAnimation;       
 				} else{
 					this.animation = this.mineUpAnimation;
 				}
 			}
-	 	} else {  // move to the entity
+		} else {  // move to the entity
 			moveEntityToTarget(this, this.taskEntity); 
 		} 
 	}
@@ -980,7 +1018,7 @@ RobotTier1.prototype.update = function() {
 };
 
 RobotTier1.prototype.draw = function(){
- 	this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);  
+	this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);  
 	Entity.prototype.draw.call(this);
 };
 
@@ -1007,8 +1045,8 @@ function ProgramButton(game, x, y, task, robot) {
 
 	this.animation = new Animation(this.image, 0, 0, 32, 32, 0.1, 1, true, false, 1);
 
- 	Entity.call(this, game, x, y);
- 	this.radius = 16;
+	Entity.call(this, game, x, y);
+	this.radius = 16;
 }
 
 ProgramButton.prototype = new Entity();
@@ -1018,22 +1056,22 @@ ProgramButton.prototype.update = function () {
 	if (collideLeft(this)) {
 		this.x += 40; 
 		this.y += 40;
-	}	
+	}   
 	if (collideRight(this)) {  
 		this.x -= 40;
 		this.y += 40;
-    }
+	}
 
-    if (collideTop(this)) { 
+	if (collideTop(this)) { 
 		this.y += 40;
-    }
+	}
 
-    if(collideBottom(this)) { 
+	if(collideBottom(this)) { 
 		this.y -= 40;
-    }
+	}
 
 	if(collide(this, this.game.mouse)) {
- 		document.getElementById("gameWorld").style.cursor = "pointer";      
+		document.getElementById("gameWorld").style.cursor = "pointer";      
 	} else {
 		document.getElementById("gameWorld").style.cursor = "";          
 	}
@@ -1051,10 +1089,9 @@ ProgramButton.prototype.update = function () {
 			this.robot.taskEntity = this.game.treeEntities[Math.floor(Math.random() * this.game.treeEntities.length)];
 		} else if (this.task === this.robot.tasks[4]) { //mining 
 			this.robot.taskEntity = this.game.rockEntities[Math.floor(Math.random() * this.game.rockEntities.length)];
-		}
-		console.log(this.task);
+		} 
 
-		this.game.removeProgramButtons();		
+		this.game.removeProgramButtons();       
 		document.getElementById("gameWorld").style.cursor = "";     
 
 
@@ -1173,7 +1210,7 @@ SpaceShip.prototype = new Entity();
 SpaceShip.prototype.constructor = SpaceShip;
  
 SpaceShip.prototype.update = function () {  
- 	this.image = new Animation(AM.getAsset(this.spritesheet), (this.game.state.level * this.size), 0, 160, 160, 0.1, 1, true, false, 1);  
+	this.image = new Animation(AM.getAsset(this.spritesheet), (this.game.state.level * this.size), 0, 160, 160, 0.1, 1, true, false, 1);  
 }; 
 
 SpaceShip.prototype.draw = function (ctx) {
@@ -1184,7 +1221,7 @@ SpaceShip.prototype.draw = function (ctx) {
 function Day(game) { 
 	this.game = game;   
 	this.ctx = game.ctx;  
- 	this.duskImage = "img/dusk.png";  
+	this.duskImage = "img/dusk.png";  
 	this.eveningImage = "img/evening.png";  
 	this.midnightImage = "img/evening.png";
 	this.image = null;
@@ -1194,8 +1231,8 @@ function Day(game) {
 	this.day = true;
 	this.time = "2:00";
 	this.lastSpawnTime = 0;
-	this.spawnRate = ((4 - 0 + 0.5) * 10);
- 	Entity.call(this, game, 0, 0);
+	this.spawnRate = (2 * (4) + 0.5);
+	Entity.call(this, game, 0, 0);
 }
 
 Day.prototype = new Entity();
@@ -1205,6 +1242,7 @@ Day.prototype.update = function () {
 	this.elapsedTime += this.game.clockTick;
 	if(this.elapsedTime > this.dayLength) {
 		// nighttime has ended and now it is day
+		this.lastSpawnTime = 0;
 		this.elapsedTime = 0;
 		this.image = null;
 		this.day = true;
@@ -1213,18 +1251,18 @@ Day.prototype.update = function () {
 	} else if(this.elapsedTime > (this.dayLength * 0.55) || this.elapsedTime > (this.dayLength * 0.90)) {
 		this.image = this.eveningImage; 
 	} else if(this.elapsedTime > (this.dayLength * 0.50) || this.elapsedTime > (this.dayLength * 0.95)) {
-		this.image = this.duskImage;    
+ 		this.image = this.duskImage;    
 		this.day = false;
 	}  
 
 	var t = Math.floor(this.elapsedTime); 
- 	var min = (t % 40);
- 	var hr = Math.floor(t / 20) - 4; // clock offset
- 	if(hr >= 13) {	
- 		hr -= 12;
- 	} else if(hr <= 0) {
- 		hr = 12 + hr;
- 	}
+	var min = (t % 40);
+	var hr = Math.floor(t / 20) - 4; // clock offset
+	if(hr >= 13) {  
+		hr -= 12;
+	} else if(hr <= 0) {
+		hr = 12 + hr;
+	}
 	if(Math.floor(min / 10) === 0) {
 		this.time = hr + ":0" + min;
 	} else {
@@ -1232,9 +1270,10 @@ Day.prototype.update = function () {
 	}
 
 	if(!this.day) {    
-		this.spawnRate = (this.game.state.level + 0.5) * 10; 
-		if(this.elapsedTime - this.spawnRate > (this.lastSpawnTime )) { 
+		this.spawnRate = (Math.pow((4 - this.game.state.level), 2) + 0.5);  
+		if(this.elapsedTime - this.spawnRate > (this.lastSpawnTime)) { 
 			this.lastSpawnTime = this.elapsedTime;
+			this.elaspedTime = 0;
 			var spawnType = Math.floor(Math.random() * Math.floor(3));
 			if(spawnType === 0) {
 				this.game.addNpcEntity(new Rummager(this.game), false);
@@ -1244,7 +1283,13 @@ Day.prototype.update = function () {
 				this.game.addNpcEntity(new Scavenger(this.game), false);
 			}  
 		} 
-	}  
+	} else {
+		this.spawnRate = 1.5 * (Math.pow((4 - this.game.state.level), 2) + 0.5);  
+		if(this.elapsedTime - this.spawnRate > (this.lastSpawnTime)) { 
+			this.lastSpawnTime = this.elapsedTime;
+			this.game.addNpcEntity(new Alien(this.game), false);
+		}
+	}
 };
 
 Day.prototype.draw = function (ctx) { 
@@ -1259,7 +1304,7 @@ function State(game, player, ship, day) {
 	this.ship = ship;
 	this.day = day;
 
-	this.level = 1; // change this to "upgrade" the spaceship (0 to 4)
+	this.level = 0; // change this to "upgrade" the spaceship (0 to 4)
 	
 	this.wood = 0;
 	this.food = 0;
@@ -1269,7 +1314,7 @@ function State(game, player, ship, day) {
 	this.robotCount = 1;
 
 	this.shipMaxHealth = this.ship.lives;
- 	this.playerMaxLives = this.player.lives;
+	this.playerMaxLives = this.player.lives;
 }
 
 State.prototype = new Entity();
@@ -1289,11 +1334,23 @@ State.prototype.update = function () {
 		document.getElementById("metalCount").innerHTML = "<img src=\"img/metal.png\"/>" + this.scrap; 
 		document.getElementById("mineralCount").innerHTML = "<img src=\"img/rock1.png\"/>" + this.minerals; 
 		document.getElementById("robotCount").innerHTML = "<img src=\"img/robot.png\"/>" + this.robotCount; 
-	 
-	 	document.getElementById("shipHealth").style.width = "" + 100 * (this.ship.lives / this.shipMaxHealth) + "%";
+	 	
+	 	if(100 * (this.ship.lives / this.shipMaxHealth) < 20) { // 20%
+	 		document.getElementById("shipHealth").style.color = "red";
+	 	} else {
+	 		document.getElementById("shipHealth").style.color = "";
+	 	}
+
+		document.getElementById("shipHealth").style.width = "" + 100 * (this.ship.lives / this.shipMaxHealth) + "%";
 		document.getElementById("shipHealth").innerHTML = this.ship.lives + "/" + this.shipMaxHealth; 
 
-	 	document.getElementById("playerHealth").style.width = "" + 100 * (this.player.lives / this.playerMaxLives) + "%";
+	 	if(100 * (this.player.lives / this.playerMaxLives) < 20) {
+	 		document.getElementById("playerHealth").style.color = "red";
+	 	} else {
+	 		document.getElementById("playerHealth").style.color = "";
+	 	} 
+
+		document.getElementById("playerHealth").style.width = "" + 100 * (this.player.lives / this.playerMaxLives) + "%";
 		document.getElementById("playerHealth").innerHTML = this.player.lives + "/" + this.playerMaxLives; 
 	}
 };
@@ -1325,9 +1382,9 @@ function pause() {
 
 function gameOver() {
 	if(gameEngine.gameOver) { 
- 		document.location.reload();
- 	} else {
-		gameEngine.gameOver = true; 
+		gameEngine.state.update();
+	} else {
+ 		gameEngine.gameOver = true; 
 		document.getElementById("playButton").style.display = "";
 		document.getElementById("playGameText").style.display = ""; 
 		document.getElementById("playGameText").innerHTML = "Game Over";      
@@ -1336,17 +1393,20 @@ function gameOver() {
 	} 
 };
 
-function eatFood() {
-	if(gameEngine.state.food >= 1) {
+function eatFood() { 
+	canvas.focus();
+	if(gameEngine.state.food >= 1 && gameEngine.state.player.lives < gameEngine.state.playerMaxLives) {
 		gameEngine.state.food--;
 		gameEngine.state.player.lives++;
 	}
 };
 
 function addRobot() {
-	if(gameEngine.state.scrap >= 2 && gameEngine.state.minerals >= 2) {
-		gameEngine.state.scrap -= 2;
-		gameEngine.state.minerals -= 2;  
+	canvas.focus();
+	if(gameEngine.state.scrap >= 5 && gameEngine.state.minerals >= 5 && gameEngine.state.wood >= 5) {
+		gameEngine.state.wood -= 5;
+		gameEngine.state.scrap -= 5;
+		gameEngine.state.minerals -= 5;  
 		gameEngine.state.robotCount++;
 		gameEngine.addProgrammableEntity(new RobotTier1(gameEngine, gameEngine.state.day), true);
 	}
