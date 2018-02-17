@@ -169,6 +169,7 @@ function attack(ent, target) {
 		}
 	}  
 	target.lives -= ent.damage;
+    soundManager.playDamageSound(target);
 };
  
 function collide(ent, otherEnt) { 
@@ -258,6 +259,7 @@ function Player(game) {
 	this.dyingAnimation = new Animation(spritesheet,        0,  128,    64, 64, 0.1,    8, false,   false,  0.75); 
 	this.deadAnimation = new Animation(spritesheet,        448, 128,    64, 64, 0.1,    1, true,    false,  0.75);  
 
+    this.name = "Player";
 	this.game = game;
 	this.ctx = game.ctx;  
 	Entity.call(this, game, (width / 2) - 25, (height / 2 ) + 25);  
@@ -274,6 +276,14 @@ function Player(game) {
     this.isDying = false;
     this.programmingFrameCounter = 0;
     this.isProgramming = false;
+
+    this.attackSound = document.createElement("audio");
+    this.attackSound.src = "sound_effects/space_traveler_attack.mp3";
+    this.attackSound.loop = false;
+
+    this.damageSound = document.createElement("audio");
+    this.damageSound.src = "sound_effects/space_traveler_damage.mp3";
+    this.damageSound.loop = false;
 }
 
 Player.prototype = new Entity();
@@ -301,7 +311,9 @@ Player.prototype.update = function () {
                 if (this != ent && collide(this, ent) && this.game.keys.attack &&
                     (!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 0.5))) {
                         ent.lives -= this.damage; 
-                        this.lastAttackTime = this.game.timer.gameTime; 
+                        this.lastAttackTime = this.game.timer.gameTime;
+                        console.log("Player hit: " + ent.name + " for " + this.damage + " damage");
+                        soundManager.playDamageSound(ent); 
                 }  
             }
 
@@ -357,6 +369,7 @@ Player.prototype.update = function () {
                 } 
             }
             if(this.game.keys.attack) {
+                soundManager.playAttackSound(this);
                 this.isAttacking = true;
                 this.attackFrameCounter += 1;
                 this.animation = this.attackAnimation;
@@ -366,6 +379,7 @@ Player.prototype.update = function () {
                         (!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 0.5))) {
                             ent.lives -= this.damage; 
                             this.lastAttackTime = this.game.timer.gameTime; 
+                            soundManager.playDamageSound(ent);
                     }  
                 } 
             } 
@@ -406,6 +420,7 @@ function Alien(game, enemy) {
 	this.leftAttackAnimation = new Animation(spritesheet,   0,    192,  64, 64, 0.1, 4, true, false,   0.75); 
 	this.dyingAnimation = new Animation(spritesheet,        0,    0, 64, 64, 0.1, 8, false,  false,  0.75);    
 	
+    this.name = "Alien";
 	this.game = game;
 	this.ctx = game.ctx; 
 	this.enemy = enemy;
@@ -413,7 +428,7 @@ function Alien(game, enemy) {
 	this.radius = 24;
 	this.lives = 150;
 	this.speed = 50;
-	this.damage = 5;
+	this.damage = 2;
 	this.visualRadius = 200;
 	this.lastAttackTime = 0;
 	this.task = 3;
@@ -482,6 +497,7 @@ function Scavenger(game, enemy) {
 	this.leftAttackAnimation = new Animation(spritesheet,   512,    0,  64, 64, 0.1, 4, true, false,   0.75); 
 	this.dyingAnimation = new Animation(spritesheet,        256,    64, 64, 64, 0.1, 4, false,  false,  0.75);    
 
+    this.name = "Scavenger";
 	this.game = game;
 	this.ctx = game.ctx; 
 	this.enemy = enemy;
@@ -560,6 +576,7 @@ function Rummager(game, enemy) {
 	this.downAttackAnimation = new Animation(spritesheet,   0,    256,   64, 64, 0.1, 1, true,  false,  0.75);    
 	this.animation = this.upAnimation;
 
+    this.name = "Rummager";
 	this.game = game;
 	this.ctx = game.ctx;  
 	Entity.call(this, game, Math.random() * width, height);
@@ -656,6 +673,7 @@ Bullet.prototype.update = function() {
 		if (this != ent && collide(this, ent)) {
 			ent.lives -= this.damage;
 			this.removeFromWorld = true;
+            soundManager.playDamageSound(ent);
 		}  
 	} 
 
@@ -738,6 +756,7 @@ function RobotTier1(game) { //spriteSheet, startX, startY, frameWidth, frameHeig
 	this.animation = this.stillAnimation;
 
 	//add rest
+    this.name = "Robot";
 	this.speed = 75;  
 	this.game = game;
 	this.ctx = game.ctx; 
@@ -1259,6 +1278,8 @@ AM.queueDownload("img/plus.png");
 
 AM.downloadAll(startGame);
 
+var soundManager = new SoundManager();
+
 function startGame() {  
 	canvas = document.getElementById("gameWorld");
 	var ctx = canvas.getContext("2d");
@@ -1277,9 +1298,6 @@ function startGame() {
 	height = canvas.height;
 	width = canvas.width; 
 	gameEngine = new GameEngine(); 
-
-
-	var soundManager = new SoundManager();
  
 	gameEngine.init(ctx); 
 	gameEngine.start();

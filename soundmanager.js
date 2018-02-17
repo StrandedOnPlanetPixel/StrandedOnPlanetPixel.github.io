@@ -1,4 +1,5 @@
 var backgroundSong = document.createElement("audio");
+var currentVolume = 1;
 
 function SoundManager() {
     //this.backgroundSong = document.createElement("audio");
@@ -17,7 +18,7 @@ SoundManager.prototype.setupBackgroundMusic = function() {
     console.log(backgroundSong.paused);
     var audioToggle = document.getElementById("audioToggle").addEventListener("click", this.toggleBackgroundMusic); 
     var volumeUp = document.getElementById("volumeUp").addEventListener("click", this.volumeUp); 
-    var volumeDown = document.getElementById("volumeDown").addEventListener("click", this.volumeDown); 
+    var volumeDown = document.getElementById("volumeDown").addEventListener("click", this.volumeDown);
 };
 
 SoundManager.prototype.toggleBackgroundMusic = function() {
@@ -39,6 +40,7 @@ SoundManager.prototype.volumeUp = function() {
     // loop through each sound and increase sound????
     try {
         backgroundSong.volume += 0.1;
+        currentVolume += 0.1;
     } catch(err) {
         console.log("Max volume"); 
     }
@@ -48,6 +50,7 @@ SoundManager.prototype.volumeDown= function() {
     // loop through each sound and decrease sound???    
     try {
         backgroundSong.volume -= 0.1;
+        currentVolume -= 0.1;
     } catch(err) {
         console.log("Sound Muted"); 
     }
@@ -55,18 +58,21 @@ SoundManager.prototype.volumeDown= function() {
 
 SoundManager.prototype.playAttackSound = function(entity) {
     if (entity.attackSound != null) {
+        entity.attackSound.volume = currentVolume;
         entity.attackSound.play();
     }
 };
 
 SoundManager.prototype.playDamageSound = function(entity) {
     if (entity.damageSound != null) {
+        entity.damageSound.volume = currentVolume;
         entity.damageSound.play();
     }
 };
 
 SoundManager.prototype.playDeathSound = function(entity) {
     if (entity.deathSound != null) {
+        entity.deathSound.volume = currentVolume;
         entity.deathSound.play();
     }
 };
