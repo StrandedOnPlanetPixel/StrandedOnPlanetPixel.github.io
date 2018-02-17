@@ -773,7 +773,7 @@ function RobotTier1(game, day) { //spriteSheet, startX, startY, frameWidth, fram
 	this.dead = false; 
 	this.lives = 200; 
 	this.elapsedTime = 0;
-	this.workspeed = 10;
+	this.workspeed = 5;
 	this.chargespeed = 2;
 	this.charge = 100;
 	this.day = day;
@@ -830,16 +830,28 @@ RobotTier1.prototype.update = function() {
     }
 	
 	if(this.lives <= 0){
-		if(this.dir === this.directions[3]){
-			this.animation = this.dyingDownAnimation;
-		} else if(this.dir === this.directions[0]){
-			this.animation = this.dyingLeftAnimation;		
-		} else if(this.dir === this.directions[1]){
-			this.animation = this.dyingRightAnimation;		
-		} else{
-			this.animation = this.dyingUpAnimation;
-		}
+		
+		this.animation = this.dyingUpAnimation;
 		this.removeFromWorld = true;
+	}
+	
+	var closestEnt = this.game.hostileEntities[0];
+	for (i = 0; i < this.game.hostileEntities.length; i++) {
+		ent = this.game.hostileEntities[i];
+		if (ent != this && collide(this, { x: ent.x, y: ent.y, radius: this.visualRadius })) {
+			var dist = distance(this, ent); 
+			if(dist < distance(this, closestEnt)) {
+				closestEnt = ent;
+			}
+		}  
+	}
+
+ 	if(collide(this, closestEnt)) {
+		if(!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 1.5)) {
+			//record last shot time and create the bullet.
+			attack(this, closestEnt);
+ 			this.lastAttackTime = this.game.timer.gameTime; 
+		}  
 	}
 	
 	if(this.charge <= 0){
@@ -860,6 +872,21 @@ RobotTier1.prototype.update = function() {
 		if(collide(this, this.taskEntity)){ 
 			// fix repair directions;
 			if (this.task === this.tasks[0] ) { // repair
+				if(this.game.state.scrap >= 50 && this.game.state.wood >= 30 && this.game.state.minerals >= 30){
+					if( this.game.state.ship.lives === this.game.state.shipMaxHealth){
+						this.game.state.level += 1;
+						this.game.state.ship.lives = 100;
+						this.game.state.shipMaxHealth += 100;
+						this.game.state.scrap -= 50;
+						this.game.state.wood -= 30;
+						this.game.state.minerals -= 30;
+					}
+					else if(this.game.state.scrap >= 25 && this.game.state.wood >= 25 && this.game.state.shipMaxHealth > this.state.ship.level){
+						this.game.state.ship.lives += 25;
+						this.game.state.scrap -= 25;
+						this.game.state.wood -= 25;
+					}
+				}
 				if(this.dir === this.directions[3]){
 					this.animation = this.repairDownAnimation;
 				} else if(this.dir === this.directions[0]){
@@ -1189,6 +1216,7 @@ Day.prototype.update = function () {
 		this.spawnRate = (this.game.state.level + 0.5) * 10; 
 		if(this.elapsedTime - this.spawnRate > (this.lastSpawnTime )) { 
 			this.lastSpawnTime = this.elapsedTime;
+			this.elaspedTime = 0;
 			var spawnType = Math.floor(Math.random() * Math.floor(3));
 			if(spawnType === 0) {
 				this.game.addNpcEntity(new Rummager(this.game), false);
