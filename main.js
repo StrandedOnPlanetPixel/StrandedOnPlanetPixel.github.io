@@ -948,28 +948,26 @@ RobotTier1.prototype.update = function() {
 						};
 						this.game.state.ship.lives = 100;
 						this.game.state.shipMaxHealth += 100;
-<<<<<<< HEAD
-						this.game.state.scrap -= 10;
+
+						this.game.state.scrap -= 5;
 						this.game.state.wood -= 20;
-						this.game.state.minerals -= 10;
+						this.game.state.minerals -= 5;
 					}
 				
 				} else if(this.game.state.scrap >= 5 && this.game.state.wood >= 10 && 
 					this.game.state.minerals >= 5  && this.game.state.shipMaxHealth > this.game.state.ship.lives) {
 						this.game.state.ship.lives += 25;
-=======
-					} 
-				} else if(this.game.state.scrap >= 5 && this.game.state.wood >= 10 && this.game.state.minerals >= 5  && this.game.state.shipMaxHealth > this.game.state.ship.lives){
-  						this.game.state.ship.lives += 1;
->>>>>>> 2f8629849359bfd38a22446ecc010fdda1efc117
-						if(this.game.state.ship.lives > this.game.state.shipMaxHealth) {
-							this.game.state.ship.lives = his.game.state.shipMaxHealth; // lives cant pass maxx lives
-						}
-						this.game.state.scrap -= 5;
-						this.game.state.wood -= 10;
-						this.game.state.minerals -= 5;
-				}
 
+				} 
+				
+
+				if(this.game.state.ship.lives > this.game.state.shipMaxHealth) {
+							this.game.state.ship.lives = his.game.state.shipMaxHealth; // lives cant pass maxx lives
+				}
+				this.game.state.scrap -= 5;
+				this.game.state.wood -= 10;
+				this.game.state.minerals -= 5;
+				
 				if(this.dir === this.directions[3]){
 					this.animation = this.repairDownAnimation;
 				} else if(this.dir === this.directions[0]){
