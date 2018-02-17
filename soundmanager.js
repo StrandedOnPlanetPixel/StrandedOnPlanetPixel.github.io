@@ -1,5 +1,6 @@
 var backgroundSong = document.createElement("audio");
 var currentVolume = 1;
+var cachedVolume = 1;
 
 function SoundManager() {
     //this.backgroundSong = document.createElement("audio");
@@ -29,10 +30,13 @@ SoundManager.prototype.toggleBackgroundMusic = function() {
         console.log("playing sound");
         backgroundSong.play();          
         audioToggleImage.src = "img/pause.png";
+        currentVolume = cachedVolume;
     } else {
         console.log("paused sound");
         backgroundSong.pause();     
         audioToggleImage.src = "img/play.png";
+        cachedVolume = currentVolume;
+        currentVolume = 0;
     }
 };
 
