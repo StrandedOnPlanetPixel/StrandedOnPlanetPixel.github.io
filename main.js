@@ -755,7 +755,7 @@ RobotTier1.prototype.update = function() {
 					this.animation = this.gatherBerryUpAnimation;		
 				}
 			} else if (this.task === this.tasks[2]) { //gather scrap
-				state.scrap += 1;
+				this.game.state.scrap += 1;
 				if(this.dir === this.directions[3]){
 					this.animation = this.gatherScrapDownAnimation;
 				} else if(this.dir === this.directions[0]){
@@ -842,7 +842,9 @@ ProgramButton.prototype.update = function () {
 		} else if (this.task === this.robot.tasks[4]) { //mining 
 			this.robot.taskEntity = this.game.rockEntities[Math.floor(Math.random() * this.game.rockEntities.length)];
 		}
+		this.removeFromWorld = true;
 	} 
+
 	if(collide(this, this.game.mouse)) {
  		document.getElementById("gameWorld").style.cursor = "pointer";      
 	} else {
