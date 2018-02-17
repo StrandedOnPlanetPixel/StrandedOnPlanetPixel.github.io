@@ -936,7 +936,6 @@ RobotTier1.prototype.update = function() {
 				if(this.game.state.scrap >= 5 && this.game.state.wood >= 20 && this.game.state.minerals >= 5){
 					if(this.game.state.ship.lives === this.game.state.shipMaxHealth){
 						
-						this.game.state.ship.lives = 100;
 						this.game.state.shipMaxHealth += 100;
 						this.game.state.scrap -= 5;
 						this.game.state.wood -= 20;
@@ -1327,10 +1326,10 @@ function State(game, player, ship, day) {
 
 	this.level = 0; // change this to "upgrade" the spaceship (0 to 4)
 	
-	this.wood = 20;
-	this.food = 40;
-	this.scrap = 5;
-	this.minerals = 5;
+	this.wood = 0;
+	this.food = 0;
+	this.scrap = 0;
+	this.minerals = 0;
 
 	this.robotCount = 1;
 
