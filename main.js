@@ -947,8 +947,12 @@ RobotTier1.prototype.update = function() {
 						this.game.state.wood -= 30;
 						this.game.state.minerals -= 30;
 					}
-				}else if(this.game.state.scrap >= 5 && this.game.state.wood >= 10 && this.game.state.minerals >= 5  && this.game.state.shipMaxHealth > this.game.state.ship.lives){
-						this.game.state.ship.lives += 1;
+				} else if(this.game.state.scrap >= 5 && this.game.state.wood >= 10 && 
+					this.game.state.minerals >= 5  && this.game.state.shipMaxHealth > this.game.state.ship.lives) {
+						this.game.state.ship.lives += 25;
+						if(this.game.state.ship.lives > this.game.state.shipMaxHealth) {
+							this.game.state.ship.lives = his.game.state.shipMaxHealth; // lives cant pass maxx lives
+						}
 						this.game.state.scrap -= 25;
 						this.game.state.wood -= 25;
 				}
