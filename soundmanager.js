@@ -76,3 +76,10 @@ SoundManager.prototype.playDeathSound = function(entity) {
         entity.deathSound.play();
     }
 };
+
+SoundManager.prototype.playWalkSound = function(entity) {
+    if (entity.walkSound != null) {
+        entity.walkSound.volume = currentVolume;
+        entity.walkSound.play();
+    }
+};
