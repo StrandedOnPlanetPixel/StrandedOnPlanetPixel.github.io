@@ -946,7 +946,7 @@ RobotTier1.prototype.update = function() {
 						this.game.state.wood -= 30;
 						this.game.state.minerals -= 30;
 					}
-				}else if(this.game.state.scrap >= 5 && this.game.state.wood >= 10 && this.game.state.minerals >= 5 && this.game.state.shipMaxHealth > this.state.ship.level){
+				}else if(this.game.state.scrap >= 5 && this.game.state.wood >= 10 && this.game.state.minerals >= 5 && this.game.state.shipMaxHealth > this.state.ship.lives){
 						this.game.state.ship.lives += 25;
 						this.game.state.scrap -= 25;
 						this.game.state.wood -= 25;
