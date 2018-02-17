@@ -327,12 +327,12 @@ Player.prototype.update = function () {
                 this.attackFrameCounter = 0;
                 this.isAttacking = false;
             }
-        } else if (this.isProgramming) {
+        } else if (this.isProgramming) {              
+        	this.game.removeProgramButtons();
             this.programmingFrameCounter += 1;
             this.animation = this.programAnimation;
             for (var i = 0; i < this.game.programmableEntities.length; i++) {
                 var ent = this.game.programmableEntities[i];
-                this.game.removeProgramButtons();
                 if (this != ent && collide(this, ent)) { 
                     console.log("Programing " + ent);  
                     ent.setTask();
@@ -1345,6 +1345,7 @@ State.prototype.update = function () {
 		document.getElementById("metalCount").innerHTML = "<img src=\"img/metal.png\"/>" + this.scrap; 
 		document.getElementById("mineralCount").innerHTML = "<img src=\"img/rock1.png\"/>" + this.minerals; 
 		document.getElementById("robotCount").innerHTML = "<img src=\"img/robot.png\"/>" + this.robotCount; 
+		document.getElementById("level").innerHTML = this.level + 1; 
 	 	
 	 	if(100 * (this.ship.lives / this.shipMaxHealth) < 20) { // 20%
 	 		document.getElementById("shipHealth").style.color = "red";
