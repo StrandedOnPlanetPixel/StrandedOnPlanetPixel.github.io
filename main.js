@@ -945,9 +945,9 @@ RobotTier1.prototype.update = function() {
 						this.game.state.level += 1;
 						if(this.game.state.level === 5) { // you win!
 							gameOver();
-						
 						};
 					} 
+					
 				} else if(this.game.state.scrap >= 5 && this.game.state.wood >= 10 && this.game.state.minerals >= 5  && this.game.state.shipMaxHealth > this.game.state.ship.lives){
   						this.game.state.ship.lives += 1;
 						if(this.game.state.ship.lives > this.game.state.shipMaxHealth) {
