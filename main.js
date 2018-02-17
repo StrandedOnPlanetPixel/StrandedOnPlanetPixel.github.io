@@ -133,12 +133,12 @@ function moveEntityToTarget(ent, target) {
 			ent.animation = ent.rightAnimation;
 		} 
 	} else {     
-		if(dx < 0 || dy > 0) {       
+		if(dx < 0 || dy > 0) {   
+			ent.dir = "down";
+			ent.animation = ent.downAnimation;     
+		} else {               
 			ent.dir = "up"; 
 			ent.animation = ent.upAnimation;   
-		} else {               
-			ent.dir = "down";
-			ent.animation = ent.downAnimation; 
 		}
 	} 
 	ent.x += dx * ent.game.clockTick * ent.speed;
@@ -332,6 +332,7 @@ Player.prototype.update = function () {
             this.animation = this.programAnimation;
             for (var i = 0; i < this.game.programmableEntities.length; i++) {
                 var ent = this.game.programmableEntities[i];
+                this.game.removeProgramButtons();
                 if (this != ent && collide(this, ent)) { 
                     console.log("Programing " + ent);  
                     ent.setTask();
@@ -1415,7 +1416,7 @@ function addRobot() {
 function addEnivironmentEntities(gameEngine) {  
 	var treeEnts = [new Tree(gameEngine, 64, 64), new Tree(gameEngine, 222, 55), new Tree(gameEngine, 130, 85), 
 				new Tree(gameEngine, 305, 70), new Tree(gameEngine, 85, 160), new Tree(gameEngine, 155, 193), 
-				new Tree(gameEngine, 305, 220)];
+				new Tree(gameEngine, 305, 220)]; 
 
 	for(var i = 0; i < treeEnts.length; i++) {
 		gameEngine.addTreeEntity(treeEnts[i]);
