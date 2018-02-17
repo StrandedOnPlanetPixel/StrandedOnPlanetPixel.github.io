@@ -928,17 +928,12 @@ RobotTier1.prototype.update = function() {
 			attack(this, closestEnt);
  			this.lastAttackTime = this.game.timer.gameTime; 
 		}  
-	}
-	
-	       
-	
-	else if(this.taskEntity) { // if the robot has been programmed
+	} else if(this.taskEntity) { // if the robot has been programmed
 		// If the robot reaches its target entity 
 		if(collide(this, this.taskEntity)){ 
 			// fix repair directions;
 			if (this.task === this.tasks[0] ) { // repair
-				if(this.game.state.scrap >= 5 && this.game.state.wood >= 20
-					&& this.game.state.minerals >= 5){
+				if(this.game.state.scrap >= 5 && this.game.state.wood >= 20 && this.game.state.minerals >= 5){
 					if(this.game.state.ship.lives === this.game.state.shipMaxHealth){
 						this.game.state.level += 1;
 						if(this.game.state.level === 5) { // you win!
@@ -946,6 +941,9 @@ RobotTier1.prototype.update = function() {
 						};
 						this.game.state.ship.lives = 100;
 						this.game.state.shipMaxHealth += 100;
+						this.game.state.scrap -= 5;
+						this.game.state.wood -= 10;
+						this.game.state.minerals -= 5;
 					} 
 				} else if(this.game.state.scrap >= 5 && this.game.state.wood >= 10 && this.game.state.minerals >= 5  && this.game.state.shipMaxHealth > this.game.state.ship.lives){
   						this.game.state.ship.lives += 1;
