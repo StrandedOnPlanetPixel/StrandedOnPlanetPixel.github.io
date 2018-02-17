@@ -45,7 +45,7 @@ function GameEngine() {
 		attack: false,
 		program: false
 	}; 
-};
+}
 
 GameEngine.prototype.init = function (ctx) {
     this.ctx = ctx;

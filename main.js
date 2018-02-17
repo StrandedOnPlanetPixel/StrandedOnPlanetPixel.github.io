@@ -169,6 +169,7 @@ function attack(ent, target) {
 		}
 	}  
 	target.lives -= ent.damage;
+    soundManager.playDamageSound(target);
 };
  
 function collide(ent, otherEnt) { 
@@ -243,12 +244,15 @@ Background.prototype.draw = function (ctx) {
 
 function Player(game) {
  	var spritesheet = AM.getAsset("img/space_traveler.png");
+    //(spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, reverse, scale)
+	this.animation = new Animation(spritesheet,             0,  448,    64, 64, 0.1,    8, true,    false,  0.75);
+
 	this.stillAnimation = new Animation(spritesheet,        0,  256,    64, 64, 0.1,    1, true,    false,  0.75);
 	this.upAnimation = new Animation(spritesheet,           0,  448,    64, 64, 0.095,  8, true,    false,  0.75);
 	this.downAnimation = new Animation(spritesheet,         0,  256,    64, 64, 0.095,  8, true,    false,  0.75);
 	this.rightAnimation = new Animation(spritesheet,        0,  384,    64, 64, 0.095,  8, true,    false,  0.75);
 	this.leftAnimation = new Animation(spritesheet,         0,  320,    64, 64, 0.095,  8, true,    false,  0.75);    
-	this.attackAnimation = new Animation(spritesheet,       0,  0,      64, 64, 0.1,    8, true,    false,  0.75);    
+	this.attackAnimation = new Animation(spritesheet,       0,  0,      64, 64, 0.1,    8, false,    false,  0.75);    
 	this.frontAttackAnimation = new Animation(spritesheet,  0,  0,      64, 64, 0.1,    8, true,    false,  0.75);    
 	this.leftAttackAnimation = new Animation(spritesheet,   0,  0,      64, 64, 0.1,    8, true,    false,  0.75);    
 	this.rightAttackAnimation = new Animation(spritesheet,  0,  64,     64, 64, 0.1,    8, true,    false,  0.75);
@@ -257,6 +261,7 @@ function Player(game) {
 	this.deadAnimation = new Animation(spritesheet,        448, 128,    64, 64, 0.1,    1, true,    false,  0.75);  
 	this.animation = this.stillAnimation;
 
+    this.name = "Player";
 	this.game = game;
 	this.ctx = game.ctx;  
 	Entity.call(this, game, (width / 2) - 25, (height / 2 ) + 25);  
@@ -267,13 +272,27 @@ function Player(game) {
 	this.speed = 150; 
 	this.damage = 10;
 	this.lastAttackTime = 0;
-};
+    this.attackFrameCounter = 0;
+    this.isAttacking = false;
+    this.deathFrameCounter = 0;
+    this.isDying = false;
+    this.programmingFrameCounter = 0;
+    this.isProgramming = false;
+
+    this.attackSound = document.createElement("audio");
+    this.attackSound.src = "sound_effects/space_traveler_attack.mp3";
+    this.attackSound.loop = false;
+
+    this.damageSound = document.createElement("audio");
+    this.damageSound.src = "sound_effects/space_traveler_damage.mp3";
+    this.damageSound.loop = false;
+}
 
 Player.prototype = new Entity();
 Player.prototype.constructor = Player;
 
 Player.prototype.update = function () {
- 
+    var ticksPerAnimation = 95;
 	if (collideLeft(this) || collideRight(this)) { 
 		if (collideLeft(this)) this.x = this.radius;
 		if (collideRight(this)) this.x = width - this.radius; 
@@ -285,50 +304,102 @@ Player.prototype.update = function () {
 	}
 	
 	if(this.lives > 0) {
-		if(this.game.keys.up) {
-			this.attackAnimation = this.frontAttackAnimation;
-			this.animation = this.upAnimation;
-			this.y -= this.game.clockTick * this.speed;  
-		} else if (this.game.keys.down) {  
-			this.attackAnimation = this.frontAttackAnimation;
-			this.animation = this.downAnimation;
-			this.y += this.game.clockTick * this.speed;
-		} else if (this.game.keys.left) {
-			this.attackAnimation = this.leftAttackAnimation;
-			this.animation = this.leftAnimation; 
-			this.x -= this.game.clockTick * this.speed;   
-		} else if (this.game.keys.right) {
-			this.attackAnimation = this.rightAttackAnimation;
-			this.animation = this.rightAnimation;    
-			this.x += this.game.clockTick * this.speed;      
-		} else {
-			this.attackAnimation = this.frontAttackAnimation;
-			this.animation = this.stillAnimation;    
-		} 
-		if(this.game.keys.program) {
-			this.animation = this.programAnimation;
-			
-			this.game.removeProgramButtons();	
-			for (var i = 0; i < this.game.programmableEntities.length; i++) {
-				var ent = this.game.programmableEntities[i];
-				if (this != ent && collide(this, ent)) { 
- 					ent.setTask();
- 				}  
-			} 
-		}  
-		if(this.game.keys.attack) {
-			this.animation = this.attackAnimation;
-			for (var i = 0; i < this.game.hostileEntities.length; i++) {
-				var ent = this.game.hostileEntities[i];
-				if (this != ent && collide(this, ent) && this.game.keys.attack &&
-					(!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 0.5))) {
- 						ent.lives -= this.damage; 
- 						this.lastAttackTime = this.game.timer.gameTime; 
- 				}  
-			} 
-		}   
+
+        if (this.isAttacking) {
+            this.attackFrameCounter += 1;
+            this.animation = this.attackAnimation;
+            for (var i = 0; i < this.game.hostileEntities.length; i++) {
+                var ent = this.game.hostileEntities[i];
+                if (this != ent && collide(this, ent) && this.game.keys.attack &&
+                    (!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 0.5))) {
+                        ent.lives -= this.damage; 
+                        this.lastAttackTime = this.game.timer.gameTime;
+                        console.log("Player hit: " + ent.name + " for " + this.damage + " damage");
+                        soundManager.playDamageSound(ent); 
+                }  
+            }
+
+            if (this.attackFrameCounter > ticksPerAnimation) {
+                this.attackFrameCounter = 0;
+                this.isAttacking = false;
+            }
+        } else if (this.isProgramming) {
+            this.programmingFrameCounter += 1;
+            this.animation = this.programAnimation;
+            for (var i = 0; i < this.game.programmableEntities.length; i++) {
+                var ent = this.game.programmableEntities[i];
+                if (this != ent && collide(this, ent)) { 
+                    console.log("Programing " + ent);  
+                    ent.setTask();
+                }  
+            } 
+
+            if (this.programmingFrameCounter > ticksPerAnimation) {
+                this.programmingFrameCounter = 0;
+                this.isProgramming = false;
+            }
+        } else{
+            if(this.game.keys.up) {
+                this.attackAnimation = this.frontAttackAnimation;
+                this.animation = this.upAnimation;
+                this.y -= this.game.clockTick * this.speed;  
+            } else if (this.game.keys.down) {  
+                this.attackAnimation = this.frontAttackAnimation;
+                this.animation = this.downAnimation;
+                this.y += this.game.clockTick * this.speed;
+            } else if (this.game.keys.left) {
+                this.attackAnimation = this.leftAttackAnimation;
+                this.animation = this.leftAnimation; 
+                this.x -= this.game.clockTick * this.speed;   
+            } else if (this.game.keys.right) {
+                this.attackAnimation = this.rightAttackAnimation;
+                this.animation = this.rightAnimation;    
+                this.x += this.game.clockTick * this.speed;      
+            } else {
+                this.attackAnimation = this.frontAttackAnimation;
+                this.animation = this.stillAnimation;    
+            } 
+            if(this.game.keys.program) {
+                this.isProgramming = true;
+                this.animation = this.programAnimation;
+                for (var i = 0; i < this.game.programmableEntities.length; i++) {
+                    var ent = this.game.programmableEntities[i];
+                    if (this != ent && collide(this, ent)) { 
+                        console.log("Programing " + ent);  
+                        ent.setTask();
+                    }  
+                } 
+            }
+            if(this.game.keys.attack) {
+                soundManager.playAttackSound(this);
+                this.isAttacking = true;
+                this.attackFrameCounter += 1;
+                this.animation = this.attackAnimation;
+                for (var i = 0; i < this.game.hostileEntities.length; i++) {
+                    var ent = this.game.hostileEntities[i];
+                    if (this != ent && collide(this, ent) && this.game.keys.attack &&
+                        (!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 0.5))) {
+                            ent.lives -= this.damage; 
+                            this.lastAttackTime = this.game.timer.gameTime; 
+                            soundManager.playDamageSound(ent);
+                    }  
+                } 
+            } 
+        } 
 	} else {
-		this.animation = this.deadAnimation;
+        if (this.deathFrameCounter == 0) {
+            this.isDying = true;
+        }
+        if (this.isDying) {
+            this.animation = this.dyingAnimation;
+            this.deathFrameCounter += 1;
+
+            if(this.deathFrameCounter > ticksPerAnimation) {
+                this.isDying = false;
+            }
+        } else {
+            this.animation = this.deadAnimation;
+        }
 	} 
 	Entity.prototype.update.call(this); 
 };
@@ -351,6 +422,7 @@ function Alien(game, enemy) {
 	this.leftAttackAnimation = new Animation(spritesheet,   0,    192,  64, 64, 0.1, 4, true, false,   0.75); 
 	this.dyingAnimation = new Animation(spritesheet,        0,    0, 64, 64, 0.1, 8, false,  false,  0.75);    
 	
+    this.name = "Alien";
 	this.game = game;
 	this.ctx = game.ctx; 
 	this.enemy = enemy;
@@ -427,6 +499,7 @@ function Scavenger(game, enemy) {
 	this.leftAttackAnimation = new Animation(spritesheet,   512,    0,  64, 64, 0.1, 4, true, false,   0.75); 
 	this.dyingAnimation = new Animation(spritesheet,        256,    64, 64, 64, 0.1, 4, false,  false,  0.75);    
 
+    this.name = "Scavenger";
 	this.game = game;
 	this.ctx = game.ctx; 
 	this.enemy = enemy;
@@ -505,6 +578,7 @@ function Rummager(game, enemy) {
 	this.downAttackAnimation = new Animation(spritesheet,   0,    256,   64, 64, 0.1, 1, true,  false,  0.75);    
 	this.animation = this.upAnimation;
 
+    this.name = "Rummager";
 	this.game = game;
 	this.ctx = game.ctx;  
 	Entity.call(this, game, Math.random() * width, height);
@@ -601,6 +675,7 @@ Bullet.prototype.update = function() {
 		if (this != ent && collide(this, ent)) {
 			ent.lives -= this.damage;
 			this.removeFromWorld = true;
+            soundManager.playDamageSound(ent);
 		}  
 	} 
 
@@ -683,6 +758,7 @@ function RobotTier1(game, day) { //spriteSheet, startX, startY, frameWidth, fram
 	this.animation = this.stillAnimation;
 
 	//add rest
+    this.name = "Robot";
 	this.speed = 75;  
 	this.game = game;
 	this.ctx = game.ctx; 
@@ -1306,6 +1382,8 @@ AM.queueDownload("img/plus.png");
 
 AM.downloadAll(startGame);
 
+var soundManager = new SoundManager();
+
 function startGame() {  
 	canvas = document.getElementById("gameWorld");
 	var ctx = canvas.getContext("2d");
@@ -1326,9 +1404,6 @@ function startGame() {
 	height = canvas.height;
 	width = canvas.width; 
 	gameEngine = new GameEngine(); 
-
-
-	var soundManager = new SoundManager();
  
 	gameEngine.init(ctx); 
 	gameEngine.start();
