@@ -937,24 +937,24 @@ RobotTier1.prototype.update = function() {
 		if(collide(this, this.taskEntity)){ 
 			// fix repair directions;
 			if (this.task === this.tasks[0] ) { // repair
-				if(this.game.state.scrap >= 10 && this.game.state.wood >= 20
-				 && this.game.state.minerals >= 10){
+				if(this.game.state.scrap >= 5 && this.game.state.wood >= 20
+					&& this.game.state.minerals >= 5){
 					if(this.game.state.ship.lives === this.game.state.shipMaxHealth){
 						this.game.state.level += 1;
+						if(this.game.state.level === 5) { // you win!
+							gameOver();
+						};
 						this.game.state.ship.lives = 100;
 						this.game.state.shipMaxHealth += 100;
-						this.game.state.scrap -= 50;
-						this.game.state.wood -= 30;
-						this.game.state.minerals -= 30;
 					} 
 				} else if(this.game.state.scrap >= 5 && this.game.state.wood >= 10 && this.game.state.minerals >= 5  && this.game.state.shipMaxHealth > this.game.state.ship.lives){
-						this.game.state.ship.lives += 1;
-  						this.game.state.ship.lives += 25;
+  						this.game.state.ship.lives += 1;
 						if(this.game.state.ship.lives > this.game.state.shipMaxHealth) {
 							this.game.state.ship.lives = his.game.state.shipMaxHealth; // lives cant pass maxx lives
 						}
- 						this.game.state.scrap -= 25;
-						this.game.state.wood -= 25;
+						this.game.state.scrap -= 5;
+						this.game.state.wood -= 10;
+						this.game.state.minerals -= 5;
 				}
 				if(this.dir === this.directions[3]){
 					this.animation = this.repairDownAnimation;
@@ -1399,17 +1399,30 @@ function pause() {
 	}
 };
 
-function gameOver() {
-	if(gameEngine.gameOver) { 
-		gameEngine.state.update();
+function gameOver() {	
+	if(gameEngine.state.level === 5) { 
+		if(gameEngine.gameOver) { 
+			gameEngine.state.update();
+		} else {
+	 		gameEngine.gameOver = true; 
+			document.getElementById("playButton").style.display = "";
+			document.getElementById("playGameText").style.display = ""; 
+			document.getElementById("playGameText").innerHTML = "You win!";      
+			document.getElementById("playGameText").style.left = "45%"; 
+			document.getElementById("gameWorld").style.opacity = "0.4";
+		}  
 	} else {
- 		gameEngine.gameOver = true; 
-		document.getElementById("playButton").style.display = "";
-		document.getElementById("playGameText").style.display = ""; 
-		document.getElementById("playGameText").innerHTML = "Game Over";      
-		document.getElementById("playGameText").style.left = "42.3%"; 
-		document.getElementById("gameWorld").style.opacity = "0.4";
-	} 
+		if(gameEngine.gameOver) { 
+			gameEngine.state.update();
+		} else {
+	 		gameEngine.gameOver = true; 
+			document.getElementById("playButton").style.display = "";
+			document.getElementById("playGameText").style.display = ""; 
+			document.getElementById("playGameText").innerHTML = "Game Over";      
+			document.getElementById("playGameText").style.left = "42.3%"; 
+			document.getElementById("gameWorld").style.opacity = "0.4";
+		} 
+	}
 };
 
 function eatFood() { 
