@@ -1278,8 +1278,9 @@ function pause() {
 
 function gameOver() {
 	if(gameEngine.gameOver) { 
-		document.location.reload();
+
 	} else {
+		gameEngine.state.update();
 		gameEngine.gameOver = true; 
 		document.getElementById("playButton").style.display = "";
 		document.getElementById("playGameText").style.display = ""; 
@@ -1289,14 +1290,16 @@ function gameOver() {
 	} 
 };
 
-function eatFood() {
-	if(gameEngine.state.food >= 1 && gameEngine.state.player < gameEngine.state.playerMaxLives) {
+function eatFood() { 
+	canvas.focus();
+	if(gameEngine.state.food >= 1 && gameEngine.state.player.lives < gameEngine.state.playerMaxLives) {
 		gameEngine.state.food--;
 		gameEngine.state.player.lives++;
 	}
 };
 
 function addRobot() {
+	canvas.focus();
 	if(gameEngine.state.scrap >= 5 && gameEngine.state.minerals >= 5 && gameEngine.state.wood >= 5) {
 		gameEngine.state.wood -= 5;
 		gameEngine.state.scrap -= 5;
