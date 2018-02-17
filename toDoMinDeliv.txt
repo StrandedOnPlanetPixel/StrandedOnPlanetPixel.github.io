@@ -1,8 +1,6 @@
 To-Do:
 	fix alien side view (Amanda)
-		alien attack animation
-		
-	rummager animations (Taylor) 
+		alien attack animation 
 
 	fix controls (Amanda)
 		mouse input for robot menus 
@@ -11,20 +9,11 @@ To-Do:
 		display controls
 	
     fix animation completes on button clicked (Taylor)
-
-    start screen (Taylor)
-		so user clicks canvas
-		controls
 	
 	resource management (Amanda)
 		counters
 		cap on resources
-
-	display resources (Taylor)
-		element above canvas
-		placeholder images
-		player health
-	
+ 	
 	menus for our robots (Amanda)
 		simple menu with images as buttons for each resource type
 		display robot health
@@ -50,15 +39,10 @@ To-Do:
 			Scavenger damage
 			Alien death (sploosh)
 			Player attack
-			Robot attack
-
-	day/night cycle (Taylor)
-		day/night as entity
-		adjusting view
-		adjusting charge levels
-		baddies come out at night
-		only certain enemies come out at night (random?)
-
+			Robot attack 
+	
+	adjusting charge levels (Taylor) 
+ 
 	level object
 
 	checks for win and lose
