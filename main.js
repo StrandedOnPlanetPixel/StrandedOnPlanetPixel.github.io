@@ -133,12 +133,12 @@ function moveEntityToTarget(ent, target) {
 			ent.animation = ent.rightAnimation;
 		} 
 	} else {     
-		if(dx < 0 || dy > 0) {          
-			ent.dir = "down";
-			ent.animation = ent.downAnimation;
-		} else {                
+		if(dx < 0 || dy > 0) {       
 			ent.dir = "up"; 
-			ent.animation = ent.upAnimation;
+			ent.animation = ent.upAnimation;   
+		} else {               
+			ent.dir = "down";
+			ent.animation = ent.downAnimation; 
 		}
 	} 
 	ent.x += dx * ent.game.clockTick * ent.speed;
@@ -378,6 +378,7 @@ Player.prototype.update = function () {
 					if (this != ent && collide(this, ent) && this.game.keys.attack &&
 						(!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 0.5))) {
 							ent.lives -= this.damage; 
+							console.log("player hit " + ent.name + " with " + this.damage + " damage");
 							this.lastAttackTime = this.game.timer.gameTime; 
 							soundManager.playDamageSound(ent);
 					}  
