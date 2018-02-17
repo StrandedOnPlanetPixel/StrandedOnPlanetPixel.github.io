@@ -270,13 +270,17 @@ function Player(game) {
 	this.lastAttackTime = 0;
     this.attackFrameCounter = 0;
     this.isAttacking = false;
-};
+    this.deathFrameCounter = 0;
+    this.isDying = false;
+    this.programmingFrameCounter = 0;
+    this.isProgramming = false;
+}
 
 Player.prototype = new Entity();
 Player.prototype.constructor = Player;
 
 Player.prototype.update = function () {
- 
+    var ticksPerAnimation = 95;
 	if (collideLeft(this) || collideRight(this)) { 
 		if (collideLeft(this)) this.x = this.radius;
 		if (collideRight(this)) this.x = width - this.radius; 
@@ -290,9 +294,7 @@ Player.prototype.update = function () {
 	if(this.lives > 0) {
 
         if (this.isAttacking) {
-            console.log(this.isAttacking + ' ' + this.attackFrameCounter);
             this.attackFrameCounter += 1;
-            this.isAttacking = true;
             this.animation = this.attackAnimation;
             for (var i = 0; i < this.game.hostileEntities.length; i++) {
                 var ent = this.game.hostileEntities[i];
@@ -303,9 +305,24 @@ Player.prototype.update = function () {
                 }  
             }
 
-            if (this.attackFrameCounter > 95) {
+            if (this.attackFrameCounter > ticksPerAnimation) {
                 this.attackFrameCounter = 0;
                 this.isAttacking = false;
+            }
+        } else if (this.isProgramming) {
+            this.programmingFrameCounter += 1;
+            this.animation = this.programAnimation;
+            for (var i = 0; i < this.game.programmableEntities.length; i++) {
+                var ent = this.game.programmableEntities[i];
+                if (this != ent && collide(this, ent)) { 
+                    console.log("Programing " + ent);  
+                    ent.setTask();
+                }  
+            } 
+
+            if (this.programmingFrameCounter > ticksPerAnimation) {
+                this.programmingFrameCounter = 0;
+                this.isProgramming = false;
             }
         } else{
             if(this.game.keys.up) {
@@ -329,6 +346,7 @@ Player.prototype.update = function () {
                 this.animation = this.stillAnimation;    
             } 
             if(this.game.keys.program) {
+                this.isProgramming = true;
                 this.animation = this.programAnimation;
                 for (var i = 0; i < this.game.programmableEntities.length; i++) {
                     var ent = this.game.programmableEntities[i];
@@ -339,7 +357,6 @@ Player.prototype.update = function () {
                 } 
             }
             if(this.game.keys.attack) {
-                console.log("attack pressed");
                 this.isAttacking = true;
                 this.attackFrameCounter += 1;
                 this.animation = this.attackAnimation;
@@ -352,52 +369,21 @@ Player.prototype.update = function () {
                     }  
                 } 
             } 
-        }
-        /*
-		if(this.game.keys.up) {
-			this.attackAnimation = this.frontAttackAnimation;
-			this.animation = this.upAnimation;
-			this.y -= this.game.clockTick * this.speed;  
-		} else if (this.game.keys.down) {  
-			this.attackAnimation = this.frontAttackAnimation;
-			this.animation = this.downAnimation;
-			this.y += this.game.clockTick * this.speed;
-		} else if (this.game.keys.left) {
-			this.attackAnimation = this.leftAttackAnimation;
-			this.animation = this.leftAnimation; 
-			this.x -= this.game.clockTick * this.speed;   
-		} else if (this.game.keys.right) {
-			this.attackAnimation = this.rightAttackAnimation;
-			this.animation = this.rightAnimation;    
-			this.x += this.game.clockTick * this.speed;      
-		} else {
-			this.attackAnimation = this.frontAttackAnimation;
-			this.animation = this.stillAnimation;    
-		} 
-		if(this.game.keys.program) {
-			this.animation = this.programAnimation;
-			for (var i = 0; i < this.game.programmableEntities.length; i++) {
-				var ent = this.game.programmableEntities[i];
-				if (this != ent && collide(this, ent)) { 
-					console.log("Programing " + ent);  
-					ent.setTask();
- 				}  
-			} 
-		}  */
-		/*if(this.game.keys.attack) {
-            this.isAttacking = true;
-			this.animation = this.attackAnimation;
-			for (var i = 0; i < this.game.hostileEntities.length; i++) {
-				var ent = this.game.hostileEntities[i];
-				if (this != ent && collide(this, ent) && this.game.keys.attack &&
-					(!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 0.5))) {
- 						ent.lives -= this.damage; 
- 						this.lastAttackTime = this.game.timer.gameTime; 
- 				}  
-			} 
-		} */  
+        } 
 	} else {
-		this.animation = this.deadAnimation;
+        if (this.deathFrameCounter == 0) {
+            this.isDying = true;
+        }
+        if (this.isDying) {
+            this.animation = this.dyingAnimation;
+            this.deathFrameCounter += 1;
+
+            if(this.deathFrameCounter > ticksPerAnimation) {
+                this.isDying = false;
+            }
+        } else {
+            this.animation = this.deadAnimation;
+        }
 	} 
 	Entity.prototype.update.call(this); 
 };
@@ -427,7 +413,7 @@ function Alien(game, enemy) {
 	this.radius = 24;
 	this.lives = 150;
 	this.speed = 50;
-	this.damage = 2;
+	this.damage = 5;
 	this.visualRadius = 200;
 	this.lastAttackTime = 0;
 	this.task = 3;

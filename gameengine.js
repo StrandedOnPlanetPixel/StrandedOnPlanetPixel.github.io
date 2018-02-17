@@ -91,7 +91,6 @@ GameEngine.prototype.keyListener = function() {
     var that = this;
     this.ctx.canvas.addEventListener("keydown", function(e) {
         var keyPressed = String.fromCharCode(e.which); 
-        console.log(keyPressed);
         if(keyPressed === 'W' || e.which === 38) that.keys.up = true;
         if(keyPressed === 'A' || e.which === 37) that.keys.left = true;  
         if(keyPressed === 'D' || e.which === 39) that.keys.right = true;  
