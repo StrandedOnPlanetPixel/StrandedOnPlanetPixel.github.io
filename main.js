@@ -447,10 +447,10 @@ function Alien(game, enemy) {
 	this.damage = 2;
 	this.visualRadius = 200;
 	this.lastAttackTime = 0;
-<<<<<<< HEAD
+
 	this.task = 5;
-=======
-	this.task = 3;
+
+
 
     this.attackSound = document.createElement("audio");
     this.attackSound.src = "sound_effects/alien_attack.mp3";
@@ -459,7 +459,7 @@ function Alien(game, enemy) {
     this.damageSound = document.createElement("audio");
     this.damageSound.src = "sound_effects/alien_damage.mp3";
     this.damageSound.loop = false;
->>>>>>> 41991f23a7e62e53a3a92f8bb940f305971dd736
+
 };
 
 Alien.prototype = new Entity();
@@ -618,15 +618,14 @@ function Rummager(game, enemy) {
 	this.speed = 50;
 	this.visualRadius = 200;
 	this.lastBulletTime = 0;
-<<<<<<< HEAD
+
 	this.task = 5;
-=======
-	this.task = 3;
+
 
     this.attackSound = document.createElement("audio");
     this.attackSound.src = "sound_effects/rummager_attack.mp3";
     this.attackSound.loop = false;
->>>>>>> 41991f23a7e62e53a3a92f8bb940f305971dd736
+
 };
 
 Rummager.prototype = new Entity();
@@ -764,10 +763,10 @@ function RobotTier1(game, day) { //spriteSheet, startX, startY, frameWidth, fram
 	this.loggingLeftAnimation = new Animation(spriteSheet, 512, 256, 64, 64, 0.1, 4, true, false, 0.75);
 	
 	//defending animation
-	this.defendingUpAnimation = new Animation(spriteSheet, 384, 832, 64, 64, 0.1, 6, true, false, 0.75);
-	this.defendingDownAnimation = new Animation(spriteSheet, 0, 128, 64, 64, 0.1, 6, true, false, 0.75);
-	this.defendingRightAnimation = new Animation(spriteSheet, 0, 256, 64, 64, 0.1, 6, true, false, 0.75);
-	this.defendingLeftAnimation = new Animation(spriteSheet, 0, 384, 64, 64, 0.1, 6, true, false, 0.75);
+	this.upAttackAnimation = new Animation(spriteSheet, 384, 832, 64, 64, 0.1, 6, true, false, 0.75);
+	this.downAttackAnimation = new Animation(spriteSheet, 0, 128, 64, 64, 0.1, 6, true, false, 0.75);
+	this.rightAttackAnimation = new Animation(spriteSheet, 0, 256, 64, 64, 0.1, 6, true, false, 0.75);
+	this.leftAttackAnimation = new Animation(spriteSheet, 0, 384, 64, 64, 0.1, 6, true, false, 0.75);
 	
 	//charging animation
 	this.chargeUpAnimation = new Animation(spriteSheet, 0, 448, 64, 64, 0.1 , 6, true, false, 0.75);
@@ -815,6 +814,7 @@ function RobotTier1(game, day) { //spriteSheet, startX, startY, frameWidth, fram
 	this.chargespeed = 2;
 	this.charge = 100;
 	this.day = day;
+	this.damage = 10;
 
     this.attackSound = document.createElement("audio");
     this.attackSound.src = "sound_effects/robot_attack.mp3";
@@ -863,6 +863,7 @@ RobotTier1.prototype.update = function() {
 		}
 	}
 	
+	
 	if (collideLeft(this)) {
 		this.x += this.radius;
 		
@@ -877,6 +878,19 @@ RobotTier1.prototype.update = function() {
 
 	if(collideBottom(this)) { 
 		this.y -= this.radius;
+	}
+	
+	if (this.charge <= 0){
+		if(this.dir === this.directions[3]){
+			this.animation = this.pDDownAnimation;
+		} else if(this.dir === this.directions[0]){
+			this.animation = this.pDLeftAnimation;      
+		} else if(this.dir === this.directions[1]){
+			this.animation = this.pDRightAnimation;     
+		} else{
+			this.animation = this.pDUpAnimation;
+		}
+
 	}
 	
 	if(this.lives <= 0){
@@ -916,20 +930,9 @@ RobotTier1.prototype.update = function() {
 		}  
 	}
 	
-	if(this.charge <= 0){
-		if(this.dir === this.directions[3]){
-			this.animation = this.pDDownAnimation;
-		} else if(this.dir === this.directions[0]){
-			this.animation = this.pDLeftAnimation;      
-		} else if(this.dir === this.directions[1]){
-			this.animation = this.pDRightAnimation;     
-		} else{
-			this.animation = this.pDUpAnimation;
-		}
-
-	}       
+	       
 	
-	if(this.taskEntity) { // if the robot has been programmed
+	else if(this.taskEntity) { // if the robot has been programmed
 		// If the robot reaches its target entity 
 		if(collide(this, this.taskEntity)){ 
 			// fix repair directions;
@@ -943,7 +946,7 @@ RobotTier1.prototype.update = function() {
 						this.game.state.wood -= 30;
 						this.game.state.minerals -= 30;
 					}
-				}else if(this.game.state.scrap >= 5 && this.game.state.wood >= 10 && this,game.state.minerals >= 5 && this.game.state.shipMaxHealth > this.state.ship.level){
+				}else if(this.game.state.scrap >= 5 && this.game.state.wood >= 10 && this.game.state.minerals >= 5 && this.game.state.shipMaxHealth > this.state.ship.level){
 						this.game.state.ship.lives += 25;
 						this.game.state.scrap -= 25;
 						this.game.state.wood -= 25;
