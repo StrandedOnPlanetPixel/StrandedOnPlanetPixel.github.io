@@ -958,6 +958,7 @@ RobotTier1.prototype.update = function() {
 						this.game.state.wood -= 10;
 						this.game.state.minerals -= 5;
 				}
+
 				if(this.dir === this.directions[3]){
 					this.animation = this.repairDownAnimation;
 				} else if(this.dir === this.directions[0]){
