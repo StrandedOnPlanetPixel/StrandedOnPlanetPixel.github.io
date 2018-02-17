@@ -432,7 +432,7 @@ function Alien(game, enemy) {
 	this.damage = 2;
 	this.visualRadius = 200;
 	this.lastAttackTime = 0;
-	this.task = 3;
+	this.task = 5;
 };
 
 Alien.prototype = new Entity();
@@ -510,7 +510,7 @@ function Scavenger(game, enemy) {
 	this.visualRadius = 200;
 	this.dead = false;
 	this.lastAttackTime = 0;
-	this.task = 3;
+	this.task = 5;
 	Entity.call(this, game, Math.floor((Math.random() * this.game.width ) + 1), this.game.height);
 };
 
@@ -587,7 +587,7 @@ function Rummager(game, enemy) {
 	this.speed = 50;
 	this.visualRadius = 200;
 	this.lastBulletTime = 0;
-	this.task = 3;
+	this.task = 5;
 };
 
 Rummager.prototype = new Entity();
@@ -767,7 +767,7 @@ function RobotTier1(game, day) { //spriteSheet, startX, startY, frameWidth, fram
 	this.y += this.radius;
 	this.taskEntity = null; 
 	this.directions = ["left", "right", "up", "down"];
-	this.tasks = ["repair", "gatherBerry", "gatherScrap", "defend", "mine", "log", "charge"];
+	this.tasks = ["repair", "gatherBerry", "gatherScrap"/*, "defend"*/, "mine", "log", /*"charge"*/];
 	this.task = this.tasks[0];
 	this.dead = false; 
 	this.lives = 200; 
@@ -883,7 +883,7 @@ RobotTier1.prototype.update = function() {
 		if(collide(this, this.taskEntity)){ 
 			// fix repair directions;
 			if (this.task === this.tasks[0] ) { // repair
-				if(this.game.state.scrap >= 50 && this.game.state.wood >= 30 && this.game.state.minerals >= 30){
+				if(this.game.state.scrap >= 10 && this.game.state.wood >= 20 && this.game.state.minerals >= 10){
 					if( this.game.state.ship.lives === this.game.state.shipMaxHealth){
 						this.game.state.level += 1;
 						this.game.state.ship.lives = 100;
@@ -892,11 +892,10 @@ RobotTier1.prototype.update = function() {
 						this.game.state.wood -= 30;
 						this.game.state.minerals -= 30;
 					}
-					else if(this.game.state.scrap >= 25 && this.game.state.wood >= 25 && this.game.state.shipMaxHealth > this.state.ship.level){
+				}else if(this.game.state.scrap >= 5 && this.game.state.wood >= 10 && this,game.state.minerals >= 5 && this.game.state.shipMaxHealth > this.state.ship.level){
 						this.game.state.ship.lives += 25;
 						this.game.state.scrap -= 25;
 						this.game.state.wood -= 25;
-					}
 				}
 				if(this.dir === this.directions[3]){
 					this.animation = this.repairDownAnimation;
@@ -937,7 +936,7 @@ RobotTier1.prototype.update = function() {
 				} else{
 					this.animation = this.gatherScrapUpAnimation;
 				}
-			} else if (this.task === this.tasks[5]) { //logging
+			} else if (this.task === this.tasks[4]) { //logging
 				this.elapsedTime += this.game.clockTick;
 				if(this.elapsedTime > this.workspeed) {
 					this.game.state.wood += 1;
@@ -952,7 +951,7 @@ RobotTier1.prototype.update = function() {
 				} else{
 					this.animation = this.loggingUpAnimation;
 				}
-			} else if (this.task === this.tasks[4]) { //mining
+			} else if (this.task === this.tasks[3]) { //mining
 				this.elapsedTime += this.game.clockTick;
 				if(this.elapsedTime > this.workspeed) {
 					this.game.state.minerals += 1;
@@ -991,11 +990,11 @@ function ProgramButton(game, x, y, task, robot) {
 		this.image = AM.getAsset("img/bushIcon.png");
 	} else if (this.task === this.robot.tasks[2]) { //gather scrap
 		this.image = AM.getAsset("img/metal.png");
-	} else if (this.task === this.robot.tasks[3]) { //defending
-		this.image = AM.getAsset("img/plus.png");
-	} else if (this.task === this.robot.tasks[4]) { //mining 
+	/*} else if (this.task === this.robot.tasks[3]) { //defending
+		this.image = AM.getAsset("img/plus.png");*/
+	} else if (this.task === this.robot.tasks[3]) { //mining 
 		this.image = AM.getAsset("img/rock1.png");
-	} else if (this.task === this.robot.tasks[5]) { //logging
+	} else if (this.task === this.robot.tasks[4]) { //logging
 		this.image = AM.getAsset("img/treeIcon.png");
 	} else { // charge?
 		this.image = AM.getAsset("img/plus.png"); 
@@ -1043,9 +1042,9 @@ ProgramButton.prototype.update = function () {
 			this.robot.taskEntity = this.game.bushEntities[Math.floor(Math.random() * this.game.bushEntities.length)];
 		} else if (this.task === this.robot.tasks[2]) { //gather scrap
 			this.robot.taskEntity = this.game.buildingEntities[Math.floor(Math.random() * this.game.buildingEntities.length)];
-		} else if (this.task === this.robot.tasks[5]) { //logging
+		} else if (this.task === this.robot.tasks[4]) { //logging
 			this.robot.taskEntity = this.game.treeEntities[Math.floor(Math.random() * this.game.treeEntities.length)];
-		} else if (this.task === this.robot.tasks[4]) { //mining 
+		} else if (this.task === this.robot.tasks[3]) { //mining 
 			this.robot.taskEntity = this.game.rockEntities[Math.floor(Math.random() * this.game.rockEntities.length)];
 		} 
 
@@ -1068,7 +1067,7 @@ function Tree(game, x, y) {
 	this.ctx = game.ctx;     
 	Entity.call(this, game, x, y);  
 	this.radius = 62; 
-	this.task = 5;
+	this.task = 4;
 }
 
 Tree.prototype = new Entity();
@@ -1108,7 +1107,7 @@ function Rock(game, x, y) {
 	this.ctx = game.ctx;     
 	Entity.call(this, game, x, y);   
 	this.radius = 16; 
-	this.task = 4;
+	this.task = 3;
 }
 
 Rock.prototype = new Entity();
@@ -1376,7 +1375,7 @@ function addEnivironmentEntities(gameEngine) {
 
 	var berryEnts = [new BerryBush(gameEngine, 325, 135), new BerryBush(gameEngine, 238, 150), new BerryBush(gameEngine, 215, 253),
 				 new BerryBush(gameEngine, 44, 233), new BerryBush(gameEngine, 115, 340), new BerryBush(gameEngine, 315, 342),
-				 new BerryBush(gameEngine, 178, 365), new BerryBush(gameEngine, 245, 435), new BerryBush(gameEngine, 25, 535),
+				 new BerryBush(gameEngine, 178, 65), new BerryBush(gameEngine, 245, 435), new BerryBush(gameEngine, 25, 535),
 				 new BerryBush(gameEngine, 95, 500), new BerryBush(gameEngine, 165, 615), new BerryBush(gameEngine, 279, 504)];
 	for(i = 0; i < berryEnts.length; i++) {
 		gameEngine.addBushEntity(berryEnts[i]);
