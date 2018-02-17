@@ -615,7 +615,7 @@ Bullet.prototype.draw = function() {
 	Entity.prototype.draw.call(this);
 };
 
-function RobotTier1(game) { //spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, scale
+function RobotTier1(game, day) { //spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, scale
 	var spriteSheet = AM.getAsset("img/robotSpriteSheet1.png"); 
 	this.stillAnimation = new Animation(spriteSheet, 0, 0, 64, 64, 0.1, 1, true, false, 0.75);
 
@@ -691,10 +691,15 @@ function RobotTier1(game) { //spriteSheet, startX, startY, frameWidth, frameHeig
 	this.y += this.radius;
 	this.taskEntity = null;	
 	this.directions = ["left", "right", "up", "down"];
- 	this.tasks = ["repair", "gatherBerry", "gatherScrap", "defend", "mine", "log", "charge", "dying"];
+ 	this.tasks = ["repair", "gatherBerry", "gatherScrap", "defend", "mine", "log", "charge"];
 	this.task = this.tasks[0];
 	this.dead = false; 
 	this.lives = 200; 
+	this.elapsedTime = 0;
+	this.workspeed = 10;
+	this.chargespeed = 2;
+	this.charge = 100;
+	this.day = day;
 }
 
 RobotTier1.prototype = new Entity();
@@ -711,10 +716,27 @@ RobotTier1.prototype.setTask = function() {
 		console.log(this.tasks[i]);
 		this.game.addProgramButtonEntity(new ProgramButton(this.game, menuX, menuY, this.tasks[i], this));
 	}
+	
  };
 
 
 RobotTier1.prototype.update = function() {
+	
+	if(!this.day){
+		this.elapsedTime += this.game.clockTick;
+		if(this.elapsedTime > this.chargespeed) {
+			this.charge -= 1;
+			this.elapsedTime = 0;
+		}
+		
+	} else if (this.day && this.charge < 100){
+		this.elapsedTime += this.game.clockTick;
+		if(this.elapsedTime > this.chargespeed) {
+			this.charge += 1;
+			this.elapsedTime = 0;
+		}
+	}
+	
 	if (collideLeft(this)) {
 		this.x += this.radius;
 		
@@ -730,6 +752,33 @@ RobotTier1.prototype.update = function() {
     if(collideBottom(this)) { 
 		this.y -= this.radius;
     }
+	
+	if(this.lives <= 0){
+		if(this.dir === this.directions[3]){
+			this.animation = this.dyingDownAnimation;
+		} else if(this.dir === this.directions[0]){
+			this.animation = this.dyingLeftAnimation;		
+		} else if(this.dir === this.directions[1]){
+			this.animation = this.dyingRightAnimation;		
+		} else{
+			this.animation = this.dyingUpAnimation;
+		}
+		this.removeFromWorld = true;
+	}
+	
+	if(this.charge <= 0){
+		if(this.dir === this.directions[3]){
+			this.animation = this.pDDownAnimation;
+		} else if(this.dir === this.directions[0]){
+			this.animation = this.pDLeftAnimation;		
+		} else if(this.dir === this.directions[1]){
+			this.animation = this.pDRightAnimation;		
+		} else{
+			this.animation = this.pDUpAnimation;
+		}
+
+	}		
+	
 	if(this.taskEntity) { // if the robot has been programmed
    		// If the robot reaches its target entity 
 		if(collide(this, this.taskEntity)){ 
@@ -745,6 +794,11 @@ RobotTier1.prototype.update = function() {
 					this.animation = this.repairUpAnimation;		
 				}				
 			} else if (this.task === this.tasks[1]) { //gather berry
+				this.elapsedTime += this.game.clockTick;
+				if(this.elapsedTime > this.workspeed) {
+					this.game.state.food += 1;
+					this.elapsedTime = 0;
+				}
 				if(this.dir === this.directions[3]){
 					this.animation = this.gatherBerryDownAnimation;
 				} else if(this.dir === this.directions[0]){
@@ -755,7 +809,11 @@ RobotTier1.prototype.update = function() {
 					this.animation = this.gatherBerryUpAnimation;		
 				}
 			} else if (this.task === this.tasks[2]) { //gather scrap
-				this.game.state.scrap += 1;
+				this.elapsedTime += this.game.clockTick;
+				if(this.elapsedTime > this.workspeed) {
+					this.game.state.scrap += 1;
+					this.elapsedTime = 0;
+				}
 				if(this.dir === this.directions[3]){
 					this.animation = this.gatherScrapDownAnimation;
 				} else if(this.dir === this.directions[0]){
@@ -766,6 +824,11 @@ RobotTier1.prototype.update = function() {
 					this.animation = this.gatherScrapUpAnimation;
 				}
 			} else if (this.task === this.tasks[5]) { //logging
+				this.elapsedTime += this.game.clockTick;
+				if(this.elapsedTime > this.workspeed) {
+					this.game.state.wood += 1;
+					this.elapsedTime = 0;
+				}
 				if(this.dir === this.directions[3]){
 					this.animation = this.loggingDownAnimation;
 				} else if(this.dir === this.directions[0]){
@@ -776,6 +839,11 @@ RobotTier1.prototype.update = function() {
 					this.animation = this.loggingUpAnimation;
 				}
 			} else if (this.task === this.tasks[4]) { //mining
+				this.elapsedTime += this.game.clockTick;
+				if(this.elapsedTime > this.workspeed) {
+					this.game.state.minerals += 1;
+					this.elapsedTime = 0;
+				}
 				if(this.dir === this.directions[3]){
 					this.animation = this.mineDownAnimation;
 				} else if(this.dir === this.directions[0]){
@@ -1165,6 +1233,11 @@ function addEnivironmentEntities(gameEngine) {
 	for(i = 0; i < buildingEnts.length; i++) {
 		gameEngine.addBuildingEntity(buildingEnts[i]);
 	}
+	
+	rockEnts = [new Rock(gameEngine, 600, 105), new Rock(gameEngine, 660, 105), new Rock(gameEngine, 660, 115), new Rock(gameEngine, 605, 115)];
+	for(var i = 0; i < rockEnts.length; i++) {
+		gameEngine.addRockEntity(rockEnts[i]);
+	}
    
 };
 
@@ -1232,13 +1305,9 @@ function startGame() {
 	var player = new Player(gameEngine);
 	var map = new Background(gameEngine); 
 	var day = new Day(gameEngine);
-<<<<<<< HEAD
 	var spaceship = new SpaceShip(gameEngine); 
-	var robot2 = new RobotTier1(gameEngine, gameEngine.buildingEntities.get(1));
-=======
 	var spaceship = new SpaceShip(gameEngine);  
-	var robot2 = new RobotTier1(gameEngine);
->>>>>>> 51fd09f4b922b02222ce09221b512e9882fdbe5b
+	var robot2 = new RobotTier1(gameEngine, day);
 	
 	var state = new State(gameEngine, player, spaceship, day);
 
