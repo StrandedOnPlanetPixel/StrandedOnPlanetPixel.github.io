@@ -943,28 +943,20 @@ RobotTier1.prototype.update = function() {
 						this.game.state.level += 1;
 						this.game.state.ship.lives = 100;
 						this.game.state.shipMaxHealth += 100;
-						this.game.state.scrap -= 50;
-						this.game.state.wood -= 30;
-						this.game.state.minerals -= 30;
+						this.game.state.scrap -= 10;
+						this.game.state.wood -= 20;
+						this.game.state.minerals -= 10;
 					}
-<<<<<<< HEAD
-<<<<<<< HEAD
-				}else if(this.game.state.scrap >= 5 && this.game.state.wood >= 10 && this.game.state.minerals >= 5 && this.game.state.shipMaxHealth > this.state.ship.lives){
-						this.game.state.ship.lives += 25;
-=======
-				}else if(this.game.state.scrap >= 5 && this.game.state.wood >= 10 && this.game.state.minerals >= 5  && this.game.state.shipMaxHealth > this.game.state.ship.lives){
-						this.game.state.ship.lives += 1;
->>>>>>> bbe0bf8ffc6ae2b985f8828a8ae595add24d4c95
-=======
+				
 				} else if(this.game.state.scrap >= 5 && this.game.state.wood >= 10 && 
 					this.game.state.minerals >= 5  && this.game.state.shipMaxHealth > this.game.state.ship.lives) {
 						this.game.state.ship.lives += 25;
 						if(this.game.state.ship.lives > this.game.state.shipMaxHealth) {
 							this.game.state.ship.lives = his.game.state.shipMaxHealth; // lives cant pass maxx lives
 						}
->>>>>>> ff54aa643b5bc01c347da663099ea7c7522c9f7c
-						this.game.state.scrap -= 25;
-						this.game.state.wood -= 25;
+						this.game.state.scrap -= 5;
+						this.game.state.wood -= 10;
+						this.game.state.minerals -= 5;
 				}
 				if(this.dir === this.directions[3]){
 					this.animation = this.repairDownAnimation;
