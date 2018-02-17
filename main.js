@@ -243,7 +243,6 @@ Background.prototype.draw = function (ctx) {
 
 function Player(game) {
  	var spritesheet = AM.getAsset("img/space_traveler.png");
-	this.animation = new Animation(spritesheet,             0,  448,    64, 64, 0.1,    8, true,    false,  0.75);
 	this.stillAnimation = new Animation(spritesheet,        0,  256,    64, 64, 0.1,    1, true,    false,  0.75);
 	this.upAnimation = new Animation(spritesheet,           0,  448,    64, 64, 0.095,  8, true,    false,  0.75);
 	this.downAnimation = new Animation(spritesheet,         0,  256,    64, 64, 0.095,  8, true,    false,  0.75);
@@ -256,6 +255,7 @@ function Player(game) {
 	this.programAnimation = new Animation(spritesheet,      0,  192,    64, 64, 0.1,    8, true,    false,  0.75);
 	this.dyingAnimation = new Animation(spritesheet,        0,  128,    64, 64, 0.1,    8, false,   false,  0.75); 
 	this.deadAnimation = new Animation(spritesheet,        448, 128,    64, 64, 0.1,    1, true,    false,  0.75);  
+	this.animation = this.stillAnimation;
 
 	this.game = game;
 	this.ctx = game.ctx;  
@@ -841,11 +841,13 @@ ProgramButton.prototype.update = function () {
     if(collideBottom(this)) { 
 		this.y -= 40;
     }
+
 	if(collide(this, this.game.mouse)) {
  		document.getElementById("gameWorld").style.cursor = "pointer";      
 	} else {
 		document.getElementById("gameWorld").style.cursor = "";          
 	}
+
 	if(collide(this, this.game.click)) { 
 		this.game.click = null;
 		this.robot.task = this.task;
@@ -861,7 +863,8 @@ ProgramButton.prototype.update = function () {
 			this.robot.taskEntity = this.game.rockEntities[Math.floor(Math.random() * this.game.rockEntities.length)];
 		}
 		this.game.removeProgramButtons();		
-		document.getElementById("gameWorld").style.cursor = "";          
+		document.getElementById("gameWorld").style.cursor = "";     
+
 
 	}  
 };
@@ -1021,7 +1024,7 @@ Day.prototype.update = function () {
 
 	var t = Math.floor(this.elapsedTime); 
  	var min = (t % 60);
- 	var hr = Math.floor(t / 60) + 2; // clock offset
+ 	var hr = Math.floor(t / 2) + 2; // clock offset
  	if(hr >= 13) {	
  		hr -= 12;
  	} 
