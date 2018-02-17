@@ -213,12 +213,12 @@ function moveEntityToTarget(ent, target) {
 			ent.animation = ent.rightAnimation;
 		} 
 	} else {     
-		if(dx < 0 || dy > 0) {          
-			ent.dir = "down";
-			ent.animation = ent.downAnimation;
-		} else {                
+		if(dx < 0 || dy > 0) {                 
 			ent.dir = "up"; 
 			ent.animation = ent.upAnimation;
+		} else {   
+			ent.dir = "down";
+			ent.animation = ent.downAnimation;      
 		}
 	} 
 	ent.x += dx * ent.game.clockTick * ent.speed;
@@ -314,8 +314,7 @@ Player.prototype.update = function () {
 					(!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 0.5))) {
 						ent.lives -= this.damage; 
 						this.lastAttackTime = this.game.timer.gameTime;
-						console.log("Player hit: " + ent.name + " for " + this.damage + " damage out of " + ent.lives);
-						soundManager.playDamageSound(ent); 
+ 						soundManager.playDamageSound(ent); 
 				}  
 			}
 
@@ -1197,7 +1196,13 @@ Day.prototype.update = function () {
 				this.game.addNpcEntity(new Scavenger(this.game), false);
 			}  
 		} 
-	}  
+	} else {
+		this.spawnRate = 1.5 * (Math.pow((4 - this.game.state.level), 2) + 0.5);  
+		if(this.elapsedTime - this.spawnRate > (this.lastSpawnTime)) { 
+			this.lastSpawnTime = this.elapsedTime;
+			this.game.addNpcEntity(new Alien(this.game), false);
+		}
+	}
 };
 
 Day.prototype.draw = function (ctx) { 
@@ -1249,12 +1254,6 @@ State.prototype.update = function () {
 	 		document.getElementById("shipHealth").style.color = "";
 	 	}
 
-		if(100 * (this.ship.lives / this.shipMaxHealth) < 10) { // 10%
-	 		document.getElementById("canvasHolder").classList.add("warning");
-	 	} else {
-	 		document.getElementById("canvasHolder").classList.remove("warning");
-	 	}
-
 		document.getElementById("shipHealth").style.width = "" + 100 * (this.ship.lives / this.shipMaxHealth) + "%";
 		document.getElementById("shipHealth").innerHTML = this.ship.lives + "/" + this.shipMaxHealth; 
 
@@ -1262,7 +1261,8 @@ State.prototype.update = function () {
 	 		document.getElementById("playerHealth").style.color = "red";
 	 	} else {
 	 		document.getElementById("playerHealth").style.color = "";
-	 	}
+	 	} 
+
 		document.getElementById("playerHealth").style.width = "" + 100 * (this.player.lives / this.playerMaxLives) + "%";
 		document.getElementById("playerHealth").innerHTML = this.player.lives + "/" + this.playerMaxLives; 
 	}
