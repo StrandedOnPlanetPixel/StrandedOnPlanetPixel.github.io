@@ -133,12 +133,12 @@ function moveEntityToTarget(ent, target) {
 			ent.animation = ent.rightAnimation;
 		} 
 	} else {     
-		if(dx < 0 || dy > 0) {          
+		if(dx < 0 || dy > 0) {   
 			ent.dir = "down";
-			ent.animation = ent.downAnimation;
-		} else {                
+			ent.animation = ent.downAnimation;     
+		} else {               
 			ent.dir = "up"; 
-			ent.animation = ent.upAnimation;
+			ent.animation = ent.upAnimation;   
 		}
 	} 
 	ent.x += dx * ent.game.clockTick * ent.speed;
@@ -213,12 +213,12 @@ function moveEntityToTarget(ent, target) {
 			ent.animation = ent.rightAnimation;
 		} 
 	} else {     
-		if(dx < 0 || dy > 0) {          
-			ent.dir = "down";
-			ent.animation = ent.downAnimation;
-		} else {                
+		if(dx < 0 || dy > 0) {                 
 			ent.dir = "up"; 
 			ent.animation = ent.upAnimation;
+		} else {   
+			ent.dir = "down";
+			ent.animation = ent.downAnimation;      
 		}
 	} 
 	ent.x += dx * ent.game.clockTick * ent.speed;
@@ -272,27 +272,32 @@ function Player(game) {
 	this.speed = 150; 
 	this.damage = 10;
 	this.lastAttackTime = 0;
-	this.attackFrameCounter = 0;
-	this.isAttacking = false;
-	this.deathFrameCounter = 0;
-	this.isDying = false;
-	this.programmingFrameCounter = 0;
-	this.isProgramming = false;
+    this.attackFrameCounter = 0;
+    this.isAttacking = false;
+    this.deathFrameCounter = 0;
+    this.isDying = false;
+    this.programmingFrameCounter = 0;
+    this.isProgramming = false;
 
-	this.attackSound = document.createElement("audio");
-	this.attackSound.src = "sound_effects/space_traveler_attack.mp3";
-	this.attackSound.loop = false;
+    this.attackSound = document.createElement("audio");
+    this.attackSound.src = "sound_effects/space_traveler_attack.mp3";
+    this.attackSound.loop = false;
 
-	this.damageSound = document.createElement("audio");
-	this.damageSound.src = "sound_effects/space_traveler_damage.mp3";
-	this.damageSound.loop = false;
+    this.damageSound = document.createElement("audio");
+    this.damageSound.src = "sound_effects/space_traveler_damage.mp3";
+    this.damageSound.loop = false;
+
+    this.walkSound = document.createElement("audio");
+    this.walkSound.src = "sound_effects/space_traveler_walking_right.mp3";
+    this.walkSound.loop = false;
 }
 
 Player.prototype = new Entity();
 Player.prototype.constructor = Player;
 
 Player.prototype.update = function () {
-	var ticksPerAnimation = 95;
+    var ticksPerAnimation = 95;
+    var playerMoving = false;
 	if (collideLeft(this) || collideRight(this)) { 
 		if (collideLeft(this)) this.x = this.radius;
 		if (collideRight(this)) this.x = width - this.radius; 
@@ -304,87 +309,97 @@ Player.prototype.update = function () {
 	}
 	
 	if(this.lives > 0) {
+        if (this.isAttacking) {
+            this.attackFrameCounter += 1;
+            this.animation = this.attackAnimation;
+            for (var i = 0; i < this.game.hostileEntities.length; i++) {
+                var ent = this.game.hostileEntities[i];
+                if (this != ent && collide(this, ent) && this.game.keys.attack &&
+                    (!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 0.5))) {
+                        ent.lives -= this.damage; 
+                        this.lastAttackTime = this.game.timer.gameTime;
+                        console.log("Player hit: " + ent.name + " for " + this.damage + " damage");
+                        soundManager.playDamageSound(ent); 
+                }  
+            }
 
-		if (this.isAttacking) {
-			this.attackFrameCounter += 1;
-			this.animation = this.attackAnimation;
-			for (var i = 0; i < this.game.hostileEntities.length; i++) {
-				var ent = this.game.hostileEntities[i];
-				if (this != ent && collide(this, ent) && this.game.keys.attack &&
-					(!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 0.5))) {
-						ent.lives -= this.damage; 
-						this.lastAttackTime = this.game.timer.gameTime;
-						console.log("Player hit: " + ent.name + " for " + this.damage + " damage out of " + ent.lives);
-						soundManager.playDamageSound(ent); 
-				}  
-			}
+            if (this.attackFrameCounter > ticksPerAnimation) {
+                this.attackFrameCounter = 0;
+                this.isAttacking = false;
+            }
+        } else if (this.isProgramming) {
+            this.programmingFrameCounter += 1;
+            this.animation = this.programAnimation;
+            for (var i = 0; i < this.game.programmableEntities.length; i++) {
+                var ent = this.game.programmableEntities[i];
+                this.game.removeProgramButtons();
+                if (this != ent && collide(this, ent)) { 
+                    console.log("Programing " + ent);  
+                    ent.setTask();
+                }  
+            } 
 
-			if (this.attackFrameCounter > ticksPerAnimation) {
-				this.attackFrameCounter = 0;
-				this.isAttacking = false;
-			}
-		} else if (this.isProgramming) {
-			this.game.removeProgramButtons();  
-			this.programmingFrameCounter += 1;
-			this.animation = this.programAnimation;
-			for (var i = 0; i < this.game.programmableEntities.length; i++) {
-				var ent = this.game.programmableEntities[i];
-				if (this != ent && collide(this, ent)) { 
-					ent.setTask();
-				}  
-			} 
-
-			if (this.programmingFrameCounter > ticksPerAnimation) {
-				this.programmingFrameCounter = 0;
-				this.isProgramming = false;
-			}
-		} else{
-			if(this.game.keys.up) {
-				this.attackAnimation = this.frontAttackAnimation;
-				this.animation = this.upAnimation;
-				this.y -= this.game.clockTick * this.speed;  
-			} else if (this.game.keys.down) {  
-				this.attackAnimation = this.frontAttackAnimation;
-				this.animation = this.downAnimation;
-				this.y += this.game.clockTick * this.speed;
-			} else if (this.game.keys.left) {
-				this.attackAnimation = this.leftAttackAnimation;
-				this.animation = this.leftAnimation; 
-				this.x -= this.game.clockTick * this.speed;   
-			} else if (this.game.keys.right) {
-				this.attackAnimation = this.rightAttackAnimation;
-				this.animation = this.rightAnimation;    
-				this.x += this.game.clockTick * this.speed;      
-			} else {
-				this.attackAnimation = this.frontAttackAnimation;
-				this.animation = this.stillAnimation;    
-			} 
-			if(this.game.keys.program) {
-				this.isProgramming = true;
-				this.animation = this.programAnimation;
-				for (var i = 0; i < this.game.programmableEntities.length; i++) {
-					var ent = this.game.programmableEntities[i];
-					if (this != ent && collide(this, ent)) { 
-						ent.setTask();
-					}  
-				} 
-			}
-			if(this.game.keys.attack) {
-				soundManager.playAttackSound(this);
-				this.isAttacking = true;
-				this.attackFrameCounter += 1;
-				this.animation = this.attackAnimation;
-				for (var i = 0; i < this.game.hostileEntities.length; i++) {
-					var ent = this.game.hostileEntities[i];
-					if (this != ent && collide(this, ent) && this.game.keys.attack &&
-						(!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 0.5))) {
-							ent.lives -= this.damage; 
-							this.lastAttackTime = this.game.timer.gameTime; 
-							soundManager.playDamageSound(ent);
-					}  
-				} 
-			} 
-		} 
+            if (this.programmingFrameCounter > ticksPerAnimation) {
+                this.programmingFrameCounter = 0;
+                this.isProgramming = false;
+            }
+        } else{
+            if(this.game.keys.up) {
+                this.attackAnimation = this.frontAttackAnimation;
+                this.animation = this.upAnimation;
+                this.y -= this.game.clockTick * this.speed;  
+                playerMoving = true;
+            } else if (this.game.keys.down) {  
+                this.attackAnimation = this.frontAttackAnimation;
+                this.animation = this.downAnimation;
+                this.y += this.game.clockTick * this.speed;
+                playerMoving = true;
+            } else if (this.game.keys.left) {
+                this.attackAnimation = this.leftAttackAnimation;
+                this.animation = this.leftAnimation; 
+                this.x -= this.game.clockTick * this.speed;   
+                playerMoving = true;
+            } else if (this.game.keys.right) {
+                this.attackAnimation = this.rightAttackAnimation;
+                this.animation = this.rightAnimation;    
+                this.x += this.game.clockTick * this.speed;
+                playerMoving = true;    
+            } else {
+                this.attackAnimation = this.frontAttackAnimation;
+                this.animation = this.stillAnimation;    
+            } 
+            if(this.game.keys.program) {
+                this.isProgramming = true;
+                this.animation = this.programAnimation;
+                for (var i = 0; i < this.game.programmableEntities.length; i++) {
+                    var ent = this.game.programmableEntities[i];
+                    if (this != ent && collide(this, ent)) { 
+                        console.log("Programing " + ent);  
+                        ent.setTask();
+                    }  
+                } 
+            }
+            if(this.game.keys.attack) {
+                soundManager.playAttackSound(this);
+                this.isAttacking = true;
+                this.attackFrameCounter += 1;
+                this.animation = this.attackAnimation;
+                for (var i = 0; i < this.game.hostileEntities.length; i++) {
+                    var ent = this.game.hostileEntities[i];
+                    if (this != ent && collide(this, ent) && this.game.keys.attack &&
+                        (!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 0.5))) {
+                            ent.lives -= this.damage; 
+                            this.lastAttackTime = this.game.timer.gameTime; 
+                            soundManager.playDamageSound(ent);
+                    }  
+                } 
+            } 
+            if(playerMoving) {
+                if(!isPlaying(this.walkSound)) {
+                    soundManager.playWalkSound(this);
+                }
+            }
+        } 
 	} else {
 		if (this.deathFrameCounter == 0) {
 			this.isDying = true;
@@ -432,7 +447,19 @@ function Alien(game, enemy) {
 	this.damage = 2;
 	this.visualRadius = 200;
 	this.lastAttackTime = 0;
+<<<<<<< HEAD
 	this.task = 5;
+=======
+	this.task = 3;
+
+    this.attackSound = document.createElement("audio");
+    this.attackSound.src = "sound_effects/alien_attack.mp3";
+    this.attackSound.loop = false;
+
+    this.damageSound = document.createElement("audio");
+    this.damageSound.src = "sound_effects/alien_damage.mp3";
+    this.damageSound.loop = false;
+>>>>>>> 41991f23a7e62e53a3a92f8bb940f305971dd736
 };
 
 Alien.prototype = new Entity();
@@ -512,6 +539,10 @@ function Scavenger(game, enemy) {
 	this.lastAttackTime = 0;
 	this.task = 5;
 	Entity.call(this, game, Math.floor((Math.random() * this.game.width ) + 1), this.game.height);
+
+    this.deathSound = document.createElement("audio");
+    this.deathSound.src = "sound_effects/scavenger_death.mp3";
+    this.deathSound.loop = false;
 };
 
 Scavenger.prototype = new Entity();
@@ -587,7 +618,15 @@ function Rummager(game, enemy) {
 	this.speed = 50;
 	this.visualRadius = 200;
 	this.lastBulletTime = 0;
+<<<<<<< HEAD
 	this.task = 5;
+=======
+	this.task = 3;
+
+    this.attackSound = document.createElement("audio");
+    this.attackSound.src = "sound_effects/rummager_attack.mp3";
+    this.attackSound.loop = false;
+>>>>>>> 41991f23a7e62e53a3a92f8bb940f305971dd736
 };
 
 Rummager.prototype = new Entity();
@@ -776,6 +815,18 @@ function RobotTier1(game, day) { //spriteSheet, startX, startY, frameWidth, fram
 	this.chargespeed = 2;
 	this.charge = 100;
 	this.day = day;
+
+    this.attackSound = document.createElement("audio");
+    this.attackSound.src = "sound_effects/robot_attack.mp3";
+    this.attackSound.loop = false;
+
+    this.damageSound = document.createElement("audio");
+    this.damageSound.src = "sound_effects/robot_damage.mp3";
+    this.damageSound.loop = false;
+
+    this.deathSound = document.createElement("audio");
+    this.deathSound.src = "sound_effects/robot_death.mp3";
+    this.deathSound.loop = false;
 }
 
 RobotTier1.prototype = new Entity();
@@ -1156,6 +1207,10 @@ function SpaceShip(game) {
  
 	this.image.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);
 	Entity.prototype.draw.call(this);
+
+    this.damageSound = document.createElement("audio");
+    this.damageSound.src = "sound_effects/ship_damage.mp3";
+    this.damageSound.loop = false;
 }
  
 
@@ -1236,7 +1291,13 @@ Day.prototype.update = function () {
 				this.game.addNpcEntity(new Scavenger(this.game), false);
 			}  
 		} 
-	}  
+	} else {
+		this.spawnRate = 1.5 * (Math.pow((4 - this.game.state.level), 2) + 0.5);  
+		if(this.elapsedTime - this.spawnRate > (this.lastSpawnTime)) { 
+			this.lastSpawnTime = this.elapsedTime;
+			this.game.addNpcEntity(new Alien(this.game), false);
+		}
+	}
 };
 
 Day.prototype.draw = function (ctx) { 
@@ -1288,12 +1349,6 @@ State.prototype.update = function () {
 	 		document.getElementById("shipHealth").style.color = "";
 	 	}
 
-		if(100 * (this.ship.lives / this.shipMaxHealth) < 10) { // 10%
-	 		document.getElementById("canvasHolder").classList.add("warning");
-	 	} else {
-	 		document.getElementById("canvasHolder").classList.remove("warning");
-	 	}
-
 		document.getElementById("shipHealth").style.width = "" + 100 * (this.ship.lives / this.shipMaxHealth) + "%";
 		document.getElementById("shipHealth").innerHTML = this.ship.lives + "/" + this.shipMaxHealth; 
 
@@ -1301,7 +1356,8 @@ State.prototype.update = function () {
 	 		document.getElementById("playerHealth").style.color = "red";
 	 	} else {
 	 		document.getElementById("playerHealth").style.color = "";
-	 	}
+	 	} 
+
 		document.getElementById("playerHealth").style.width = "" + 100 * (this.player.lives / this.playerMaxLives) + "%";
 		document.getElementById("playerHealth").innerHTML = this.player.lives + "/" + this.playerMaxLives; 
 	}
@@ -1367,7 +1423,7 @@ function addRobot() {
 function addEnivironmentEntities(gameEngine) {  
 	var treeEnts = [new Tree(gameEngine, 64, 64), new Tree(gameEngine, 222, 55), new Tree(gameEngine, 130, 85), 
 				new Tree(gameEngine, 305, 70), new Tree(gameEngine, 85, 160), new Tree(gameEngine, 155, 193), 
-				new Tree(gameEngine, 305, 220)];
+				new Tree(gameEngine, 305, 220)]; 
 
 	for(var i = 0; i < treeEnts.length; i++) {
 		gameEngine.addTreeEntity(treeEnts[i]);
@@ -1404,6 +1460,14 @@ function addEnivironmentEntities(gameEngine) {
 	}
    
 };
+
+function isPlaying(song) {
+    return song
+        && song.currentTime > 0
+        && !song.paused
+        && !song.ended
+        && song.readyState > 2;
+}
 
 
 var height = null;
