@@ -370,7 +370,7 @@ Alien.prototype.constructor = Alien;
 Alien.prototype.update = function () { 
  	if(this.dead) {
 		this.removeFromWorld = true;
-	} if(this.lives < 0) {
+	} if(this.lives <= 0) {
 		//dead
 		this.animation = this.dyingAnimation;
 		this.dead = true;
