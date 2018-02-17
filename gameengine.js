@@ -85,7 +85,7 @@ GameEngine.prototype.keyListener = function() {
 	var getXandY = function(e) {
 		var x = e.clientX - that.ctx.canvas.getBoundingClientRect().left;
 		var y = e.clientY - that.ctx.canvas.getBoundingClientRect().top;
-		 return {x: x, y: y, radius: 16};
+		 return {x: x, y: y, radius: 1};
 	};
 
 	var that = this;

@@ -130,3 +130,7 @@ ul {
 .soundControls img, .addTo { 
 	cursor: pointer;
 } 
+
+.warning { 
+    box-shadow: 1px 1px 20px red inset;
+}

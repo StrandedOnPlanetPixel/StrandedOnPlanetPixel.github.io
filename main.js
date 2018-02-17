@@ -1242,10 +1242,27 @@ State.prototype.update = function () {
 		document.getElementById("metalCount").innerHTML = "<img src=\"img/metal.png\"/>" + this.scrap; 
 		document.getElementById("mineralCount").innerHTML = "<img src=\"img/rock1.png\"/>" + this.minerals; 
 		document.getElementById("robotCount").innerHTML = "<img src=\"img/robot.png\"/>" + this.robotCount; 
-	 
+	 	
+	 	if(100 * (this.ship.lives / this.shipMaxHealth) < 20) { // 20%
+	 		document.getElementById("shipHealth").style.color = "red";
+	 	} else {
+	 		document.getElementById("shipHealth").style.color = "";
+	 	}
+
+		if(100 * (this.ship.lives / this.shipMaxHealth) < 10) { // 10%
+	 		document.getElementById("canvasHolder").classList.add("warning");
+	 	} else {
+	 		document.getElementById("canvasHolder").classList.remove("warning");
+	 	}
+
 		document.getElementById("shipHealth").style.width = "" + 100 * (this.ship.lives / this.shipMaxHealth) + "%";
 		document.getElementById("shipHealth").innerHTML = this.ship.lives + "/" + this.shipMaxHealth; 
 
+	 	if(100 * (this.player.lives / this.playerMaxLives) < 20) {
+	 		document.getElementById("playerHealth").style.color = "red";
+	 	} else {
+	 		document.getElementById("playerHealth").style.color = "";
+	 	}
 		document.getElementById("playerHealth").style.width = "" + 100 * (this.player.lives / this.playerMaxLives) + "%";
 		document.getElementById("playerHealth").innerHTML = this.player.lives + "/" + this.playerMaxLives; 
 	}
@@ -1278,10 +1295,9 @@ function pause() {
 
 function gameOver() {
 	if(gameEngine.gameOver) { 
-
-	} else {
 		gameEngine.state.update();
-		gameEngine.gameOver = true; 
+	} else {
+ 		gameEngine.gameOver = true; 
 		document.getElementById("playButton").style.display = "";
 		document.getElementById("playGameText").style.display = ""; 
 		document.getElementById("playGameText").innerHTML = "Game Over";      
