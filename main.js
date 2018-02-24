@@ -1033,7 +1033,7 @@ RobotTier1.prototype.draw = function(){
 	Entity.prototype.draw.call(this);
 };
 
-function RobotTier2(game, day) { //spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, scale
+function RobotTier2(game, day) { //spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, scale 
 	var spriteSheet = AM.getAsset("img/robotSpriteSheet5.png"); 
 	this.stillAnimation = new Animation(spriteSheet, 0, 0, 64, 64, 0.1, 1, true, false, 0.75);
 
@@ -1119,7 +1119,7 @@ function RobotTier2(game, day) { //spriteSheet, startX, startY, frameWidth, fram
 	this.chargespeed = 2;
 	this.charge = 150;
 	this.day = day;
-	this.damage = 12;
+	this.damage = 13;
 
     this.attackSound = document.createElement("audio");
     this.attackSound.src = "sound_effects/robot_attack.mp3";
