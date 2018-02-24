@@ -1042,6 +1042,321 @@ RobotTier1.prototype.draw = function(){
 	Entity.prototype.draw.call(this);
 };
 
+function RobotTier2(game, day) { //spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, scale
+	var spriteSheet = AM.getAsset("img/robotSpriteSheet5.png"); 
+	this.stillAnimation = new Animation(spriteSheet, 0, 0, 64, 64, 0.1, 1, true, false, 0.75);
+
+	//walking animations
+	this.upAnimation = new Animation(spriteSheet, 0, 320, 64, 64, 0.1, 8, true, false, 0.75);
+	this.downAnimation = new Animation(spriteSheet, 0, 0, 64, 64, 0.1, 8, true, false, 0.75);
+	this.rightAnimation = new Animation(spriteSheet, 0, 1152, 64, 64, 0.1, 11, true, false, 0.75);
+	this.leftAnimation = new Animation(spriteSheet, 0, 1088, 64, 64, 0.1, 11, true, false, 0.75);
+		
+	//repairing animations
+	this.repairUpAnimation = new Animation(spriteSheet, 512, 640, 64, 64, 0.1, 4, true, false, 0.75);
+	this.repairDownAnimation = new Animation(spriteSheet, 256, 512, 64, 64, 0.1, 4, true, false, 0.75);
+	this.repairRightAnimation = new Animation(spriteSheet, 0, 192, 64, 64, 0.1, 4, true, false, 0.75);
+	this.repairLeftAnimation = new Animation(spriteSheet, 512, 704, 64, 64, 0.1, 4, true, false, 0.75);
+		
+	//gathering berries animation
+	this.gatherBerryUpAnimation = new Animation(spriteSheet, 256, 640, 64, 64, 0.1, 4, true, false, 0.75);
+	this.gatherBerryDownAnimation = new Animation(spriteSheet, 0, 704, 64, 64, 0.1, 4, true, false, 0.75);
+	this.gatherBerryRightAnimation = new Animation(spriteSheet, 512, 320, 64, 64, 0.1, 4, true, false, 0.75);
+	this.gatherBerryLeftAnimation = new Animation(spriteSheet, 512, 384, 64, 64, 0.1, 4, true, false, 0.75);
+
+	//gathering scrap animation
+	this.gatherScrapUpAnimation = new Animation(spriteSheet, 512, 448, 64, 64, 0.1, 4, true, false, 0.75);
+	this.gatherScrapDownAnimation = new Animation(spriteSheet, 0, 512, 64, 64, 0.1, 4, true, false, 0.75);
+	this.gatherScrapRightAnimation = new Animation(spriteSheet, 512, 192, 64, 64, 0.1, 4, true, false, 0.75);
+	this.gatherScrapLeftAnimation = new Animation(spriteSheet, 512, 512, 64, 64, 0.1, 4, true, false, 0.75);
+	
+	//logging animation
+	this.loggingUpAnimation = new Animation(spriteSheet, 256, 704, 64, 64, 0.1, 4, true, false, 0.75);
+	this.loggingDownAnimation = new Animation(spriteSheet, 256, 64, 64, 64, 0.1, 4, true, false, 0.75);
+	this.loggingRightAnimation = new Animation(spriteSheet, 448, 960, 64, 64, 0.1, 4, true, false, 0.75);
+	this.loggingLeftAnimation = new Animation(spriteSheet, 512, 256, 64, 64, 0.1, 4, true, false, 0.75);
+	
+	//defending animation
+	this.upAttackAnimation = new Animation(spriteSheet, 384, 832, 64, 64, 0.1, 6, true, false, 0.75);
+	this.downAttackAnimation = new Animation(spriteSheet, 0, 128, 64, 64, 0.1, 6, true, false, 0.75);
+	this.rightAttackAnimation = new Animation(spriteSheet, 0, 256, 64, 64, 0.1, 6, true, false, 0.75);
+	this.leftAttackAnimation = new Animation(spriteSheet, 0, 384, 64, 64, 0.1, 6, true, false, 0.75);
+	
+	//charging animation
+	this.chargeUpAnimation = new Animation(spriteSheet, 0, 448, 64, 64, 0.1 , 6, true, false, 0.75);
+	this.chargeDownAnimation = new Animation(spriteSheet, 0, 576, 64, 64, 0.1, 6, true, false, 0.75);
+	this.chargeRightAnimation =  new Animation(spriteSheet, 0, 768, 64, 64, 0.1, 6, true, false, 0.75);
+	this.chargeLeftAnimation = new Animation(spriteSheet, 0, 832, 64, 64, 0.1, 6, true, false, 0.75);
+	
+	//powering down animation
+	this.pDUpAnimation = new Animation(spriteSheet, 0, 896, 64, 64, 0.1, 6, true, false, 0.75);
+	this.pDDownAnimation = new Animation(spriteSheet, 384, 768, 64, 64, 0.1, 6, true, false, 0.75);
+	this.pDRightAnimation = new Animation(spriteSheet, 0, 960, 64, 64, 0.1, 6, true, false, 0.75);
+	this.pDLeftAnimation = new Animation(spriteSheet, 384, 896, 64, 64, 0.1, 6, true, false, 0.75);
+	
+	//Dying animation
+	this.dyingUpAnimation = new Animation(spriteSheet, 512, 576, 64, 64, 0.1, 4, true, false, 0.75);
+	this.dyingDownAnimation = new Animation(spriteSheet, 0, 640, 64, 64, 0.1, 4, true, false, 0.75);
+	this.dyingRightAnimation = new Animation(spriteSheet, 512, 0, 64, 64, 0.1, 4, true, false, 0.75);
+	this.dyingLeftAnimation = new Animation(spriteSheet, 512, 128, 64, 64, 0.1, 4, true, false, 0.75);
+	
+	//mining animation
+	this.mineUpAnimation = new Animation(spriteSheet, 0, 64, 64, 64, 0.1, 4, true, false, 0.75);
+	this.mineDownAnimation = new Animation(spriteSheet, 256, 192, 64, 64, 0.1, 4, true, false, 0.75);
+	this.mineRightAnimation = new Animation(spriteSheet, 384, 960, 64, 64, 0.1, 4, true, false, 0.75);
+	this.mineLeftAnimation = new Animation(spriteSheet, 512, 64, 64, 64, 0.1, 4, true, false, 0.75);
+	
+	this.animation = this.stillAnimation;
+
+	//add rest
+	this.name = "Robot 2";
+	this.speed = 80;  
+	this.game = game;
+	this.ctx = game.ctx; 
+	Entity.call(this, game, (width / 2) + 10, (height / 2 ) + 28);  
+	this.radius = 24;   
+	this.x += this.radius;
+	this.y += this.radius;
+	this.taskEntity = null; 
+	this.directions = ["left", "right", "up", "down"];
+	this.tasks = ["repair", "gatherBerry", "gatherScrap"/*, "defend"*/, "mine", "log", /*"charge"*/];
+	this.task = this.tasks[0];
+	this.dead = false; 
+	this.lives = 225; 
+	this.elapsedTime = 0;
+	this.workspeed = 3;
+	this.chargespeed = 2;
+	this.charge = 150;
+	this.day = day;
+	this.damage = 12;
+
+    this.attackSound = document.createElement("audio");
+    this.attackSound.src = "sound_effects/robot_attack.mp3";
+    this.attackSound.loop = false;
+
+    this.damageSound = document.createElement("audio");
+    this.damageSound.src = "sound_effects/robot_damage.mp3";
+    this.damageSound.loop = false;
+
+    this.deathSound = document.createElement("audio");
+    this.deathSound.src = "sound_effects/robot_death.mp3";
+    this.deathSound.loop = false;
+}
+
+RobotTier2.prototype = new Entity();
+RobotTier2.prototype.constructor = RobotTier2;
+
+
+RobotTier2.prototype.setTask = function() {
+	// sets the task of the robot
+	//display menu 
+	var menuX = this.x - 150;
+	var menuY = this.y - 32;
+	for(var i = 0; i < this.tasks.length; i++) {
+		menuX += 40;  
+		this.game.addProgramButtonEntity(new ProgramButton(this.game, menuX, menuY, this.tasks[i], this));
+	}
+	
+ };
+
+
+RobotTier2.prototype.update = function() {
+	
+	if(!this.day){
+		this.elapsedTime += this.game.clockTick;
+		if(this.elapsedTime > this.chargespeed) {
+			this.charge -= 1;
+			this.elapsedTime = 0;
+		}
+		
+	} else if (this.day && this.charge < 100){
+		this.elapsedTime += this.game.clockTick;
+		if(this.elapsedTime > this.chargespeed) {
+			this.charge += 1;
+			this.elapsedTime = 0;
+		}
+	}
+	
+	
+	if (collideLeft(this)) {
+		this.x += this.radius;
+		
+	}   
+	if (collideRight(this)) {  
+		this.x -= this.radius;
+	}
+
+	if (collideTop(this)) { 
+		this.y += this.radius;
+	}
+
+	if(collideBottom(this)) { 
+		this.y -= this.radius;
+	}
+	
+	if (this.charge <= 0){
+		if(this.dir === this.directions[3]){
+			this.animation = this.pDDownAnimation;
+		} else if(this.dir === this.directions[0]){
+			this.animation = this.pDLeftAnimation;      
+		} else if(this.dir === this.directions[1]){
+			this.animation = this.pDRightAnimation;     
+		} else{
+			this.animation = this.pDUpAnimation;
+		}
+
+	}
+	
+	if(this.lives <= 0){
+
+		
+		this.animation = this.dyingUpAnimation;
+
+		if(this.dir === this.directions[3]){
+			this.animation = this.dyingDownAnimation;
+		} else if(this.dir === this.directions[0]){
+			this.animation = this.dyingLeftAnimation;       
+		} else if(this.dir === this.directions[1]){
+			this.animation = this.dyingRightAnimation;      
+		} else{
+			this.animation = this.dyingUpAnimation;
+		}
+
+		this.removeFromWorld = true;
+	}
+	
+	var closestEnt = this.game.hostileEntities[0];
+	for (i = 0; i < this.game.hostileEntities.length; i++) {
+		ent = this.game.hostileEntities[i];
+		if (ent != this && collide(this, { x: ent.x, y: ent.y, radius: this.visualRadius })) {
+			var dist = distance(this, ent); 
+			if(dist < distance(this, closestEnt)) {
+				closestEnt = ent;
+			}
+		}  
+	}
+
+ 	if(collide(this, closestEnt)) {
+		if(!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 1.5)) {
+			//record last shot time and create the bullet.
+			attack(this, closestEnt);
+ 			this.lastAttackTime = this.game.timer.gameTime; 
+		}  
+	} else if(this.taskEntity) { // if the robot has been programmed
+		// If the robot reaches its target entity 
+		if(collide(this, this.taskEntity)){ 
+			// fix repair directions;
+			if (this.task === this.tasks[0] ) { // repair
+				if(this.game.state.scrap >= 5 && this.game.state.wood >= 20 && this.game.state.minerals >= 5){
+					if(this.game.state.ship.lives === this.game.state.shipMaxHealth){
+						
+						this.game.state.shipMaxHealth += 100;
+						this.game.state.scrap -= 5;
+						this.game.state.wood -= 20;
+						this.game.state.minerals -= 5;
+						
+						this.game.state.level += 1;
+						if(this.game.state.level === 5) { // you win!
+							gameOver();
+						};
+					} 
+					
+				} else if(this.game.state.scrap >= 5 && this.game.state.wood >= 10 && this.game.state.minerals >= 5  && this.game.state.shipMaxHealth > this.game.state.ship.lives){
+  						this.game.state.ship.lives += 1;
+						if(this.game.state.ship.lives > this.game.state.shipMaxHealth) {
+							this.game.state.ship.lives = his.game.state.shipMaxHealth; // lives cant pass maxx lives
+						}
+
+						this.game.state.scrap -= 5;
+						this.game.state.wood -= 20;
+						this.game.state.minerals -= 5;
+
+				} 
+				
+		
+				if(this.dir === this.directions[3]){
+					this.animation = this.repairDownAnimation;
+				} else if(this.dir === this.directions[0]){
+					this.animation = this.repairLeftAnimation;      
+				} else if(this.dir === this.directions[1]){
+					this.animation = this.repairRightAnimation;     
+				} else {
+					this.animation = this.repairUpAnimation;        
+				}               
+			} else if (this.task === this.tasks[1]) { //gather berry
+				this.elapsedTime += this.game.clockTick;
+				if(this.elapsedTime > this.workspeed) {
+					this.game.state.food += 1;
+					this.elapsedTime = 0;
+				}
+				if(this.dir === this.directions[3]){
+					this.animation = this.gatherBerryDownAnimation;
+				} else if(this.dir === this.directions[0]){
+					this.animation = this.gatherBerryLeftAnimation;     
+				} else if(this.dir === this.directions[1]){
+					this.animation = this.gatherBerryRightAnimation;        
+				} else{
+					this.animation = this.gatherBerryUpAnimation;       
+				}
+			} else if (this.task === this.tasks[2]) { //gather scrap
+				this.elapsedTime += this.game.clockTick;
+				if(this.elapsedTime > this.workspeed) {
+					this.game.state.scrap += 1;
+					this.elapsedTime = 0;
+				}
+				if(this.dir === this.directions[3]){
+					this.animation = this.gatherScrapDownAnimation;
+				} else if(this.dir === this.directions[0]){
+					this.animation = this.gatherScrapLeftAnimation;     
+				} else if(this.dir === this.directions[1]){
+					this.animation = this.gatherScrapRightAnimation;        
+				} else{
+					this.animation = this.gatherScrapUpAnimation;
+				}
+			} else if (this.task === this.tasks[4]) { //logging
+				this.elapsedTime += this.game.clockTick;
+				if(this.elapsedTime > this.workspeed) {
+					this.game.state.wood += 1;
+					this.elapsedTime = 0;
+				}
+				if(this.dir === this.directions[3]){
+					this.animation = this.loggingDownAnimation;
+				} else if(this.dir === this.directions[0]){
+					this.animation = this.loggingLeftAnimation;     
+				} else if(this.dir === this.directions[1]){
+					this.animation = this.loggingRightAnimation;        
+				} else{
+					this.animation = this.loggingUpAnimation;
+				}
+			} else if (this.task === this.tasks[3]) { //mining
+				this.elapsedTime += this.game.clockTick;
+				if(this.elapsedTime > this.workspeed) {
+					this.game.state.minerals += 1;
+					this.elapsedTime = 0;
+				}
+				if(this.dir === this.directions[3]){
+					this.animation = this.mineDownAnimation;
+				} else if(this.dir === this.directions[0]){
+					this.animation = this.mineLeftAnimation;        
+				} else if(this.dir === this.directions[1]){
+					this.animation = this.mineRightAnimation;       
+				} else{
+					this.animation = this.mineUpAnimation;
+				}
+			}
+		} else {  // move to the entity
+			moveEntityToTarget(this, this.taskEntity); 
+		} 
+	}
+	Entity.prototype.update.call(this);  
+};
+
+RobotTier2.prototype.draw = function(){
+	this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);  
+	Entity.prototype.draw.call(this);
+};
+
+
 function ProgramButton(game, x, y, task, robot) {
 	this.game = game;   
 	this.ctx = game.ctx;     
@@ -1439,13 +1754,22 @@ function eatFood() {
 
 function addRobot() {
 	canvas.focus();
-	if(gameEngine.state.scrap >= 5 && gameEngine.state.minerals >= 5 && gameEngine.state.wood >= 5) {
+	if(gameEngine.state.scrap >= 10 && gameEngine.state.minerals >= 10 && gameEngine.state.wood >= 10) {
+		gameEngine.state.wood -= 10;
+		gameEngine.state.scrap -= 10;
+		gameEngine.state.minerals -= 10;  
+		gameEngine.state.robotCount++;
+		gameEngine.addProgrammableEntity(new RobotTier2(gameEngine, gameEngine.state.day), true);
+	}
+	
+	else if(gameEngine.state.scrap >= 5 && gameEngine.state.minerals >= 5 && gameEngine.state.wood >= 5) {
 		gameEngine.state.wood -= 5;
 		gameEngine.state.scrap -= 5;
 		gameEngine.state.minerals -= 5;  
 		gameEngine.state.robotCount++;
 		gameEngine.addProgrammableEntity(new RobotTier1(gameEngine, gameEngine.state.day), true);
 	}
+	
 };
 
 function addEnivironmentEntities(gameEngine) {  
@@ -1523,6 +1847,7 @@ AM.queueDownload("img/building2.png");
 AM.queueDownload("img/building3.png"); 
 AM.queueDownload("img/spaceship.png");
 AM.queueDownload("img/robotSpriteSheet1.png");
+AM.queueDownload("img/robotSpriteSheet5.png");
 AM.queueDownload("img/rummager.png");
 AM.queueDownload("img/alien.png");
 AM.queueDownload("img/bullet.png");
