@@ -809,6 +809,7 @@ function RobotTier1(game, day) { //spriteSheet, startX, startY, frameWidth, fram
 	this.task = this.tasks[0];
 	this.dead = false; 
 	this.lives = 200; 
+	this.visualRadius = 100;
 	this.elapsedTime = 0;
 	this.workspeed = 5;
 	this.chargespeed = 2;
@@ -893,9 +894,7 @@ RobotTier1.prototype.update = function() {
 
 	}
 	
-	if(this.lives <= 0){
-
-		
+	if(this.lives <= 0) { 
 		this.animation = this.dyingUpAnimation;
 
 		if(this.dir === this.directions[3]){
@@ -914,7 +913,8 @@ RobotTier1.prototype.update = function() {
 	var closestEnt = this.game.hostileEntities[0];
 	for (i = 0; i < this.game.hostileEntities.length; i++) {
 		ent = this.game.hostileEntities[i];
-		if (ent != this && collide(this, { x: ent.x, y: ent.y, radius: this.visualRadius })) {
+		if (ent != this && collide({x: this.x, y: this.y, radius: this.visualRadius},
+								   {x: ent.x, y: ent.y, radius: ent.visualRadius})) {
 			var dist = distance(this, ent); 
 			if(dist < distance(this, closestEnt)) {
 				closestEnt = ent;
@@ -930,35 +930,26 @@ RobotTier1.prototype.update = function() {
 		}  
 	} else if(this.taskEntity) { // if the robot has been programmed
 		// If the robot reaches its target entity 
-		if(collide(this, this.taskEntity)){ 
+		if(collide(this, this.taskEntity)) { 
 			// fix repair directions;
 			if (this.task === this.tasks[0] ) { // repair
-				if(this.game.state.scrap >= 5 && this.game.state.wood >= 20 && this.game.state.minerals >= 5){
-					if(this.game.state.ship.lives === this.game.state.shipMaxHealth){
-						
+				if(this.game.state.scrap >= 5 && this.game.state.wood >= 10 && this.game.state.minerals >= 5){
+					
+					console.log("Upgrading damaged ship");
+
+					this.game.state.ship.lives += 1;
+					this.game.state.scrap -= 5;
+					this.game.state.wood -= 10;
+					this.game.state.minerals -= 5;
+					if(this.game.state.ship.lives >= this.game.state.shipMaxHealth) {
 						this.game.state.shipMaxHealth += 100;
-						this.game.state.scrap -= 5;
-						this.game.state.wood -= 20;
-						this.game.state.minerals -= 5;
 						
 						this.game.state.level += 1;
 						if(this.game.state.level === 5) { // you win!
 							gameOver();
-						};
-					} 
-					
-				} else if(this.game.state.scrap >= 5 && this.game.state.wood >= 10 && this.game.state.minerals >= 5  && this.game.state.shipMaxHealth > this.game.state.ship.lives){
-  						this.game.state.ship.lives += 1;
-						if(this.game.state.ship.lives > this.game.state.shipMaxHealth) {
-							this.game.state.ship.lives = his.game.state.shipMaxHealth; // lives cant pass maxx lives
 						}
-
-						this.game.state.scrap -= 5;
-						this.game.state.wood -= 20;
-						this.game.state.minerals -= 5;
-
-				} 
-				
+					} 	
+				} 				
 		
 				if(this.dir === this.directions[3]){
 					this.animation = this.repairDownAnimation;
