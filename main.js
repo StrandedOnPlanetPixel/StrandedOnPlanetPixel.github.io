@@ -464,7 +464,7 @@ Alien.prototype.constructor = Alien;
 Alien.prototype.update = function () { 
 	if(this.dead) {
 		this.removeFromWorld = true;
-	} if(this.lives <= 0) {
+	} else if(this.lives <= 0) {
 		//dead
 		this.animation = this.dyingAnimation;
 		this.dead = true;
@@ -1367,9 +1367,6 @@ State.prototype = new Entity();
 State.prototype.constructor = State;
  
 State.prototype.update = function () {  
-	if(this.ship.lives < 0 || this.player.lives < 0) {
-		gameOver();
-	} else {
 		if(this.day.day) {
 			document.getElementById("time").innerHTML =  "<img src=\"img/time.png\"/>" + this.day.time; 
 		} else {
@@ -1381,6 +1378,9 @@ State.prototype.update = function () {
 		document.getElementById("mineralCount").innerHTML = "<img src=\"img/rock1.png\"/>" + this.minerals; 
 		document.getElementById("robotCount").innerHTML = "<img src=\"img/robot.png\"/>" + this.robotCount; 
 		document.getElementById("level").innerHTML = this.level + 1; 
+
+		this.player.lives = this.player.lives <= 0 ? 0 : this.player.lives;
+		this.ship.lives = this.ship.lives <= 0 ? 0 : this.ship.lives;
 	 	
 	 	if(100 * (this.ship.lives / this.shipMaxHealth) < 20) { // 20%
 	 		document.getElementById("shipHealth").style.color = "red";
@@ -1399,7 +1399,11 @@ State.prototype.update = function () {
 
 		document.getElementById("playerHealth").style.width = "" + 100 * (this.player.lives / this.playerMaxLives) + "%";
 		document.getElementById("playerHealth").innerHTML = this.player.lives + "/" + this.playerMaxLives; 
-	}
+
+		if(this.ship.lives <= 0 || this.player.lives <= 0) {
+			gameOver();
+		}
+
 };
 
 State.prototype.draw = function (ctx) {  
