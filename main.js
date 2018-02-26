@@ -328,8 +328,8 @@ Player.prototype.update = function () {
             this.animation = this.programAnimation;
             for (var i = 0; i < this.game.programmableEntities.length; i++) {
                 var ent = this.game.programmableEntities[i];
-                if (this != ent && collide({x:this.x, y:this.y, radius:this.attackRadius}, ent)) { 
-                    console.log("Programing " + ent.name);  
+                if (this != ent && !ent.removeFromWorld && collide({x:this.x, y:this.y, radius:this.attackRadius}, ent)) { 
+                        console.log("Programing " + ent.name + " " + ent.tier);  
                     ent.setTask();
                 }  
             } 
@@ -368,8 +368,9 @@ Player.prototype.update = function () {
                 this.animation = this.programAnimation;
                 for (var i = 0; i < this.game.programmableEntities.length; i++) {
                     var ent = this.game.programmableEntities[i];
-                    if (this != ent && collide({x:this.x, y:this.y, radius:this.attackRadius}, ent)) { 
-                        console.log("Programing " + ent);  
+                    if (this != ent && !ent.removeFromWorld && 
+                    	collide({x:this.x, y:this.y, radius:this.attackRadius}, ent)) { 
+                        console.log("Programing " + ent.name + " " + ent.tier);  
                         ent.setTask();
                     }  
                 } 
@@ -726,7 +727,7 @@ Bullet.prototype.draw = function() {
 function Robot(game, tier) { //spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, scale
 	var img = "img/robotSpriteSheet1.png";
  	if(tier === 2) {
-		img = "img/robotSpriteSheet5.png";
+		img = "img/robotSpriteSheet2.png";
 	}
 	var spriteSheet = AM.getAsset(img);
 	this.stillAnimation = new Animation(spriteSheet, 0, 0, 64, 64, 0.1, 1, true, false, 0.75);
@@ -918,15 +919,17 @@ Robot.prototype.update = function() {
 				closestEnt = ent;
 			}
 		}  
-	}
+	} 
 
- 	if(collide(this, closestEnt)) {
+	if(closestEnt && collide(this, {x: closestEnt.x, y: closestEnt.y, radius: this.attackRadius})) {
 		if(!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 1.5)) {
 			//record last shot time and create the bullet.
 			attack(this, closestEnt);
- 			this.lastAttackTime = this.game.timer.gameTime; 
-		}  
-	} else if(this.taskEntity) { // if the robot has been programmed
+			this.lastAttackTime = this.game.timer.gameTime; 
+		}
+	} else if(closestEnt && collide(this,{x: closestEnt.x, y: closestEnt.y, radius: this.visualRadius})) {
+		moveEntityToTarget(this, closestEnt);	
+	} else if(this.taskEntity && (!closestEnt || !collide(this,{x: closestEnt.x, y: closestEnt.y, radius: this.visualRadius}))) { // if the robot has been programmed
 		// If the robot reaches its target entity 
 		if(collide(this, this.taskEntity)) { 
 			// fix repair directions;
@@ -1107,11 +1110,11 @@ ProgramButton.prototype.update = function () {
 			this.robot.taskEntity = this.game.rockEntities[Math.floor(Math.random() * this.game.rockEntities.length)];
 		} else if (this.task === this.robot.tasks[4]) { //logging
 			this.robot.taskEntity = this.game.treeEntities[Math.floor(Math.random() * this.game.treeEntities.length)];
-		} else if (this.task === this.robot.tasks[5] && (gameEngine.state.scrap >= 5 
-				&& gameEngine.state.minerals >= 5 && gameEngine.state.wood >= 5)) {
-			gameEngine.state.wood -= 5;
-			gameEngine.state.scrap -= 5;
-			gameEngine.state.minerals -= 5;   
+		} else if (this.task === this.robot.tasks[5] && (gameEngine.state.scrap >= 10 
+				&& gameEngine.state.minerals >= 10 && gameEngine.state.wood >= 10)) {
+			gameEngine.state.wood -= 10;
+			gameEngine.state.scrap -= 10;
+			gameEngine.state.minerals -= 10;   
 
 			var upgradedSelf = new Robot(this.game, 2); 
 			upgradedSelf.x = this.robot.x; 
@@ -1134,7 +1137,7 @@ ProgramButton.prototype.draw = function (ctx) {
  		Entity.prototype.draw.call(this);
 
  	} else if (this.task === this.robot.tasks[5]) {
- 		if((gameEngine.state.scrap >= 5 && gameEngine.state.minerals >= 5 && gameEngine.state.wood >= 5)) {
+ 		if((gameEngine.state.scrap >= 10 && gameEngine.state.minerals >= 10 && gameEngine.state.wood >= 10)) {
 			this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);
 			Entity.prototype.draw.call(this);
  		}
@@ -1147,7 +1150,12 @@ function Tree(game, x, y) {
 	this.game = game;   
 	this.ctx = game.ctx;     
 	Entity.call(this, game, x, y);  
-	this.radius = 62; 
+
+	this.height = 75;
+	this.width = 32;
+	this.textureOffset = 40;
+ 
+	//this.radius = 62; 
 	this.task = 4;
 }
 
@@ -1158,7 +1166,7 @@ Tree.prototype.update = function () {
 };
 
 Tree.prototype.draw = function (ctx) {
-	this.image.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);
+	this.image.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.textureOffset);
 	Entity.prototype.draw.call(this);
 };
  
@@ -1542,7 +1550,7 @@ AM.queueDownload("img/building2.png");
 AM.queueDownload("img/building3.png"); 
 AM.queueDownload("img/spaceship.png");
 AM.queueDownload("img/robotSpriteSheet1.png");
-AM.queueDownload("img/robotSpriteSheet5.png");
+AM.queueDownload("img/robotSpriteSheet2.png");
 AM.queueDownload("img/rummager.png");
 AM.queueDownload("img/alien.png");
 AM.queueDownload("img/bullet.png");
@@ -1568,6 +1576,8 @@ function startGame() {
 	ctx.canvas.addEventListener("keydown", function(e) {
 		var keyPressed = String.fromCharCode(e.which); 
 		if(keyPressed === 'P' || e.which === 80) pause(); 
+		if(keyPressed === 'R' || e.which === 80) addRobot(); 
+		if(keyPressed === 'E' || e.which === 80) eatFood(); 
 		e.preventDefault(); 
 	}, false);  
 
