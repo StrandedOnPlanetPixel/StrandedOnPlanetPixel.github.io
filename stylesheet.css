@@ -23,22 +23,36 @@ canvas {
 	z-index: 2;
 }
 
-
-#playButton { 
+#button {
 	position: absolute;
 	top: 38%;
 	left: 40%;
 	width: 256px;
 	height: 128px;
-	cursor: pointer;
+	cursor: pointer; 
+	margin: 0 auto; 
+	text-align: center;
 	z-index: 3;
 }
 
+#playButton { 
+	display: inline; 
+}
+
+#playButtonHidden { 
+	display: none;
+    position: absolute;
+    top: -10000px;
+    left: -10000px;
+}
+
 #playGameText {
-	position: absolute;
-	top: 39%;
-	left: 42.5%;
-	font-size: 32px;
+	position: absolute; 
+	top: 0px; 
+	left: 0px;
+	width: 100%;
+	display: inline;
+	font-size: 32px; 
 	cursor: pointer;
 	z-index: 4;
 }
@@ -76,8 +90,8 @@ div {
 
 #gameHolder { 
 	text-align: center;
-	min-width: 1282px;
-	max-width: 1282px;
+	min-width: 1280px;
+	max-width: 1280px;
 	margin: auto; 
 }
 
@@ -90,6 +104,7 @@ div {
 	padding-left: 16px;
 	padding-right: 16px;
 	background: url("img/resourceBar.png");
+	margin: 0;
 }
 
 .resources img, #resourceBar img {
@@ -100,7 +115,7 @@ div {
 }
 
 #audioToggle {
-	padding-right: 10px;
+	padding-right: 5px;
 }
 
 #resourceBar p { 
@@ -115,6 +130,10 @@ ul {
 	overflow: hidden;
 	text-align: center; 
 } 
+ 
+.stats {
+	width: 6%;
+}
 
 .resources, .addTo {
 	padding-right: 16px;
@@ -126,6 +145,12 @@ ul {
 	padding-left: 16px;
 	float: right;
 	margin: 0 auto;
+}
+
+#how {
+	margin: 0 auto; 
+
+	display: inline-block;
 }
 
 .soundControls img, .addTo { 

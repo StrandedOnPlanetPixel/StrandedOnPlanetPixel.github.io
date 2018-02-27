@@ -725,7 +725,7 @@ Bullet.prototype.draw = function() {
 };
 
 function Robot(game, tier) { //spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, scale
-	var img = "img/robotSpriteSheet1.png";
+	var img = "img/robotSpriteSheet6.png";
  	if(tier === 2) {
 		img = "img/robotSpriteSheet2.png";
 	}
@@ -1368,9 +1368,9 @@ State.prototype.constructor = State;
  
 State.prototype.update = function () {  
 		if(this.day.day) {
-			document.getElementById("time").innerHTML =  "<img src=\"img/time.png\"/>" + this.day.time; 
+			document.getElementById("time").innerHTML =  "<p>Day</p> <div> <img src=\"img/day.png\"/></div>"; 
 		} else {
-			document.getElementById("time").innerHTML =  "<img src=\"img/time.png\"/>" + this.day.time; 
+			document.getElementById("time").innerHTML =  "<p>Night</p> <div> <img src=\"img/night.png\"/></div>"; 
 		}
 		document.getElementById("woodCount").innerHTML = "<img src=\"img/tree.png\"/>" + this.wood;
 		document.getElementById("foodCount").innerHTML = "<img src=\"img/bush.png\"/>" + this.food; 
@@ -1381,6 +1381,7 @@ State.prototype.update = function () {
 
 		this.player.lives = this.player.lives <= 0 ? 0 : this.player.lives;
 		this.ship.lives = this.ship.lives <= 0 ? 0 : this.ship.lives;
+		this.robotCount = this.robotCount <= 0 ? 0 : this.robotCount;
 	 	
 	 	if(100 * (this.ship.lives / this.shipMaxHealth) < 20) { // 20%
 	 		document.getElementById("shipHealth").style.color = "red";
@@ -1400,7 +1401,7 @@ State.prototype.update = function () {
 		document.getElementById("playerHealth").style.width = "" + 100 * (this.player.lives / this.playerMaxLives) + "%";
 		document.getElementById("playerHealth").innerHTML = this.player.lives + "/" + this.playerMaxLives; 
 
-		if(this.ship.lives <= 0 || this.player.lives <= 0) {
+		if(this.ship.lives <= 0 || this.player.lives <= 0 || this.robotCount <= 0) {
 			gameOver();
 		}
 
@@ -1410,13 +1411,16 @@ State.prototype.draw = function (ctx) {
 };
   
 function play() {
-	if(!gameEngine.gameOver) {
+	if(!gameEngine.gameOver) { // i.e. the game is pauesed
 		canvas.focus();
 		gameEngine.start();
-		document.getElementById("playButton").style.display = "none";
-		document.getElementById("playGameText").style.display = "none";   
-		document.getElementById("playGameText").style.left = "42.5%";       
+		playButton.classList.add("playButtonHidden");	
+		playButtonText.classList.add("playButtonHidden");
+		playButton.style.display = "none";
+		playButtonText.style.display = "none";   
 		document.getElementById("gameWorld").style.opacity = "1";
+	} else {
+ 		startGame();
 	}
 };
 
@@ -1425,10 +1429,11 @@ function pause() {
 		play();
 	} else if(!gameEngine.gameOver) {
 		gameEngine.pause();      
-		document.getElementById("playButton").style.display = "";
-		document.getElementById("playGameText").style.display = ""; 
-		document.getElementById("playGameText").innerHTML = "Resume";      
-		document.getElementById("playGameText").style.left = "44.5%"; 
+		playButton.classList.remove("playButtonHidden");	
+		playButtonText.classList.remove("playButtonHidden");
+		playButton.style.display = "";
+		playButtonText.style.display = ""; 
+		playButtonText.innerHTML = "Resume";      
 		document.getElementById("gameWorld").style.opacity = "0.4";
 	}
 };
@@ -1439,10 +1444,11 @@ function gameOver() {
 			gameEngine.state.update();
 		} else {
 	 		gameEngine.gameOver = true; 
-			document.getElementById("playButton").style.display = "";
-			document.getElementById("playGameText").style.display = ""; 
-			document.getElementById("playGameText").innerHTML = "You win!";      
-			document.getElementById("playGameText").style.left = "45%"; 
+			playButton.classList.remove("playButtonHidden");	
+			playButtonText.classList.remove("playButtonHidden");
+			playButton.style.display = "";
+			playButtonText.style.display = ""; 
+			playButtonText.innerHTML = "You win! Click to play again?";      
 			document.getElementById("gameWorld").style.opacity = "0.4";
 		}  
 	} else {
@@ -1450,10 +1456,12 @@ function gameOver() {
 			gameEngine.state.update();
 		} else {
 	 		gameEngine.gameOver = true; 
-			document.getElementById("playButton").style.display = "";
-			document.getElementById("playGameText").style.display = ""; 
-			document.getElementById("playGameText").innerHTML = "Game Over";      
-			document.getElementById("playGameText").style.left = "42.3%"; 
+			playButton.classList.remove("playButtonHidden");		
+			playButtonText.classList.remove("playButtonHidden");		
+			playButton.style.display = "";
+			playButtonText.style.display = ""; 
+			playButtonText.innerHTML = "Game Over, Click to play again?";   
+			playButtonText.style.fontSize = "25px";   
 			document.getElementById("gameWorld").style.opacity = "0.4";
 		} 
 	}
@@ -1528,12 +1536,15 @@ function isPlaying(song) {
         && song.readyState > 2;
 }
 
-
 var height = null;
 var width = null;
 var paused = true;
 var gameEngine = null;
 var canvas = null;
+var ctx = null; 
+
+var playButton = null;
+var playButtonText = null;
 
 var AM = new AssetManager(); 
 
@@ -1553,7 +1564,7 @@ AM.queueDownload("img/building1.png");
 AM.queueDownload("img/building2.png"); 
 AM.queueDownload("img/building3.png"); 
 AM.queueDownload("img/spaceship.png");
-AM.queueDownload("img/robotSpriteSheet1.png");
+AM.queueDownload("img/robotSpriteSheet6.png");
 AM.queueDownload("img/robotSpriteSheet2.png");
 AM.queueDownload("img/rummager.png");
 AM.queueDownload("img/alien.png");
@@ -1568,23 +1579,25 @@ AM.downloadAll(startGame);
 var soundManager = new SoundManager();
 
 function startGame() {  
+	playButton = document.getElementById("button");
+	playButtonText = document.getElementById("playGameText");
 	canvas = document.getElementById("gameWorld");
-	var ctx = canvas.getContext("2d");
+	ctx = canvas.getContext("2d");
 
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-	document.getElementById("playButton").addEventListener("click", play);
-	document.getElementById("playGameText").addEventListener("click", play); 
+	playButton.addEventListener("click", play);
+	playButtonText.addEventListener("click", play); 
 	document.getElementById("addRobot").addEventListener("click", addRobot);
 	document.getElementById("heal").addEventListener("click", eatFood);      
 	ctx.canvas.addEventListener("keydown", function(e) {
 		var keyPressed = String.fromCharCode(e.which); 
 		if(keyPressed === 'P' || e.which === 80) pause(); 
-		if(keyPressed === 'R' || e.which === 80) addRobot(); 
 		if(keyPressed === 'E' || e.which === 80) eatFood(); 
-		e.preventDefault(); 
-	}, false);  
+		if(keyPressed === 'R' || e.which === 80) addRobot(); 
 
+		e.preventDefault(); 
+	}, false);   
 
 	height = canvas.height;
 	width = canvas.width; 
