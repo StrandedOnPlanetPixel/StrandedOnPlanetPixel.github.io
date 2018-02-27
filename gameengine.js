@@ -54,6 +54,7 @@ GameEngine.prototype.init = function (ctx) {
 	this.keyListener();
 	this.timer = new Timer();
 	console.log("game initialized");
+	this.sortEntities();
 };
 
 GameEngine.prototype.start = function () {
@@ -184,13 +185,16 @@ GameEngine.prototype.addEnvironmentEntity = function(entity) {
 	this.environmentEntities.push(entity);
 };
 
+GameEngine.prototype.sortEntities = function() {
+	this.entities.sort(function(a, b){return a.z - b.z});
+};
 
 GameEngine.prototype.draw = function () {
 	this.ctx.clearRect(0, 0, this.width, this.height);
 	this.ctx.save();
 	for (var i = 0; i < this.entities.length; i++) {
 		this.entities[i].draw(this.ctx);
-	} 
+	}  
 	this.ctx.restore();
 };
 
@@ -253,6 +257,7 @@ function Entity(game, x, y) {
 	this.game = game;
 	this.x = x;
 	this.y = y;
+	this.z = 0;
 	this.removeFromWorld = false;
 }
 

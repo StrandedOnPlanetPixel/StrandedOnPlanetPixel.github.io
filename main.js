@@ -93,26 +93,57 @@ function distance(a, b) {
 };
  
 function collide(ent, otherEnt) { 
-	//if they are both circles
-	if(ent && otherEnt && ent.radius && otherEnt.radius) {
-		return distance(ent, otherEnt) < ent.radius + otherEnt.radius;
-	}   
-	//if they are both boxes
-	if(ent && otherEnt && ent.height && otherEnt.height && ent.width && otherEnt.width) {
-		return (ent.x < otherEnt.x + otherEnt.width 
-			&& ent.x + ent.width > otherEnt.x 
-			&& ent.y < otherEnt.y + otherEnt.height 
-			&& ent.height + ent.y > otherEnt.y);
-	}  
+	if(ent && otherEnt) {
+		//if they are both circles
 
-	//if ent is a square and otherEnt is a circle
-	if(ent && otherEnt && ent.height && otherEnt.radius && ent.width) {
-		return intersects(otherEnt, ent);
-	}
+		if(ent.radius && otherEnt.radius) { 
+			if(ent.y + ent.radius > otherEnt.y + otherEnt.radius) {
+				ent.z = 2;
+				otherEnt.z = 1;
+			} else {
+		 		ent.z = 1;
+				otherEnt.z = 2;	 
+			}
+			return distance(ent, otherEnt) < ent.radius + otherEnt.radius;
+		}   
+		//if they are both boxes
+		if(ent.height && otherEnt.height && ent.width && otherEnt.width) { 
+			if(ent.y + ent.height > otherEnt.y + otherEnt.height) {
+				ent.z = 2;
+				otherEnt.z = 1;
+			} else {
+		 		ent.z = 1;
+				otherEnt.z = 2;	 
+			}
+			return (ent.x < otherEnt.x + otherEnt.width 
+				&& ent.x + ent.width > otherEnt.x 
+				&& ent.y < otherEnt.y + otherEnt.height 
+				&& ent.height + ent.y > otherEnt.y);
+		}  
 
-	//if ent is a circle and otherEnt is a square
-	if(ent && otherEnt && otherEnt.height && ent.radius && otherEnt.width) {
-		return intersects(ent, otherEnt);
+		//if ent is a square and otherEnt is a circle
+		if(ent.height && otherEnt.radius && ent.width) { 			
+			if(ent.y + ent.height > otherEnt.y + otherEnt.radius) {
+				ent.z = 2;
+				otherEnt.z = 1;
+			} else {
+		 		ent.z = 1;
+				otherEnt.z = 2;	 
+			}
+			return intersects(otherEnt, ent);
+		}
+
+		//if ent is a circle and otherEnt is a square
+		if(otherEnt.height && ent.radius && otherEnt.width) { 
+			if(ent.y + ent.radius > otherEnt.y + otherEnt.height) {
+				ent.z = 2;
+				otherEnt.z = 1;
+			} else {
+		 		ent.z = 1;
+				otherEnt.z = 2;	 
+			}
+			return intersects(ent, otherEnt);
+		}
 	}
 };
 
@@ -300,7 +331,7 @@ Player.prototype.update = function () {
 	if (collideTop(this) || collideBottom(this)) {
 		if (collideTop(this)) this.y = 0;
 		if (collideBottom(this)) this.y = height - this.height; 
-	}
+	} 
 	
 	if(this.lives > 0) {
         if (this.isAttacking) {
@@ -309,12 +340,12 @@ Player.prototype.update = function () {
             for (var i = 0; i < this.game.hostileEntities.length; i++) {
                 var ent = this.game.hostileEntities[i];
                 if (this != ent && collide({x:this.x, y:this.y, radius:this.attackRadius}, ent) 
-                	&& this.game.keys.attack &&
-                    (!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 0.5))) {
-                        ent.lives -= this.damage; 
-                        this.lastAttackTime = this.game.timer.gameTime;
-                        console.log("Player hit: " + ent.name + " for " + this.damage + " damage");
-                        soundManager.playDamageSound(ent); 
+                	&& this.game.keys.attack && (!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 0.5))) {
+					ent.lives -= this.damage; 
+					this.lastAttackTime = this.game.timer.gameTime;
+					console.log("Player hit: " + ent.name + " for " + this.damage + " damage");
+					soundManager.playDamageSound(ent); 
+					 
                 }  
             }
 
@@ -331,6 +362,7 @@ Player.prototype.update = function () {
                 if (this != ent && !ent.removeFromWorld && collide({x:this.x, y:this.y, radius:this.attackRadius}, ent)) { 
                         console.log("Programing " + ent.name + " " + ent.tier);  
                     ent.setTask();
+					 
                 }  
             } 
 
@@ -368,9 +400,9 @@ Player.prototype.update = function () {
                 this.animation = this.programAnimation;
                 for (var i = 0; i < this.game.programmableEntities.length; i++) {
                     var ent = this.game.programmableEntities[i];
-                    if (this != ent && !ent.removeFromWorld && 
-                    	collide({x:this.x, y:this.y, radius:this.attackRadius}, ent)) { 
+                    if (this != ent && !ent.removeFromWorld && collide({x:this.x, y:this.y, radius:this.attackRadius}, ent)) { 
                         console.log("Programing " + ent.name + " " + ent.tier);  
+    					 
                         ent.setTask();
                     }  
                 } 
@@ -387,6 +419,7 @@ Player.prototype.update = function () {
                             ent.lives -= this.damage; 
                             this.lastAttackTime = this.game.timer.gameTime; 
                             soundManager.playDamageSound(ent);
+          					 
                     }  
                 } 
             } 
@@ -477,8 +510,8 @@ Alien.prototype.update = function () {
 		if (collideTop(this) || collideBottom(this)) {
 			if (collideTop(this)) this.y = this.radius;
 			if (collideBottom(this)) this.y = height - this.radius; 
-		}
- 
+		} 
+
 		var closestEnt = this.game.friendlyEntities[0];
 		for (i = 0; i < this.game.friendlyEntities.length; i++) {
 			ent = this.game.friendlyEntities[i];
@@ -491,6 +524,7 @@ Alien.prototype.update = function () {
 		}
 
 		if(collide(this, closestEnt)) {
+			 
 			if(!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 1.5)) {
 				//record last shot time and create the bullet.
 				attack(this, closestEnt);
@@ -560,8 +594,7 @@ Scavenger.prototype.update = function () {
 		if (collideTop(this) || collideBottom(this)) {
 			if (collideTop(this)) this.y = this.radius;
 			if (collideBottom(this)) this.y = height - this.radius; 
-		}
-
+		} 
 		var closestEnt = this.game.friendlyEntities[0];
 		for (i = 0; i < this.game.friendlyEntities.length; i++) {
 			ent = this.game.friendlyEntities[i];
@@ -574,6 +607,7 @@ Scavenger.prototype.update = function () {
 		}
 
 		if(collide(this, closestEnt)) {
+			 
 			if(!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 1.5)) {
 				//record last shot time and create the bullet.
 				attack(this, closestEnt);
@@ -640,8 +674,7 @@ Rummager.prototype.update = function () {
 		if (collideTop(this) || collideBottom(this)) {
 			if (collideTop(this)) this.y = this.radius;
 			if (collideBottom(this)) this.y = height - this.radius; 
-		}
-
+		} 
 		var closestEnt = this.game.friendlyEntities[0];
 		for (var i = 0; i < this.game.friendlyEntities.length; i++) {
 			var ent = this.game.friendlyEntities[i];
@@ -654,6 +687,7 @@ Rummager.prototype.update = function () {
 		}
 
 		if(collide(this, {x: closestEnt.x, y: closestEnt.y, radius: this.visualRadius})) {
+			 
 			//this.animation = this.shootAnimation;
 			if(!this.lastBulletTime || (this.lastBulletTime < this.game.timer.gameTime - 1.5)) {
 				//record last shot time and create the bullet.
@@ -879,7 +913,6 @@ Robot.prototype.update = function() {
 		if (collideTop(this)) this.y = 0;
 		if (collideBottom(this)) this.y = height - this.height; 
 	}
-	
 	if (this.charge <= 0){
 		if(this.dir === this.directions[3]){
 			this.animation = this.pDDownAnimation;
@@ -922,6 +955,7 @@ Robot.prototype.update = function() {
 	} 
 
 	if(closestEnt && collide(this, {x: closestEnt.x, y: closestEnt.y, radius: this.attackRadius})) {
+		 
 		if(!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 1.5)) {
 			//record last shot time and create the bullet.
 			attack(this, closestEnt);
@@ -932,6 +966,8 @@ Robot.prototype.update = function() {
 	} else if(this.taskEntity && (!closestEnt || !collide(this,{x: closestEnt.x, y: closestEnt.y, radius: this.visualRadius}))) { // if the robot has been programmed
 		// If the robot reaches its target entity 
 		if(collide(this, this.taskEntity)) { 
+			 
+
 			// fix repair directions;
 			if (this.task === this.tasks[0] ) { // repair
 				 
@@ -1089,7 +1125,7 @@ ProgramButton.prototype.update = function () {
 	if(collideBottom(this)) { 
 		this.y -= 40;
 	}
-
+ 
 	if(collide(this, this.game.mouse)) {
 		document.getElementById("gameWorld").style.cursor = "pointer";      
 	} else {
@@ -1149,11 +1185,11 @@ function Tree(game, x, y) {
 	this.image = new Animation(AM.getAsset("img/tree.png"), 0, 0, 128, 128, 0.1, 1, true, false, 0.95);
 	this.game = game;   
 	this.ctx = game.ctx;     
-	Entity.call(this, game, x, y);  
 
-	this.height = 75;
-	this.width = 32;
-	this.textureOffset = 40;
+	this.height = 100;
+	this.width = 85;
+	this.textureOffset = 18;
+	Entity.call(this, game, x - 55, y - 55);  
  
 	//this.radius = 62; 
 	this.task = 4;
@@ -1162,7 +1198,7 @@ function Tree(game, x, y) {
 Tree.prototype = new Entity();
 Tree.prototype.constructor = Tree;
 
-Tree.prototype.update = function () {
+Tree.prototype.update = function () { 
 };
 
 Tree.prototype.draw = function (ctx) {
@@ -1182,7 +1218,7 @@ function BerryBush(game, x, y) {
 BerryBush.prototype = new Entity();
 BerryBush.prototype.constructor = BerryBush;
 
-BerryBush.prototype.update = function () {
+BerryBush.prototype.update = function () { 
 };
 
 BerryBush.prototype.draw = function (ctx) {
@@ -1191,7 +1227,7 @@ BerryBush.prototype.draw = function (ctx) {
 };
 
 function Rock(game, x, y) {
-	this.image = new Animation(AM.getAsset("img/rock"+ (Math.floor(Math.random() * 2) + 1) + ".png"), 0, 0, 32, 32, 0.1, 1, true, false, 1);
+	this.image = new Animation(AM.getAsset("img/rock"+ (Math.floor(Math.random() * 2) + 1) + ".png"), 0, 0, 32, 32, 0.1, 1, true, false, 1.25);
 	this.game = game;   
 	this.ctx = game.ctx;     
 	Entity.call(this, game, x, y);   
@@ -1202,7 +1238,7 @@ function Rock(game, x, y) {
 Rock.prototype = new Entity();
 Rock.prototype.constructor = Rock;
 
-Rock.prototype.update = function () {
+Rock.prototype.update = function () { 
 };
 
 Rock.prototype.draw = function (ctx) {
@@ -1225,7 +1261,7 @@ function Building(game, x, y) {
 Building.prototype = new Entity();
 Building.prototype.constructor = Building;
 
-Building.prototype.update = function () {
+Building.prototype.update = function () { 
 };
 
 Building.prototype.draw = function (ctx) {   
@@ -1239,9 +1275,14 @@ function SpaceShip(game) {
 	this.spritesheet = "img/spaceship.png";
 	this.size = 160;
 	this.image = new Animation(AM.getAsset(this.spritesheet), (0 * this.size), 0, 160, 160, 0.1, 1, true, false, 1);  
-	this.radius = 77;
+
+
+	this.height = 130;
+	this.width = 110;
+	this.textureOffset = 20; 
+
 	this.lives = 500;
-	Entity.call(this, game, width / 2, height / 2);
+	Entity.call(this, game, width / 2 - 50, height / 2 - 50);
  
 	this.image.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);
 	Entity.prototype.draw.call(this);
@@ -1255,12 +1296,12 @@ function SpaceShip(game) {
 SpaceShip.prototype = new Entity();
 SpaceShip.prototype.constructor = SpaceShip;
  
-SpaceShip.prototype.update = function () {  
+SpaceShip.prototype.update = function () {   
 	this.image = new Animation(AM.getAsset(this.spritesheet), (this.game.state.level * this.size), 0, 160, 160, 0.1, 1, true, false, 1);  
 }; 
 
 SpaceShip.prototype.draw = function (ctx) {
-	this.image.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);
+	this.image.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.textureOffset);
 	Entity.prototype.draw.call(this);
 };
 
@@ -1346,6 +1387,7 @@ Day.prototype.draw = function (ctx) {
 };
 
 function State(game, player, ship, day) {
+	this.game = game;
 	this.player = player;
 	this.ship = ship;
 	this.day = day;
@@ -1367,6 +1409,14 @@ State.prototype = new Entity();
 State.prototype.constructor = State;
  
 State.prototype.update = function () {  
+		for(var i = 0; i < this.game.npcEntities.length; i++) {
+			for(var j = 0; j < this.game.environmentEntities.length; j++) {
+				if(collide(this.game.npcEntities[i],this.game.environmentEntities[j])){	
+					
+				}
+			}			
+		}
+
 		if(this.day.day) {
 			document.getElementById("time").innerHTML =  "<p>Day</p> <div> <img src=\"img/day.png\"/></div>"; 
 		} else {
