@@ -50,7 +50,7 @@ SoundManager.prototype.volumeUp = function() {
     }
  };
 
-SoundManager.prototype.volumeDown= function() {
+SoundManager.prototype.volumeDown = function() {
     // loop through each sound and decrease sound???    
     try {
         backgroundSong.volume -= 0.1;

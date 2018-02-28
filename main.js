@@ -264,7 +264,7 @@ Background.prototype.draw = function (ctx) {
 };
   
 function play() {
-	if(!gameEngine.gameOver) { // i.e. the game is pauesed
+	if(!gameEngine.gameOver) { 
 		canvas.focus();
 		gameEngine.start();
 		playButton.classList.add("playButtonHidden");	
@@ -272,9 +272,7 @@ function play() {
 		playButton.style.display = "none";
 		playButtonText.style.display = "none";   
 		document.getElementById("gameWorld").style.opacity = "1";
-	} else {
- 		startGame();
-	}
+	}  
 };
 
 function pause() {
@@ -390,8 +388,7 @@ function isPlaying(song) {
 }
 
 var height = null;
-var width = null;
-var paused = true;
+var width = null; 
 var gameEngine = null;
 var canvas = null;
 var ctx = null; 
@@ -484,3 +481,8 @@ function startGame() {
 
 	console.log("All Done!");
 };
+
+window.addEventListener("focus", function(event) { 
+ 	canvas.focus();
+}, false);
+ 
