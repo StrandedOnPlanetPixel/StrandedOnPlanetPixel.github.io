@@ -1,6 +1,9 @@
 var backgroundSong = document.createElement("audio");
+var daySongs = ["audio/daysong1.mp3", "audio/daysong2.mp3"];
+var nightSongs = ["audio/nightsongfast.mp3"];
 var currentVolume = 1;
 var cachedVolume = 1;
+var isDay = false;
 
 function SoundManager() {
     //this.backgroundSong = document.createElement("audio");
@@ -8,15 +11,35 @@ function SoundManager() {
     this.audioToggle = null;
 }
 
+SoundManager.prototype.playDaySong = function() {
+    if(!isDay) {
+        isDay = true;
+        var songNum = Math.floor(Math.random()*Math.floor(daySongs.length));
+        console.log("Play day song ", songNum);
+        backgroundSong.src = daySongs[songNum];
+        backgroundSong.loop = "true";
+        if(!currentVolume == 0) {
+            backgroundSong.play();
+        }
+    }
+    
+};
+
+SoundManager.prototype.playNightSong = function() {
+    if(isDay) {
+        isDay = false;
+        var songNum = Math.floor(Math.random()*Math.floor(nightSongs.length));
+        console.log("Play night song ", songNum);
+        backgroundSong.src = nightSongs[songNum];
+        backgroundSong.loop = "true";
+        if(!currentVolume == 0) {
+            backgroundSong.play();
+        }
+    }
+};
+
 SoundManager.prototype.setupBackgroundMusic = function() {
     console.log("Music Started");
-    //this.backgroundSong.src = "audio/Module2.mp3";
-    backgroundSong.src = "audio/Module2.mp3";
-    //this.backgroundSong.loop = "true";
-    backgroundSong.loop = "true";
-    //this.backgroundSong.play();
-    backgroundSong.play();
-    console.log(backgroundSong.paused);
     var audioToggle = document.getElementById("audioToggle").addEventListener("click", this.toggleBackgroundMusic); 
     var volumeUp = document.getElementById("volumeUp").addEventListener("click", this.volumeUp); 
     var volumeDown = document.getElementById("volumeDown").addEventListener("click", this.volumeDown);

@@ -1,5 +1,6 @@
-function Day(game) { 
+function Day(game, sound) { 
 	this.game = game;   
+	this.sound = sound;
 	this.ctx = game.ctx;  
 	this.duskImage = "img/dusk.png";  
 	this.eveningImage = "img/evening.png";  
@@ -50,6 +51,7 @@ Day.prototype.update = function () {
 	}
 
 	if(!this.day) {    
+		this.sound.playNightSong();
 		this.spawnRate = (Math.pow((4 - this.game.state.level), 2) + 0.5);  
 		if(this.elapsedTime - this.spawnRate > (this.lastSpawnTime)) { 
 			this.lastSpawnTime = this.elapsedTime;
@@ -64,6 +66,7 @@ Day.prototype.update = function () {
 			}  
 		} 
 	} else {
+		this.sound.playDaySong();
 		this.spawnRate = 1.5 * (Math.pow((4 - this.game.state.level), 2) + 0.5);  
 		if(this.elapsedTime - this.spawnRate > (this.lastSpawnTime)) { 
 			this.lastSpawnTime = this.elapsedTime;

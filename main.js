@@ -462,7 +462,7 @@ function startGame() {
 
 	var player = new Player(gameEngine);
 	var map = new Background(gameEngine); 
-	var day = new Day(gameEngine);
+	var day = new Day(gameEngine, soundManager);
 	var spaceship = new SpaceShip(gameEngine); 
 	var state = new State(gameEngine, player, spaceship, day);
 	
@@ -480,7 +480,8 @@ function startGame() {
 	gameEngine.addNpcEntity(player, true);  
 	gameEngine.addProgrammableEntity(robot, true);
 	
-	soundManager.setupBackgroundMusic();  
+	soundManager.setupBackgroundMusic();
+	soundManager.playDaySong();
 
 	console.log("All Done!");
 };
