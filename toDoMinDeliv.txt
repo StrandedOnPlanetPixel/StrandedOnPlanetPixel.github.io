@@ -1,68 +1,17 @@
 To-Do:
-	fix alien side view (Amanda)
-		alien attack animation 
-
-	fix controls (Amanda)
-		mouse input for robot menus 
-
-	webpage (Zira)
-		display controls
+	upload alien side view (Amanda)
 	
-    fix animation completes on button clicked (Taylor)
-	
-	resource management (Amanda)
-		counters
-		cap on resources
- 	
-	menus for our robots (Amanda)
-		simple menu with images as buttons for each resource type
+ 	menus for our robots (Amanda)
 		display robot health
-		programming
-			gathering scrap
-			gathering berries
-			defending
-			repairing
-			charging
-			mining
-			lumber-jacking
-	
-	levels (Zira)
-		this will be the bonus material needed
-	
+		
 	audio (Zira)
-		sound manager
 		music
 		sound effects
-			Rummager death 
-			Rummager damage
-			Scavenger attack
-			Scavenger damage
-			Alien death (sploosh)
-			Player attack
-			Robot attack 
-	
-	adjusting charge levels (Taylor) 
- 
-	level object
-
-	checks for win and lose
-	
-	lose conditions
-		when everyone is dead, or something
-		we had discussed making the screen look like its turns off when we die... 
-	
-	win conditions
-		ship health 100%
-		resources at appropriate levels
-		ship takes off with everyone on board
-			no robot left behind!
-
-
+			fix sound effects
+	 
 	extras
 		different player colors
 		weird songs
-		start/stop music and sounds
-		volume control
-		multiple levels
 		score for levels
-		
+
+	fix layering of entities (Taylor)
