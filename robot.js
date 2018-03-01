@@ -1,7 +1,7 @@
 function Robot(game, tier) { //spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, scale
-	var img = "img/robotSpriteSheet6.png";
+	var img = "img/robotSpriteSheet1.png";
  	if(tier === 2) {
-		img = "img/robotSpriteSheet2.png";
+		img = "img/robotSpriteSheet7.png";
 	}
 	var spriteSheet = AM.getAsset(img);
 	this.stillAnimation = new Animation(spriteSheet, 0, 0, 64, 64, 0.1, 1, true, false, 0.75);
@@ -74,7 +74,7 @@ function Robot(game, tier) { //spriteSheet, startX, startY, frameWidth, frameHei
 	this.speed = 75;  
 	this.game = game;
 	this.ctx = game.ctx; 
-	Entity.call(this, game, (width / 2) + 10, (height / 2 ) + 28);  
+	Entity.call(this, game, (width / 2) + 10, (height / 2 ) + 45);  
 	/**
 	this.radius = 24;   
 	this.x += this.radius;
@@ -89,7 +89,7 @@ function Robot(game, tier) { //spriteSheet, startX, startY, frameWidth, frameHei
 	this.tasks = ["repair", "gatherBerry", "gatherScrap"/*, "defend"*/, "mine", "log", "upgrade" /*"charge"*/ ];
 	this.task = this.tasks[0];
 	this.dead = false; 
-	this.lives = 200; 
+	this.lives = 150; 
 	this.visualRadius = 200;
 	this.elapsedTime = 0;
 	this.workspeed = 5;
@@ -181,6 +181,7 @@ Robot.prototype.update = function() {
 		}
 
 		this.removeFromWorld = true;
+		this.game.state.robotCount--;
 	}
 	
 	var closestEnt = this.game.hostileEntities[0];
@@ -193,15 +194,15 @@ Robot.prototype.update = function() {
 				closestEnt = ent;
 			}
 		}  
-	} 
+	}  
 
-	if(closestEnt && collide(this, {x: closestEnt.x, y: closestEnt.y, radius: this.attackRadius})) {
+	if(closestEnt && collide(this, {x: closestEnt.x, y: closestEnt.y, radius: this.attackRadius}) && closestEnt.lives > 0) {
 		if(!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 1.5)) {
 			//record last shot time and create the bullet.
 			attack(this, closestEnt);
 			this.lastAttackTime = this.game.timer.gameTime; 
 		}
-	} else if(closestEnt && collide(this,{x: closestEnt.x, y: closestEnt.y, radius: this.visualRadius})) {
+	} else if(closestEnt && collide(this,{x: closestEnt.x, y: closestEnt.y, radius: this.visualRadius}) && closestEnt.lives > 0) {
 		moveEntityToTarget(this, closestEnt);	
 	} else if(this.taskEntity && (!closestEnt || !collide(this,{x: closestEnt.x, y: closestEnt.y, radius: this.visualRadius}))) { // if the robot has been programmed
 		// If the robot reaches its target entity 
@@ -223,7 +224,10 @@ Robot.prototype.update = function() {
 					
 					console.log("Upgrading damaged ship");
 
-					this.game.state.ship.lives += 1;
+	
+					this.game.state.ship.lives += this.tier; 
+					this.game.state.score += this.tier;
+
 					this.game.state.scrap -= scrapCost;
 					this.game.state.wood -= woodCost;
 					this.game.state.minerals -= mineralCost;
@@ -249,7 +253,10 @@ Robot.prototype.update = function() {
 			} else if (this.task === this.tasks[1]) { //gather berry
 				this.elapsedTime += this.game.clockTick;
 				if(this.elapsedTime > this.workspeed) {
-					this.game.state.food += (2 * this.tier); // i.e 2 if tier 1 or 4 if tier 2
+					if(this.game.state.food < this.game.state.maxFood) {
+						this.game.state.food += (2 * this.tier); // i.e 2 if tier 1 or 4 if tier 2
+						this.game.state.score +=  (2 * this.tier);
+					}
 					this.elapsedTime = 0;
 				}
 				if(this.dir === this.directions[3]){
@@ -264,7 +271,10 @@ Robot.prototype.update = function() {
 			} else if (this.task === this.tasks[2]) { //gather scrap
 				this.elapsedTime += this.game.clockTick;
 				if(this.elapsedTime > this.workspeed) {
-					this.game.state.scrap += (1 + this.tier); // i.e 2 if tier 1 or 3 if tier 2
+					if(this.game.state.scrap < this.game.state.maxScrap) {
+						this.game.state.scrap += (1 + this.tier); // i.e 2 if tier 1 or 3 if tier 2
+						this.game.state.score += (1 + this.tier);
+					}
 					this.elapsedTime = 0;
 				}
 				if(this.dir === this.directions[3]){
@@ -279,7 +289,10 @@ Robot.prototype.update = function() {
 			} else if (this.task === this.tasks[4]) { //logging
 				this.elapsedTime += this.game.clockTick;
 				if(this.elapsedTime > this.workspeed) {
-					this.game.state.wood += (1 + this.tier); // i.e 2 if tier 1 or 3 if tier 2
+					if(this.game.state.wood < this.game.state.maxWood) {
+						this.game.state.wood += (1 + this.tier); // i.e 2 if tier 1 or 3 if tier 2
+						this.game.state.score += (1 + this.tier);
+					}
 					this.elapsedTime = 0;
 				}
 				if(this.dir === this.directions[3]){
@@ -294,7 +307,10 @@ Robot.prototype.update = function() {
 			} else if (this.task === this.tasks[3]) { //mining
 				this.elapsedTime += this.game.clockTick;
 				if(this.elapsedTime > this.workspeed) {
-					this.game.state.minerals += (1 + this.tier); // i.e 2 if tier 1 or 3 if tier 2
+					if(this.game.state.minerals < this.game.state.maxMinerals) {
+						this.game.state.minerals += (1 + this.tier); // i.e 2 if tier 1 or 3 if tier 2
+						this.game.state.score += (1 + this.tier);
+					}
 					this.elapsedTime = 0;
 				}
 				if(this.dir === this.directions[3]){

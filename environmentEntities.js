@@ -4,6 +4,7 @@ function BerryBush(game, x, y) {
 	this.ctx = game.ctx;     
 	Entity.call(this, game, x, y);  
 	this.radius = 30; 
+	this.height = 25; 
 	this.task = 1;
 }
 
@@ -22,10 +23,10 @@ function Building(game, x, y) {
 	this.game = game;   
 	this.ctx = game.ctx;    
 	this.spritesheet = "img/building" + (Math.floor(Math.random() * 3) + 1) + ".png";
-	this.height = 140;
+	this.height = 60;
 	this.radius = 68; 
 	this.task = 2;
-	this.image = new Animation(AM.getAsset(this.spritesheet), 0, 0, 128, this.height, 0.1, 1, true, false, 1);
+	this.image = new Animation(AM.getAsset(this.spritesheet), 0, 0, 128, 140, 0.1, 1, true, false, 1);
 	Entity.call(this, game, x, y); 
 }
 
@@ -41,11 +42,12 @@ Building.prototype.draw = function (ctx) {
 };
 
 function Rock(game, x, y) {
-	this.image = new Animation(AM.getAsset("img/rock"+ (Math.floor(Math.random() * 2) + 1) + ".png"), 0, 0, 32, 32, 0.1, 1, true, false, 1.25);
+	this.image = new Animation(AM.getAsset("img/rock"+ (Math.floor(Math.random() * 2) + 1) + ".png"), 0, 0, 32, 32, 0.1, 1, true, false, 1.35);
 	this.game = game;   
 	this.ctx = game.ctx;     
 	Entity.call(this, game, x, y);   
 	this.radius = 16; 
+	this.height = 16; 
 	this.task = 3;
 }
 
@@ -74,8 +76,7 @@ function SpaceShip(game) {
 
 	this.lives = 500;
 	Entity.call(this, game, width / 2 - 50, height / 2 - 50);
- 
-	this.image.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);
+  
 	Entity.prototype.draw.call(this);
 
     this.damageSound = document.createElement("audio");

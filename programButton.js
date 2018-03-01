@@ -2,21 +2,21 @@ function ProgramButton(game, x, y, task, robot) {
 	this.game = game;   
 	this.ctx = game.ctx;     
 	this.robot = robot;
-	this.task = task; 
- 	if (this.task === this.robot.tasks[0] ) { // repair
-		this.image = AM.getAsset("img/ship.png"); 
-	} else if (this.task === this.robot.tasks[1]) { //gather berry
-		this.image = AM.getAsset("img/bushIcon.png");
-	} else if (this.task === this.robot.tasks[2]) { //gather scrap
-		this.image = AM.getAsset("img/metal.png"); 
-	} else if (this.task === this.robot.tasks[3]) { //mining 
-		this.image = AM.getAsset("img/rock1.png");
-	} else if (this.task === this.robot.tasks[4]) { //logging
-		this.image = AM.getAsset("img/treeIcon.png");
+	this.task = task;  
+ 	
+ 	if (this.task === this.robot.tasks[0] ) { // repair 
+ 		this.animation = new Animation(AM.getAsset("img/ship.png"), 0, 0, 160, 160, 0.1, 1, true, false, 0.20);
+	} else if (this.task === this.robot.tasks[1]) { //gather berry 
+		this.animation = new Animation(AM.getAsset("img/bush.png"), 0, 0, 64, 64, 0.1, 1, true, false, 0.50);
+	} else if (this.task === this.robot.tasks[2]) { //gather scrap 
+		this.animation = new Animation(AM.getAsset("img/metal.png"), 0, 0, 32, 32, 0.1, 1, true, false, 0.95);
+	} else if (this.task === this.robot.tasks[3]) { //mining  
+		this.animation = new Animation(AM.getAsset("img/rock1.png"), 0, 0, 32, 32, 0.1, 1, true, false, 1);
+	} else if (this.task === this.robot.tasks[4]) { //logging 
+ 		this.animation = new Animation(AM.getAsset("img/tree.png"), 0, 0, 128, 128, 0.1, 1, true, false, 0.25);
 	} else if (this.task === this.robot.tasks[5]) { //upgrade only show if you have enough resources
-		this.image = AM.getAsset("img/robot2.png");
- 	}   
-	this.animation = new Animation(this.image, 0, 0, 32, 32, 0.1, 1, true, false, 1);
+		this.animation = new Animation(AM.getAsset("img/robot2.png"), 0, 0, 64, 64, 0.1, 1, true, false, 0.50);
+ 	}    
 	Entity.call(this, game, x, y);
 	this.radius = 16; 
 }

@@ -95,7 +95,6 @@ function distance(a, b) {
 function collide(ent, otherEnt) { 
 	if(ent && otherEnt) {
 		//if they are both circles
-
 		if(ent.radius && otherEnt.radius) { 
 			if(ent.y + ent.radius > otherEnt.y + otherEnt.radius) {
 				ent.z = 2;
@@ -144,6 +143,7 @@ function collide(ent, otherEnt) {
 			}
 			return intersects(ent, otherEnt);
 		}
+
 	}
 };
 
@@ -334,6 +334,7 @@ function addRobot() {
 		gameEngine.state.minerals -= 5;  
 		gameEngine.state.robotCount++;
 		gameEngine.addProgrammableEntity(new Robot(gameEngine, 1), true);
+		gameEngine.state.score += 1;
 	}
 	
 };
@@ -347,7 +348,7 @@ function addEnivironmentEntities(gameEngine) {
 		gameEngine.addTreeEntity(treeEnts[i]);
 	}
 
-	var berryEnts = [new BerryBush(gameEngine, 325, 135), new BerryBush(gameEngine, 238, 150), new BerryBush(gameEngine, 215, 253),
+	var berryEnts = [new BerryBush(gameEngine, 320, 125), new BerryBush(gameEngine, 238, 140), new BerryBush(gameEngine, 215, 253),
 				 new BerryBush(gameEngine, 44, 233), new BerryBush(gameEngine, 115, 340), new BerryBush(gameEngine, 315, 342),
 				 new BerryBush(gameEngine, 245, 435), new BerryBush(gameEngine, 25, 535), new BerryBush(gameEngine, 95, 500), 
 				 new BerryBush(gameEngine, 165, 615), new BerryBush(gameEngine, 279, 504)];
@@ -372,7 +373,12 @@ function addEnivironmentEntities(gameEngine) {
 		gameEngine.addBuildingEntity(buildingEnts[i]);
 	}
 	
-	rockEnts = [new Rock(gameEngine, 600, 105), new Rock(gameEngine, 660, 105), new Rock(gameEngine, 660, 115), new Rock(gameEngine, 605, 115)];
+	rockEnts = [new Rock(gameEngine, 420, 100), new Rock(gameEngine, 430, 95), new Rock(gameEngine, 450, 95), new Rock(gameEngine, 475, 105),
+	 			new Rock(gameEngine, 510, 100), new Rock(gameEngine, 510, 105), new Rock(gameEngine, 500, 110), new Rock(gameEngine, 525, 105),
+	 			new Rock(gameEngine, 550, 100), new Rock(gameEngine, 545, 110), new Rock(gameEngine, 570, 110), new Rock(gameEngine, 580, 100),
+	 			new Rock(gameEngine, 640, 100), new Rock(gameEngine, 650, 110),  new Rock(gameEngine, 665, 100),
+	 			new Rock(gameEngine, 685, 95), new Rock(gameEngine, 700, 95), new Rock(gameEngine, 750, 95), new Rock(gameEngine, 790, 95), 
+	 			new Rock(gameEngine, 725, 110), new Rock(gameEngine, 715, 105), new Rock(gameEngine, 740, 105), new Rock(gameEngine, 780, 105)];
 	for(var i = 0; i < rockEnts.length; i++) {
 		gameEngine.addRockEntity(rockEnts[i]);
 	}
@@ -414,13 +420,14 @@ AM.queueDownload("img/building1.png");
 AM.queueDownload("img/building2.png"); 
 AM.queueDownload("img/building3.png"); 
 AM.queueDownload("img/spaceship.png");
-AM.queueDownload("img/robotSpriteSheet6.png");
-AM.queueDownload("img/robotSpriteSheet2.png");
+AM.queueDownload("img/robotSpriteSheet1.png");
+AM.queueDownload("img/robotSpriteSheet7.png");
 AM.queueDownload("img/rummager.png");
 AM.queueDownload("img/alien.png");
 AM.queueDownload("img/bullet.png");
 AM.queueDownload("img/rock1.png");
 AM.queueDownload("img/rock2.png");
+AM.queueDownload("img/robot.png");
 AM.queueDownload("img/robot2.png");
 AM.queueDownload("img/plus.png");
 

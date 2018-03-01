@@ -81,6 +81,7 @@ canvas {
 div {
 	display: block;
 	height: auto;
+	padding: 0px;
 }
 
 #audioToggle {
@@ -101,15 +102,15 @@ div {
 	text-align: right; 
 	display: block;
 	height: 64px;
-	padding-left: 16px;
-	padding-right: 16px;
+	padding-left: 5px;
+	padding-right: 5px;
 	background: url("img/resourceBar.png");
 	margin: 0;
 }
 
 .resources img, #resourceBar img {
 	height: 32px;
-	width: 32px;   
+	width: 32px;    
 	vertical-align:middle;
 	margin-left: 5px;
 }
@@ -136,7 +137,7 @@ ul {
 }
 
 .resources, .addTo {
-	padding-right: 16px;
+	padding-left: 10px;
 	float: left;
 	margin: 0 auto;
 }
