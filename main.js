@@ -274,8 +274,10 @@ function play() {
 		document.getElementById("gameWorld").style.opacity = "1";
 	} else {  
 		playButtonText.innerHTML = "Select your player!";
-
-		for(var i = 1; i <= playerSprites; i++) {
+	 
+		playButton.removeEventListener("click", play); 
+		playButtonText.removeEventListener("click", play); 
+		for(var i = 1; i <= 3; i++) {
 
 			var img = document.createElement("img"); 
 			img.src = "img/player" + i + ".png";
@@ -289,7 +291,11 @@ function play() {
 				playButtonText.classList.add("playButtonHidden");
 				playButton.style.display = "none";
 				playButtonText.style.display = "none";   
-				playButton.innerHTML = "<img id=\"playButton\" src=\"img/playGame.png\"/> <p id=\"playGameText\">Play Game</p>";
+ 
+				playButton.innerHTML = "<img id=\"playButton\" src=\"img/playGame.png\"/> ";
+				playButton.appendChild(playButtonText);
+	 			playButton.addEventListener("click", play);
+	 			playButtonText.addEventListener("click", play);
 				document.getElementById("gameWorld").style.opacity = "1";
 			});
 
@@ -315,6 +321,7 @@ function pause() {
 };
 
 function gameOver() {	
+	gameEngine.started = false;
 	if(gameEngine.state.level === 5) { 
 		if(gameEngine.gameOver) { 
 			gameEngine.state.update();
@@ -427,7 +434,7 @@ var ctx = null;
 
 var playButton = null;
 var playButtonText = null;
-
+var toDisplay = 1;
 var playerSprites = 3;
 var AM = new AssetManager(); 
 
