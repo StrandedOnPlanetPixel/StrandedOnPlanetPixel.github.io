@@ -1,5 +1,5 @@
-function Player(game) {
-	var spritesheet = AM.getAsset("img/space_traveler.png");
+function Player(game) { 
+	var spritesheet = AM.getAsset("img/space_traveler1.png");
 	//(spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, reverse, scale)
 	this.animation = new Animation(spritesheet,             0,  448,    64, 64, 0.1,    8, true,    false,  0.75);
 
@@ -54,6 +54,28 @@ function Player(game) {
 
 Player.prototype = new Entity();
 Player.prototype.constructor = Player;
+
+Player.prototype.setImg = function (img) { 
+	console.log(img);
+	var spritesheet = AM.getAsset(img);
+	//(spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, reverse, scale)
+	this.animation = new Animation(spritesheet,             0,  448,    64, 64, 0.1,    8, true,    false,  0.75);
+
+	this.stillAnimation = new Animation(spritesheet,        0,  256,    64, 64, 0.1,    1, true,    false,  0.75);
+	this.upAnimation = new Animation(spritesheet,           0,  448,    64, 64, 0.095,  8, true,    false,  0.75);
+	this.downAnimation = new Animation(spritesheet,         0,  256,    64, 64, 0.095,  8, true,    false,  0.75);
+	this.rightAnimation = new Animation(spritesheet,        0,  384,    64, 64, 0.095,  8, true,    false,  0.75);
+	this.leftAnimation = new Animation(spritesheet,         0,  320,    64, 64, 0.095,  8, true,    false,  0.75);    
+	this.attackAnimation = new Animation(spritesheet,       0,  0,      64, 64, 0.1,    8, false,    false,  0.75);    
+	this.frontAttackAnimation = new Animation(spritesheet,  0,  0,      64, 64, 0.1,    8, true,    false,  0.75);    
+	this.leftAttackAnimation = new Animation(spritesheet,   0,  512,      64, 64, 0.1,    8, true,    false,  0.75);    
+	this.rightAttackAnimation = new Animation(spritesheet,  0,  64,     64, 64, 0.1,    8, true,    false,  0.75);
+	this.programAnimation = new Animation(spritesheet,      0,  192,    64, 64, 0.1,    8, true,    false,  0.75);
+	this.dyingAnimation = new Animation(spritesheet,        0,  128,    64, 64, 0.1,    8, false,   false,  0.75); 
+	this.deadAnimation = new Animation(spritesheet,        448, 128,    64, 64, 0.1,    1, true,    false,  0.75);  
+	this.animation = this.stillAnimation;
+	Entity.prototype.update.call(this); 
+};
 
 Player.prototype.update = function () {
 	var ticksPerAnimation = 95;

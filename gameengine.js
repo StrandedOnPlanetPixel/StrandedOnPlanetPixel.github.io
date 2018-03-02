@@ -37,6 +37,7 @@ function GameEngine() {
   
 	this.showOutlines = false;
 	this.paused = false;
+	this.started = false;
 	this.keys = {
 		up: false,
 		down: false,
@@ -59,6 +60,7 @@ GameEngine.prototype.init = function (ctx) {
 GameEngine.prototype.start = function () {
 	console.log("starting game");   
 	if(this.paused) {
+		this.started = true;
 		this.paused = false;
 		this.timer.clockTick -= this.pausedTime;
 	}

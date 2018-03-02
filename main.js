@@ -264,7 +264,7 @@ Background.prototype.draw = function (ctx) {
 };
   
 function play() {
-	if(!gameEngine.gameOver) { 
+	if(!gameEngine.gameOver && gameEngine.started) {  // if the game had been paused
 		canvas.focus();
 		gameEngine.start();
 		playButton.classList.add("playButtonHidden");	
@@ -272,7 +272,31 @@ function play() {
 		playButton.style.display = "none";
 		playButtonText.style.display = "none";   
 		document.getElementById("gameWorld").style.opacity = "1";
-	}  
+	} else {  
+		playButtonText.innerHTML = "Select your player!";
+
+		for(var i = 1; i <= playerSprites; i++) {
+
+			var img = document.createElement("img"); 
+			img.src = "img/player" + i + ".png";
+			img.alt = "img/space_traveler" + i + ".png";
+			img.addEventListener("click", function() {
+				canvas.focus();
+				player.setImg(this.alt);
+				canvas.focus();
+				gameEngine.start(); 
+				playButton.classList.add("playButtonHidden");	
+				playButtonText.classList.add("playButtonHidden");
+				playButton.style.display = "none";
+				playButtonText.style.display = "none";   
+				document.getElementById("gameWorld").style.opacity = "1";
+			});
+
+			playButton.appendChild(img);
+		} 	
+
+
+	}
 };
 
 function pause() {
@@ -336,8 +360,8 @@ function addRobot() {
 		gameEngine.addProgrammableEntity(new Robot(gameEngine, 1), true);
 		gameEngine.state.score += 1;
 	}
-	
 };
+
 
 function addEnivironmentEntities(gameEngine) {  
 	var treeEnts = [new Tree(gameEngine, 64, 64), new Tree(gameEngine, 222, 55), new Tree(gameEngine, 130, 85), 
@@ -396,26 +420,28 @@ function isPlaying(song) {
 var height = null;
 var width = null; 
 var gameEngine = null;
+var player = null;
 var canvas = null;
 var ctx = null; 
 
 var playButton = null;
 var playButtonText = null;
 
+var playerSprites = 2;
 var AM = new AssetManager(); 
 
 AM.queueDownload("img/map.png");
 AM.queueDownload("img/dusk.png");
 AM.queueDownload("img/evening.png");
 AM.queueDownload("img/midnight.png");
-AM.queueDownload("img/space_traveler.png");
+for(var i = 1; i <= playerSprites; i++) {
+	AM.queueDownload("img/space_traveler" + i + ".png"); 
+}
 AM.queueDownload("img/scavenger.png");  
-AM.queueDownload("img/tree.png"); 
-AM.queueDownload("img/treeIcon.png"); 
+AM.queueDownload("img/tree.png");  
 AM.queueDownload("img/metal.png"); 
 AM.queueDownload("img/ship.png"); 
-AM.queueDownload("img/bush.png"); 
-AM.queueDownload("img/bushIcon.png"); 
+AM.queueDownload("img/bush.png");  
 AM.queueDownload("img/building1.png"); 
 AM.queueDownload("img/building2.png"); 
 AM.queueDownload("img/building3.png"); 
@@ -464,7 +490,7 @@ function startGame() {
 	gameEngine.start();
 	gameEngine.pause();
 
-	var player = new Player(gameEngine);
+	player = new Player(gameEngine);
 	var map = new Background(gameEngine); 
 	var day = new Day(gameEngine, soundManager);
 	var spaceship = new SpaceShip(gameEngine); 
