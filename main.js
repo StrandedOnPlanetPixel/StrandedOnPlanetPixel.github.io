@@ -428,7 +428,7 @@ var ctx = null;
 var playButton = null;
 var playButtonText = null;
 
-var playerSprites = 2;
+var playerSprites = 3;
 var AM = new AssetManager(); 
 
 AM.queueDownload("img/map.png");
