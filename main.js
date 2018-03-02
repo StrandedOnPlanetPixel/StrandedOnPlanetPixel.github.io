@@ -289,6 +289,7 @@ function play() {
 				playButtonText.classList.add("playButtonHidden");
 				playButton.style.display = "none";
 				playButtonText.style.display = "none";   
+				playButton.innerHTML = "<img id=\"playButton\" src=\"img/playGame.png\"/> <p id=\"playGameText\">Play Game</p>";
 				document.getElementById("gameWorld").style.opacity = "1";
 			});
 
