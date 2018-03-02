@@ -291,10 +291,10 @@ function play() {
 				play();
 			});
 			playButton.appendChild(img);
-		} else {
-			startGame();
-		}	 
-	}
+		}
+	} else {
+		startGame();
+	}	 
 };
 
 function pause() {
