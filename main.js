@@ -272,7 +272,7 @@ function play() {
 		playButton.style.display = "none";
 		playButtonText.style.display = "none";   
 		document.getElementById("gameWorld").style.opacity = "1";
-	} else {  
+	} else if(!gameEngine.gameOver && !gameEngine.started) {  
 		playButtonText.innerHTML = "Select your player!";
 	 
 		playButton.removeEventListener("click", play); 
@@ -282,27 +282,18 @@ function play() {
 			var img = document.createElement("img"); 
 			img.src = "img/player" + i + ".png";
 			img.alt = "img/space_traveler" + i + ".png";
-			img.addEventListener("click", function() {
-				canvas.focus();
-				player.setImg(this.alt);
-				canvas.focus();
-				gameEngine.start(); 
-				playButton.classList.add("playButtonHidden");	
-				playButtonText.classList.add("playButtonHidden");
-				playButton.style.display = "none";
-				playButtonText.style.display = "none";   
- 
+			img.addEventListener("click", function() { 
+				player.setImg(this.alt); 
 				playButton.innerHTML = "<img id=\"playButton\" src=\"img/playGame.png\"/> ";
 				playButton.appendChild(playButtonText);
 	 			playButton.addEventListener("click", play);
 	 			playButtonText.addEventListener("click", play);
-				document.getElementById("gameWorld").style.opacity = "1";
+				play();
 			});
-
 			playButton.appendChild(img);
-		} 	
-
-
+		} else {
+			startGame();
+		}	 
 	}
 };
 
@@ -312,7 +303,7 @@ function pause() {
 	} else if(!gameEngine.gameOver) {
 		gameEngine.pause();      
 		playButton.classList.remove("playButtonHidden");	
-		playButtonText.classList.remove("playButtonHidden");
+		playButtonText.classList.remove("playButtonHidden"); 
 		playButton.style.display = "";
 		playButtonText.style.display = ""; 
 		playButtonText.innerHTML = "Resume";      
