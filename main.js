@@ -264,7 +264,9 @@ Background.prototype.draw = function (ctx) {
 };
   
 function play() {
-	if(!gameEngine.gameOver && gameEngine.started) {  // if the game had been paused
+	if(gameEngine.gameOver) {
+		startGame();
+	} else if(!gameEngine.gameOver && gameEngine.started) {  // if the game had been paused
 		canvas.focus();
 		gameEngine.start();
 		playButton.classList.add("playButtonHidden");	
@@ -272,7 +274,7 @@ function play() {
 		playButton.style.display = "none";
 		playButtonText.style.display = "none";   
 		document.getElementById("gameWorld").style.opacity = "1";
-	} else if(!gameEngine.gameOver && !gameEngine.started) {  
+	} else {  
 		playButtonText.innerHTML = "Select your player!";
 	 
 		playButton.removeEventListener("click", play); 
@@ -283,18 +285,22 @@ function play() {
 			img.src = "img/player" + i + ".png";
 			img.alt = "img/space_traveler" + i + ".png";
 			img.addEventListener("click", function() { 
-				player.setImg(this.alt); 
-				playButton.innerHTML = "<img id=\"playButton\" src=\"img/playGame.png\"/> ";
+				canvas.focus();
+ 				player.setImg(this.alt); 
+ 				gameEngine.start();  
+ 				playButton.classList.add("playButtonHidden");	 
+ 				playButtonText.classList.add("playButtonHidden"); 
+ 				playButton.style.display = "none";
+ 				playButtonText.style.display = "none";  
+ 				playButton.innerHTML = "<img id=\"playButton\" src=\"img/playGame.png\"/> ";
 				playButton.appendChild(playButtonText);
 	 			playButton.addEventListener("click", play);
-	 			playButtonText.addEventListener("click", play);
-				play();
+	 			playButtonText.addEventListener("click", play);    
+ 				document.getElementById("gameWorld").style.opacity = "1";
 			});
 			playButton.appendChild(img);
-		}
-	} else {
-		startGame();
-	}	 
+		} 
+	} 
 };
 
 function pause() {
