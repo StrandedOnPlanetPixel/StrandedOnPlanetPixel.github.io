@@ -24,6 +24,7 @@ function GameEngine() {
 	this.hostileEntities = [];
 	this.programmableEntities = [];
 	this.programmableButtonEntities = [];
+	this.healthBarEntities = [];
 	this.ctx = null;
 	this.level = null;
 	this.dayLength = null;
@@ -81,7 +82,12 @@ GameEngine.prototype.removeProgramButtons = function () {
 	for(var i = 0; i < this.programmableButtonEntities.length; i++) {
 		this.programmableButtonEntities[i].removeFromWorld = true;
 	}
+	for(var i = 0; i < this.healthBarEntities.length; i++) {
+		this.healthBarEntities[i].removeFromWorld = true;
+	}
 };
+
+
 
 GameEngine.prototype.keyListener = function() {
 	var getXandY = function(e) {
@@ -130,6 +136,11 @@ GameEngine.prototype.addEntity = function(entity) {
 GameEngine.prototype.addProgramButtonEntity = function(entity) { 
 	this.entities.push(entity);
 	this.programmableButtonEntities.push(entity);
+};
+
+GameEngine.prototype.addHealthBarEntity = function(entity) { 
+	this.entities.push(entity);
+	this.healthBarEntities.push(entity);
 };
 
 GameEngine.prototype.addNpcEntity = function(entity, friendly) {

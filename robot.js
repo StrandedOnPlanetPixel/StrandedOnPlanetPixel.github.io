@@ -5,6 +5,7 @@ function Robot(game, tier) { //spriteSheet, startX, startY, frameWidth, frameHei
 	}
 	var spriteSheet = AM.getAsset(img);
 	this.stillAnimation = new Animation(spriteSheet, 0, 0, 64, 64, 0.1, 1, true, false, 0.75);
+	this.poweredDownAnimation = new Animation(spriteSheet, 704, 768, 64, 64, 0.1, 1, true, false, 0.75);
 
 	//walking animations
 	this.upAnimation = new Animation(spriteSheet, 0, 320, 64, 64, 0.1, 8, true, false, 0.75);
@@ -49,10 +50,10 @@ function Robot(game, tier) { //spriteSheet, startX, startY, frameWidth, frameHei
 	this.chargeLeftAnimation = new Animation(spriteSheet, 0, 832, 64, 64, 0.1, 6, true, false, 0.75);
 	
 	//powering down animation
-	this.pDUpAnimation = new Animation(spriteSheet, 0, 896, 64, 64, 0.1, 6, true, false, 0.75);
-	this.pDDownAnimation = new Animation(spriteSheet, 384, 768, 64, 64, 0.1, 6, true, false, 0.75);
-	this.pDRightAnimation = new Animation(spriteSheet, 0, 960, 64, 64, 0.1, 6, true, false, 0.75);
-	this.pDLeftAnimation = new Animation(spriteSheet, 384, 896, 64, 64, 0.1, 6, true, false, 0.75);
+	this.pDUpAnimation = new Animation(spriteSheet, 0, 896, 64, 64, 0.1, 6, false, false, 0.75);
+	this.pDDownAnimation = new Animation(spriteSheet, 384, 768, 64, 64, 0.1, 6, false, false, 0.75);
+	this.pDRightAnimation = new Animation(spriteSheet, 0, 960, 64, 64, 0.1, 6, false, false, 0.75);
+	this.pDLeftAnimation = new Animation(spriteSheet, 384, 896, 64, 64, 0.1, 6, false, false, 0.75);
 	
 	//Dying animation
 	this.dyingUpAnimation = new Animation(spriteSheet, 512, 576, 64, 64, 0.1, 4, true, false, 0.75);
@@ -94,7 +95,7 @@ function Robot(game, tier) { //spriteSheet, startX, startY, frameWidth, frameHei
 	this.elapsedTime = 0;
 	this.workspeed = 5;
 	this.chargespeed = 2;
-	this.charge = 100;
+	this.charge = 10;
 	this.day = this.game.state.day;
 	this.damage = 10;
 
@@ -123,26 +124,28 @@ Robot.prototype.setTask = function() {
  	for(var i = 0; i < this.tasks.length; i++) {
 		menuX += 40;  
 		this.game.addProgramButtonEntity(new ProgramButton(this.game, menuX, menuY, this.tasks[i], this));
+		this.game.addHealthBarEntity(new healthBar(this.game, menuX, menuY - 16, this));
 	}
 	
 };
 
 Robot.prototype.update = function() {
 	
-	if(!this.day){
+	if(!this.day.day && this.charge > 0){
 		this.elapsedTime += this.game.clockTick;
 		if(this.elapsedTime > this.chargespeed) {
 			this.charge -= 1;
 			this.elapsedTime = 0;
+			console.log(this.charge);
 		}
-		
-	} else if (this.day && this.charge < 100){
+	}else if (this.day.day && this.charge <= 10){
 		this.elapsedTime += this.game.clockTick;
 		if(this.elapsedTime > this.chargespeed) {
 			this.charge += 1;
 			this.elapsedTime = 0;
 		}
 	}
+	
 	
 	if (collideLeft(this) || collideRight(this)) { 
 		if (collideLeft(this)) this.x = 0;
@@ -155,16 +158,9 @@ Robot.prototype.update = function() {
 	}
 	
 	if (this.charge <= 0){
-		if(this.dir === this.directions[3]){
-			this.animation = this.pDDownAnimation;
-		} else if(this.dir === this.directions[0]){
-			this.animation = this.pDLeftAnimation;      
-		} else if(this.dir === this.directions[1]){
-			this.animation = this.pDRightAnimation;     
-		} else{
-			this.animation = this.pDUpAnimation;
-		}
-
+		this.taskEntity = null;
+		this.animation = this.pDDownAnimation;
+		this.animation = this.poweredDownAnimation;
 	}
 	
 	if(this.lives <= 0) { 
@@ -327,6 +323,7 @@ Robot.prototype.update = function() {
 			moveEntityToTarget(this, this.taskEntity); 
 		} 
 	}
+	
 	Entity.prototype.update.call(this);  
 };
 
