@@ -1,5 +1,5 @@
 function Alien(game, enemy) {  
-	var spritesheet = AM.getAsset("img/alien.png");
+	var spritesheet = AM.getAsset("img/alien" + (Math.floor(Math.random() * 2) + 1) + ".png");
 	this.animation = new Animation(spritesheet,             256,    192,     64, 64, 0.1, 4, true,  false,  0.75);
 	this.upAnimation = new Animation(spritesheet,           256,    192,     64, 64, 0.1, 4, true,  false,  0.75);
 	this.downAnimation = new Animation(spritesheet,         0,     64,    64, 64, 0.1, 4, true,  false,  0.75);
@@ -47,6 +47,9 @@ Alien.prototype.update = function () {
 		//dead
 		this.animation = this.dyingAnimation;
 		this.dead = true;
+		if(Math.floor(Math.random() * 5) + 1 == 1){
+			this.game.state.food += 1;
+		}
 	} else {
 		if (collideLeft(this) || collideRight(this)) { 
 			if (collideLeft(this)) this.x = this.radius;

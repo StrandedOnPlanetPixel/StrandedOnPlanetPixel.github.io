@@ -41,6 +41,9 @@ Scavenger.prototype.update = function () {
 		//dead
 		this.animation = this.dyingAnimation;
 		this.dead = true;
+		if(Math.floor(Math.random() * 5) + 1 == 1){
+			this.game.state.minerals += 1;
+		}
 	} else {
 		if (collideLeft(this) || collideRight(this)) { 
 			if (collideLeft(this)) this.x = this.radius;

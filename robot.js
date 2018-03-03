@@ -121,12 +121,18 @@ Robot.prototype.setTask = function() {
 	//display menu 
 	var menuX = this.x - 150;
 	var menuY = this.y - 32;
- 	for(var i = 0; i < this.tasks.length; i++) {
-		menuX += 40;  
-		this.game.addProgramButtonEntity(new ProgramButton(this.game, menuX, menuY, this.tasks[i], this));
-		this.game.addHealthBarEntity(new healthBar(this.game, menuX, menuY - 16, this));
-	}
+	if(this.charge > 0){
+		for(var i = 0; i < this.tasks.length; i++) {
+			menuX += 40;  
+			this.game.addProgramButtonEntity(new ProgramButton(this.game, menuX, menuY, this.tasks[i], this));
+		
+		}
+	this.game.addHealthBarEntity(new healthBar(this.game, menuX - 200, menuY + 96, this));
+		
 	
+	} else{
+		this.game.addHealthBarEntity(new healthBar(this.game, menuX + 100, menuY + 96, this));
+	}
 };
 
 Robot.prototype.update = function() {
@@ -136,7 +142,7 @@ Robot.prototype.update = function() {
 		if(this.elapsedTime > this.chargespeed) {
 			this.charge -= 1;
 			this.elapsedTime = 0;
-			console.log(this.charge);
+		//	console.log(this.charge);
 		}
 	}else if (this.day.day && this.charge <= 10){
 		this.elapsedTime += this.game.clockTick;
@@ -144,6 +150,7 @@ Robot.prototype.update = function() {
 			this.charge += 1;
 			this.elapsedTime = 0;
 		}
+		this.animation = this.stillAnimation;
 	}
 	
 	
@@ -192,7 +199,7 @@ Robot.prototype.update = function() {
 		}  
 	}  
 
-	if(closestEnt && collide(this, {x: closestEnt.x, y: closestEnt.y, radius: this.attackRadius}) && closestEnt.lives > 0) {
+	if(this.charge > 0 && closestEnt && collide(this, {x: closestEnt.x, y: closestEnt.y, radius: this.attackRadius}) && closestEnt.lives > 0 ) {
 		if(!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 1.5)) {
 			//record last shot time and create the bullet.
 			attack(this, closestEnt);

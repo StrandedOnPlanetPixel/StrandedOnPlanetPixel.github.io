@@ -143,6 +143,8 @@ GameEngine.prototype.addHealthBarEntity = function(entity) {
 	this.healthBarEntities.push(entity);
 };
 
+
+
 GameEngine.prototype.addNpcEntity = function(entity, friendly) {
 	console.log('added npc entity');
 	this.entities.push(entity);

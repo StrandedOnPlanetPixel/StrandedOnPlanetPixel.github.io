@@ -37,6 +37,12 @@ Rummager.prototype.update = function () {
 	if(this.lives < 0) {
 		//dead
 		this.removeFromWorld = true;
+		var rareDrops = Math.floor(Math.random() * 5) + 1;
+		if(rareDrops == 1){
+			this.game.state.scrap += 1;
+		}else if(rareDrops == 2){
+			this.game.state.wood += 1;
+		}
 	} else {
 		if (collideLeft(this) || collideRight(this)) { 
 			if (collideLeft(this)) this.x = this.radius;
