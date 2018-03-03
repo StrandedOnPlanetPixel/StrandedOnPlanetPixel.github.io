@@ -27,10 +27,10 @@
 		<div id="gameHolder">
 			<div id="resourceBar">
 				<ul>
-					<li class="resources stats"><p>Wood</p> <div id="woodCount"><img src="img/tree.png"/>0</div></li>
 					<li class="resources stats"><p>Food</p> <div id="foodCount"> <img src="img/bush.png"/>0</div> </li>
-					<li class="resources stats"><p>Scrap</p> <div id="metalCount"> <img src="img/metal.png"/>0</div> </li>
+					<li class="resources stats"><p>Wood</p> <div id="woodCount"><img src="img/tree.png"/>0</div></li>
 					<li class="resources stats"><p>Minerals</p> <div id="mineralCount"> <img src="img/rock1.png"/>0</div> </li>
+					<li class="resources stats"><p>Scrap</p> <div id="metalCount"> <img src="img/metal.png"/>0</div> </li>
 					<li class="resources stats"><p>Robots</p> <div id="robotCount"><img src="img/robot.png"/>0</div> </li>
 					<li class="resources"><p>Ship Health</p> <div id="myProgress"> <div id="shipHealth">0/0</div> </div> </li>
 					<li class="resources"><p>Player Health</p> <div id="myProgress"> <div id="playerHealth">0/0</div> </div> </li>
@@ -47,7 +47,15 @@
 				</ul>
 			</div>
 			<div id="canvasHolder"> 
-				<div id="button"><img id="playButton" src="img/playGame.png"/> <p id="playGameText">Play Game</p></div>
+				<div id="tutorialHolder">
+					<h3>How to play</h3>  
+					<a class="skip" onclick="skipTutorial()">Skip</a>
+					<a class="next" onclick="plusSlides(1)">Next &#10095;</a>
+				</div>
+ 
+				<div id="button">
+					<img id="playButton" src="img/playGame.png"/> <p id="playGameText">Play Game</p>
+				</div>
 				<canvas id="gameWorld" tabindex="1" width="1280" height="640"></canvas>
 			</div>
 			<div class="resources" >

@@ -313,7 +313,7 @@ function pause() {
 		playButton.style.display = "";
 		playButtonText.style.display = ""; 
 		playButtonText.innerHTML = "Resume";      
-		document.getElementById("gameWorld").style.opacity = "0.4";
+		document.getElementById("gameWorld").style.opacity = "0.3";
 	}
 };
 
@@ -329,7 +329,7 @@ function gameOver() {
 			playButton.style.display = "";
 			playButtonText.style.display = ""; 
 			playButtonText.innerHTML = "You win! Click to play again?";      
-			document.getElementById("gameWorld").style.opacity = "0.4";
+			document.getElementById("gameWorld").style.opacity = "0.3";
 		}  
 	} else {
 		if(gameEngine.gameOver) { 
@@ -342,7 +342,7 @@ function gameOver() {
 			playButtonText.style.display = ""; 
 			playButtonText.innerHTML = "Game Over, Click to play again?";   
 			playButtonText.style.fontSize = "25px";   
-			document.getElementById("gameWorld").style.opacity = "0.4";
+			document.getElementById("gameWorld").style.opacity = "0.3";
 		} 
 	}
 };
@@ -433,6 +433,9 @@ var playButton = null;
 var playButtonText = null;
 var toDisplay = 1;
 var playerSprites = 3;
+
+var slideIndex = 1;
+
 var AM = new AssetManager(); 
 
 AM.queueDownload("img/map.png");
@@ -525,4 +528,74 @@ function startGame() {
 window.addEventListener("focus", function(event) { 
  	canvas.focus();
 }, false);
+
+window.onload = function() {
+
+	var tutorialText = [
+			"Program your robot by walking up to it and pressing ['Q']. Programing can direct your robot to a specific job, like gathering food.",
+			"Resources your robots have collected so far are shown at the top of the game.",
+			"Enemies can spawn and will attack your robots, help defend them or they might die. If you have no robots you lose.",
+			"Enemies will target you and your ship aswell. If you or your ship reach zero health, you lose.",
+			"You and your spaceship's health can be seen in the top of the game. If your health is getting low, and you have collected some food press ['E'] to eat!",
+			"One robot wont be enough, try adding a robot when you get enough resources by pressing ['R'].",
+			"At night different enemies come out. The higher level you get, the more will spawn.",
+			"These enemies can be pesky, they have a ranged attack that shoots bullets at you from afar.",
+			"After you gather enough resources you will see a new option appear when you program your robots.",
+			"This will give you a fancy purple robot, that gathers faster and does more damage to enemies.",
+			"To level up, you must fully repair your ship. You can do this by simply selecting the ship option when you program your robot."];
+
+	var tutorialHolder = document.getElementById("tutorialHolder");
+	for(var i = 1; i <= 11; i++) {
+		var div = document.createElement("div");
+		div.classList.add("tutorialSlides"); 
+		var img = document.createElement("img");
+		img.src = "tutorialImg/tutorial" + i + ".png";  
+
+		div.appendChild(img);
+
+		var cap = document.createElement("div");
+			 
+		
+		cap.classList.add("text");
+		cap.innerHTML = tutorialText[i-1];
  
+		div.appendChild(cap);
+
+		tutorialHolder.appendChild(div);
+	}
+	showSlides(slideIndex);
+
+
+}; 
+
+// Next/previous controls
+function skipTutorial() { 
+	document.getElementById("tutorialHolder").innerHTML = " ";
+
+}
+
+// Next/previous controls
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+// Thumbnail image controls
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  
+  var slides = document.getElementsByClassName("tutorialSlides"); 
+  if (n > slides.length) { 
+  	skipTutorial(); 
+  }
+  if (n < 1) {
+  	slideIndex = slides.length
+  }
+  for (var i = 0; i < slides.length; i++) {
+      slides[i].style.display = "none";
+  } 
+  slides[slideIndex-1].style.display = "block"; 
+
+} 
