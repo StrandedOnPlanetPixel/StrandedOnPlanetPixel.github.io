@@ -10,7 +10,7 @@ window.requestAnimFrame = (function () {
 })(); 
 
 /** Game Engine **/
-function GameEngine() { 
+function GameEngine(soundmanager) { 
 	this.showOutlines = true;
 
 	this.entities = [];
@@ -46,6 +46,7 @@ function GameEngine() {
 		attack: false,
 		program: false
 	}; 
+	this.sound = soundmanager;
 }
 
 GameEngine.prototype.init = function (ctx) {
