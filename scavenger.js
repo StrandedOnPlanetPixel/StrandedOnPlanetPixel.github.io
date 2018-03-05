@@ -14,6 +14,7 @@ function Scavenger(game, enemy) {
 	this.name = "Scavenger";
 	this.game = game;
 	this.ctx = game.ctx; 
+	this.sound = game.sound;
 	this.enemy = enemy;
 	Entity.call(this, game, Math.random() * width, height);
 	this.radius = 24;
@@ -36,6 +37,7 @@ Scavenger.prototype.constructor = Scavenger;
 
 Scavenger.prototype.update = function () {
 	if(this.dead) {
+		this.sound.playDeathSound(this);
 		this.removeFromWorld = true;
 	} if(this.lives < 0) {
 		//dead

@@ -14,6 +14,8 @@ function Alien(game, enemy) {
 	this.name = "Alien";
 	this.game = game;
 	this.ctx = game.ctx; 
+	this.sound = game.sound;
+
 	this.enemy = enemy;
 	Entity.call(this, game, Math.random() * width, height);
 	this.radius = 24;
@@ -42,6 +44,7 @@ Alien.prototype.constructor = Alien;
 
 Alien.prototype.update = function () { 
 	if(this.dead) {
+		this.sound.playDeathSound(this);
 		this.removeFromWorld = true;
 	} else if(this.lives <= 0) {
 		//dead
