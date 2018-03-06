@@ -172,6 +172,7 @@ Robot.prototype.update = function() {
 	
 	if(this.lives <= 0) { 
 		this.animation = this.dyingUpAnimation;
+		SoundManager.playDeathSound(this);
 
 		if(this.dir === this.directions[3]){
 			this.animation = this.dyingDownAnimation;
@@ -203,6 +204,7 @@ Robot.prototype.update = function() {
 		if(!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 1.5)) {
 			//record last shot time and create the bullet.
 			attack(this, closestEnt);
+			SoundManager.playAttackSound(this);
 			this.lastAttackTime = this.game.timer.gameTime; 
 		}
 	} else if(closestEnt && collide(this,{x: closestEnt.x, y: closestEnt.y, radius: this.visualRadius}) && closestEnt.lives > 0) {
