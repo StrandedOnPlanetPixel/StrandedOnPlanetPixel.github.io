@@ -207,9 +207,9 @@ Robot.prototype.update = function() {
 			soundManager.playAttackSound(this);
 			this.lastAttackTime = this.game.timer.gameTime; 
 		}
-	} else if(closestEnt && collide(this,{x: closestEnt.x, y: closestEnt.y, radius: this.visualRadius}) && closestEnt.lives > 0) {
+	} else if(this.charge > 0 && closestEnt && collide(this,{x: closestEnt.x, y: closestEnt.y, radius: this.visualRadius}) && closestEnt.lives > 0) {
 		moveEntityToTarget(this, closestEnt);	
-	} else if(this.taskEntity && (!closestEnt || !collide(this,{x: closestEnt.x, y: closestEnt.y, radius: this.visualRadius}))) { // if the robot has been programmed
+	} else if(this.charge > 0 && this.taskEntity && (!closestEnt || !collide(this,{x: closestEnt.x, y: closestEnt.y, radius: this.visualRadius}))) { // if the robot has been programmed
 		// If the robot reaches its target entity 
 		if(collide(this, this.taskEntity)) { 
 			// fix repair directions;
