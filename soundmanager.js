@@ -137,3 +137,11 @@ SoundManager.prototype.playWalkSound = function(entity) {
         entity.walkSound.play();
     }
 };
+
+SoundManager.prototype.playPowerDownSound = function(entity) {
+    if (entity.powerDownSound != null) {
+        console.log(entity.powerDownSound.src);
+        entity.powerDownSound.volume = currentVolume;
+        entity.powerDownSound.play();
+    }
+};

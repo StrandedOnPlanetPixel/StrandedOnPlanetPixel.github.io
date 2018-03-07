@@ -107,6 +107,10 @@ function Robot(game, tier) { //spriteSheet, startX, startY, frameWidth, frameHei
     this.deathSound = document.createElement("audio");
     this.deathSound.src = "sound_effects/robot_death.mp3";
     this.deathSound.loop = false;
+
+    this.powerDownSound = document.createElement("audio");
+    this.powerDownSound.src = "sound_effects/robot_power_down.mp3";
+    this.powerDownSound.loop = false;
 }
 
 Robot.prototype = new Entity();
