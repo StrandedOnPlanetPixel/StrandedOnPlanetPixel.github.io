@@ -24,6 +24,7 @@ function State(game, player, ship, day) {
 
 	this.shipMaxHealth = this.ship.lives;
 	this.playerMaxLives = this.player.lives;
+	this.robotMaxLives = 150;
 }
 
 State.prototype = new Entity();
