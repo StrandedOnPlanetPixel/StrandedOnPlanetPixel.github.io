@@ -75,9 +75,11 @@ function Robot(game, tier) { //spriteSheet, startX, startY, frameWidth, frameHei
 	this.speed = 75;  
 	this.game = game;
 	this.ctx = game.ctx; 
-	this.sound = game.sound;
 	Entity.call(this, game, (width / 2) + 10, (height / 2 ) + 45);  
-
+	/**
+	this.radius = 24;   
+	this.x += this.radius;
+	this.y += this.radius; */
 	this.height = 41;
 	this.width = 32;
 	this.textureOffset = 8;
@@ -117,7 +119,7 @@ Robot.prototype.constructor = Robot;
 Robot.prototype.setTask = function() {
 	// sets the task of the robot
 	//display menu 
-	var menuX = this.x - 150;
+	var menuX = this.x - 105;
 	var menuY = this.y - 32;
 	if(this.charge > 0){
 		for(var i = 0; i < this.tasks.length; i++) {
@@ -125,13 +127,14 @@ Robot.prototype.setTask = function() {
 			this.game.addProgramButtonEntity(new ProgramButton(this.game, menuX, menuY, this.tasks[i], this));
 		
 		}
-	this.game.addHealthBarEntity(new healthBar(this.game, menuX - 200, menuY + 96, this));
+	this.game.addHealthBarEntity(new healthBar(this.game, menuX - 155, menuY + 96, this));
 		
 	
 	} else{
-		this.game.addHealthBarEntity(new healthBar(this.game, menuX + 100, menuY + 96, this));
+		this.game.addHealthBarEntity(new healthBar(this.game, menuX + 80, menuY + 96, this));
 	}
 };
+
 
 Robot.prototype.update = function() {
 	
@@ -163,27 +166,14 @@ Robot.prototype.update = function() {
 	}
 	
 	if (this.charge <= 0){
-<<<<<<< HEAD
 		this.taskEntity = null;
 		this.animation = this.pDDownAnimation;
 		this.animation = this.poweredDownAnimation;
-=======
-		if(this.dir === this.directions[3]){
-			this.animation = this.pDDownAnimation;
-		} else if(this.dir === this.directions[0]){
-			this.animation = this.pDLeftAnimation;      
-		} else if(this.dir === this.directions[1]){
-			this.animation = this.pDRightAnimation;     
-		} else{
-			this.animation = this.pDUpAnimation;
-		}
-
-		this.sound.playDeathSound(this);
->>>>>>> a641836f42cd7fa4b28615572bf50f0cadfcb0cb
 	}
 	
 	if(this.lives <= 0) { 
 		this.animation = this.dyingUpAnimation;
+		soundManager.playDeathSound(this);
 
 		if(this.dir === this.directions[3]){
 			this.animation = this.dyingDownAnimation;
@@ -194,7 +184,7 @@ Robot.prototype.update = function() {
 		} else{
 			this.animation = this.dyingUpAnimation;
 		}
-		this.sound.playDeathSound(this);
+
 		this.removeFromWorld = true;
 		this.game.state.robotCount--;
 	}
@@ -215,15 +205,17 @@ Robot.prototype.update = function() {
 		if(!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 1.5)) {
 			//record last shot time and create the bullet.
 			attack(this, closestEnt);
+			soundManager.playAttackSound(this);
 			this.lastAttackTime = this.game.timer.gameTime; 
 		}
-	} else if(closestEnt && collide(this,{x: closestEnt.x, y: closestEnt.y, radius: this.visualRadius}) && closestEnt.lives > 0) {
+	} else if(this.charge > 0 && closestEnt && collide(this,{x: closestEnt.x, y: closestEnt.y, radius: this.visualRadius}) && closestEnt.lives > 0) {
 		moveEntityToTarget(this, closestEnt);	
-	} else if(this.taskEntity && (!closestEnt || !collide(this,{x: closestEnt.x, y: closestEnt.y, radius: this.visualRadius}))) { // if the robot has been programmed
+	} else if(this.charge > 0 && this.taskEntity && (!closestEnt || !collide(this,{x: closestEnt.x, y: closestEnt.y, radius: this.visualRadius}))) { // if the robot has been programmed
 		// If the robot reaches its target entity 
 		if(collide(this, this.taskEntity)) { 
 			// fix repair directions;
-			if (this.task === this.tasks[0] ) { // repair 
+			if (this.task === this.tasks[0] ) { // repair
+				 
 				var scrapCost = 5;
 				var woodCost = 10;
 				var mineralCost = 5;	
@@ -251,8 +243,6 @@ Robot.prototype.update = function() {
 						this.game.state.level += 1;
 						if(this.game.state.level === 5) { // you win!
 							gameOver();
-						} else {
-							this.sound.playLevelUpSound();
 						}
 					} 	
 				} 				
