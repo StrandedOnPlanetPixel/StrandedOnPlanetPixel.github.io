@@ -1,6 +1,6 @@
-function Day(game, sound) { 
+function Day(game) { 
 	this.game = game;   
-	this.sound = sound;
+	this.sound = game.sound;
 	this.ctx = game.ctx;  
 	this.duskImage = "img/dusk.png";  
 	this.eveningImage = "img/evening.png";  

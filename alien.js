@@ -14,6 +14,7 @@ function Alien(game, enemy) {
 	this.name = "Alien";
 	this.game = game;
 	this.ctx = game.ctx; 
+
 	this.enemy = enemy;
 	Entity.call(this, game, Math.random() * width, height);
 	this.radius = 24;

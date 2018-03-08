@@ -244,6 +244,7 @@ function attack(ent, target) {
 		}
 	}  
 	target.lives -= ent.damage;
+	soundManager.playAttackSound(ent);
 	soundManager.playDamageSound(target);
 };
  
@@ -323,6 +324,7 @@ function gameOver() {
 		if(gameEngine.gameOver) { 
 			gameEngine.state.update();
 		} else {
+			soundManager.playWinSound();
 	 		gameEngine.gameOver = true; 
 			playButton.classList.remove("playButtonHidden");	
 			playButtonText.classList.remove("playButtonHidden");
@@ -335,6 +337,7 @@ function gameOver() {
 		if(gameEngine.gameOver) { 
 			gameEngine.state.update();
 		} else {
+			soundManager.playGameOverSound();
 	 		gameEngine.gameOver = true; 
 			playButton.classList.remove("playButtonHidden");		
 			playButtonText.classList.remove("playButtonHidden");		
@@ -493,7 +496,7 @@ function startGame() {
 
 	height = canvas.height;
 	width = canvas.width; 
-	gameEngine = new GameEngine(); 
+	gameEngine = new GameEngine(soundManager); 
  
 	gameEngine.init(ctx); 
 	gameEngine.start();
@@ -501,7 +504,7 @@ function startGame() {
 
 	player = new Player(gameEngine);
 	var map = new Background(gameEngine); 
-	var day = new Day(gameEngine, soundManager);
+	var day = new Day(gameEngine);
 	var spaceship = new SpaceShip(gameEngine); 
 	var state = new State(gameEngine, player, spaceship, day);
 	

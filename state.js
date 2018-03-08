@@ -1,4 +1,7 @@
 function State(game, player, ship, day) {
+	this.game = game;
+	this.sound = game.sound;
+	
 	this.player = player;
 	this.ship = ship;
 	this.day = day; 

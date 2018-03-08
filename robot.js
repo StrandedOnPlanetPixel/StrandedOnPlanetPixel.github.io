@@ -75,11 +75,9 @@ function Robot(game, tier) { //spriteSheet, startX, startY, frameWidth, frameHei
 	this.speed = 75;  
 	this.game = game;
 	this.ctx = game.ctx; 
+	this.sound = game.sound;
 	Entity.call(this, game, (width / 2) + 10, (height / 2 ) + 45);  
-	/**
-	this.radius = 24;   
-	this.x += this.radius;
-	this.y += this.radius; */
+
 	this.height = 41;
 	this.width = 32;
 	this.textureOffset = 8;
@@ -165,9 +163,23 @@ Robot.prototype.update = function() {
 	}
 	
 	if (this.charge <= 0){
+<<<<<<< HEAD
 		this.taskEntity = null;
 		this.animation = this.pDDownAnimation;
 		this.animation = this.poweredDownAnimation;
+=======
+		if(this.dir === this.directions[3]){
+			this.animation = this.pDDownAnimation;
+		} else if(this.dir === this.directions[0]){
+			this.animation = this.pDLeftAnimation;      
+		} else if(this.dir === this.directions[1]){
+			this.animation = this.pDRightAnimation;     
+		} else{
+			this.animation = this.pDUpAnimation;
+		}
+
+		this.sound.playDeathSound(this);
+>>>>>>> a641836f42cd7fa4b28615572bf50f0cadfcb0cb
 	}
 	
 	if(this.lives <= 0) { 
@@ -182,7 +194,7 @@ Robot.prototype.update = function() {
 		} else{
 			this.animation = this.dyingUpAnimation;
 		}
-
+		this.sound.playDeathSound(this);
 		this.removeFromWorld = true;
 		this.game.state.robotCount--;
 	}
@@ -211,8 +223,7 @@ Robot.prototype.update = function() {
 		// If the robot reaches its target entity 
 		if(collide(this, this.taskEntity)) { 
 			// fix repair directions;
-			if (this.task === this.tasks[0] ) { // repair
-				 
+			if (this.task === this.tasks[0] ) { // repair 
 				var scrapCost = 5;
 				var woodCost = 10;
 				var mineralCost = 5;	
@@ -240,6 +251,8 @@ Robot.prototype.update = function() {
 						this.game.state.level += 1;
 						if(this.game.state.level === 5) { // you win!
 							gameOver();
+						} else {
+							this.sound.playLevelUpSound();
 						}
 					} 	
 				} 				
