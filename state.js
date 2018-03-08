@@ -18,6 +18,7 @@ function State(game, player, ship, day) {
 
 	this.robotCount = 1;
 	this.maxRobots = 999;
+	this.robotMaxLives = 150;
 
 	this.shipMaxHealth = this.ship.lives;
 	this.playerMaxLives = this.player.lives;

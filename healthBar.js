@@ -39,7 +39,10 @@ healthBar.prototype.update = function () {
 
 healthBar.prototype.draw = function (ctx) { 
 	//ctx.fillText("Life " + this.health+"/"+ maxHealth+" = " + percent * 100 +"%", this.x, this.y + 120);
-	ctx.fillRect(this.x,this.y,this.robot.lives,5);
+	ctx.fillRect(this.x,this.y,this.robot.lives /2,5);
+	ctx.strokeStyle="#000000";
+    ctx.strokeRect(this.x,this.y,this.robot.game.state.robotMaxLives /2 ,5);
+    ctx.fillRect(this.x,this.y,this.robot.lives / 2,5);
 	//console.log((this.health/100)*50);
 	
  	Entity.prototype.draw.call(this);

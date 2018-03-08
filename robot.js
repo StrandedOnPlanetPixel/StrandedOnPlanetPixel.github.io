@@ -119,7 +119,7 @@ Robot.prototype.constructor = Robot;
 Robot.prototype.setTask = function() {
 	// sets the task of the robot
 	//display menu 
-	var menuX = this.x - 150;
+	var menuX = this.x - 105;
 	var menuY = this.y - 32;
 	if(this.charge > 0){
 		for(var i = 0; i < this.tasks.length; i++) {
@@ -127,11 +127,11 @@ Robot.prototype.setTask = function() {
 			this.game.addProgramButtonEntity(new ProgramButton(this.game, menuX, menuY, this.tasks[i], this));
 		
 		}
-	this.game.addHealthBarEntity(new healthBar(this.game, menuX - 200, menuY + 96, this));
+	this.game.addHealthBarEntity(new healthBar(this.game, menuX - 155, menuY + 96, this));
 		
 	
 	} else{
-		this.game.addHealthBarEntity(new healthBar(this.game, menuX + 100, menuY + 96, this));
+		this.game.addHealthBarEntity(new healthBar(this.game, menuX + 80, menuY + 96, this));
 	}
 };
 
