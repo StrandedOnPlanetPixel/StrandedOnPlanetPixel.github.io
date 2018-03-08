@@ -38,10 +38,18 @@ healthBar.prototype.update = function () {
 }
 
 healthBar.prototype.draw = function (ctx) { 
+<<<<<<< HEAD
 	//ctx.fillText("Life " + this.health+"/"+ maxHealth+" = " + percent * 100 +"%", this.x, this.y + 120); 
 	   ctx.strokeStyle="#000000";
     ctx.strokeRect(this.x,this.y,this.robot.game.state.robotMaxLives /2 ,5);
     ctx.fillRect(this.x,this.y,this.robot.lives / 2,5);    
+=======
+	//ctx.fillText("Life " + this.health+"/"+ maxHealth+" = " + percent * 100 +"%", this.x, this.y + 120);
+	ctx.fillRect(this.x,this.y,this.robot.lives /2,5);
+	ctx.strokeStyle="#000000";
+    ctx.strokeRect(this.x,this.y,this.robot.game.state.robotMaxLives /2 ,5);
+    ctx.fillRect(this.x,this.y,this.robot.lives / 2,5);
+>>>>>>> 78645428ff9d656b895ac587b63cbd40c590de17
 	//console.log((this.health/100)*50);
 	
  	Entity.prototype.draw.call(this);

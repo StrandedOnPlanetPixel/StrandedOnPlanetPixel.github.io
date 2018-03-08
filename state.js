@@ -1,7 +1,4 @@
 function State(game, player, ship, day) {
-	this.game = game;
-	this.sound = game.sound;
-	
 	this.player = player;
 	this.ship = ship;
 	this.day = day; 
@@ -21,6 +18,7 @@ function State(game, player, ship, day) {
 
 	this.robotCount = 1;
 	this.maxRobots = 999;
+	this.robotMaxLives = 150;
 
 	this.shipMaxHealth = this.ship.lives;
 	this.playerMaxLives = this.player.lives;
