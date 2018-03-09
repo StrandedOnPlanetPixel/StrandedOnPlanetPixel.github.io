@@ -24,9 +24,7 @@ function Alien(game, enemy) {
 	this.lastAttackTime = 0;
 
 	this.task = 5;
-
-
-
+	
     this.attackSound = document.createElement("audio");
     this.attackSound.src = "sound_effects/alien_attack.mp3";
     this.attackSound.loop = false;
@@ -35,6 +33,7 @@ function Alien(game, enemy) {
     this.damageSound.src = "sound_effects/alien_damage.mp3";
     this.damageSound.loop = false;
 
+    this.game.addHealthBarEntity(new healthBar(this.game, this));
 };
 
 Alien.prototype = new Entity();

@@ -173,8 +173,7 @@ Player.prototype.update = function () {
 						(!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 0.5))) {
 							ent.lives -= this.damage; 
 							this.lastAttackTime = this.game.timer.gameTime; 
-							soundManager.playDamageSound(ent);
-							 
+							soundManager.playDamageSound(ent); 
 					}  
 				} 
 			} 

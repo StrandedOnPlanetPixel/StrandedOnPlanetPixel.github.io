@@ -28,6 +28,7 @@ function Rummager(game, enemy) {
     this.attackSound.src = "sound_effects/rummager_attack.mp3";
     this.attackSound.loop = false;
 
+    this.game.addHealthBarEntity(new healthBar(this.game, this));
 };
 
 Rummager.prototype = new Entity();

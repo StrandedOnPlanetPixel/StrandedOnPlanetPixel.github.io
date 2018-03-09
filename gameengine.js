@@ -10,8 +10,7 @@ window.requestAnimFrame = (function () {
 })(); 
 
 /** Game Engine **/
-function GameEngine(soundmanager) { 
-	this.showOutlines = true;
+function GameEngine(soundmanager) {  
 
 	this.entities = [];
 	this.environmentEntities = [];
@@ -82,10 +81,7 @@ GameEngine.prototype.pause = function () {
 GameEngine.prototype.removeProgramButtons = function () {
 	for(var i = 0; i < this.programmableButtonEntities.length; i++) {
 		this.programmableButtonEntities[i].removeFromWorld = true;
-	}
-	for(var i = 0; i < this.healthBarEntities.length; i++) {
-		this.healthBarEntities[i].removeFromWorld = true;
-	}
+	} 
 };
 
 
@@ -231,6 +227,13 @@ GameEngine.prototype.update = function () {
 			this.friendlyEntities.splice(i, 1); 
 		}
 	}
+
+	for (var i = this.healthBarEntities.length - 1; i >= 0; --i) {
+		if (this.healthBarEntities[i].removeFromWorld) {
+			this.healthBarEntities.splice(i, 1); 
+		}
+	}
+
 
 	for (var i = this.hostileEntities.length - 1; i >= 0; --i) {
 		if (this.hostileEntities[i].removeFromWorld) {

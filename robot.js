@@ -109,7 +109,9 @@ function Robot(game, tier) { //spriteSheet, startX, startY, frameWidth, frameHei
 
     this.deathSound = document.createElement("audio");
     this.deathSound.src = "sound_effects/robot_death.mp3";
-    this.deathSound.loop = false;
+    this.deathSound.loop = false; 		
+    this.game.addHealthBarEntity(new healthBar(this.game, this));
+		
 }
 
 Robot.prototype = new Entity();
@@ -120,18 +122,12 @@ Robot.prototype.setTask = function() {
 	// sets the task of the robot
 	//display menu 
 	var menuX = this.x - 105;
-	var menuY = this.y - 32;
+	var menuY = this.y - 48;
 	if(this.charge > 0){
 		for(var i = 0; i < this.tasks.length; i++) {
 			menuX += 40;  
 			this.game.addProgramButtonEntity(new ProgramButton(this.game, menuX, menuY, this.tasks[i], this));
-		
-		}
-	this.game.addHealthBarEntity(new healthBar(this.game, menuX - 155, menuY + 96, this));
-		
-	
-	} else{
-		this.game.addHealthBarEntity(new healthBar(this.game, menuX + 80, menuY + 96, this));
+		} 
 	}
 };
 
@@ -185,7 +181,7 @@ Robot.prototype.update = function() {
 			this.animation = this.dyingUpAnimation;
 		}
 
-		this.removeFromWorld = true;
+		this.removeFromWorld = true; 
 		this.game.state.robotCount--;
 	}
 	

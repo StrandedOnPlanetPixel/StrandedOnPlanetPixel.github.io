@@ -30,6 +30,7 @@ function Scavenger(game, enemy) {
     this.deathSound = document.createElement("audio");
     this.deathSound.src = "sound_effects/scavenger_death.mp3";
     this.deathSound.loop = false;
+    this.game.addHealthBarEntity(new healthBar(this.game, this));
 };
 
 Scavenger.prototype = new Entity();

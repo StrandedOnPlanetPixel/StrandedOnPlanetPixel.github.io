@@ -510,7 +510,6 @@ function startGame() {
 	
 	gameEngine.state = state;
 
-	var robot = new Robot(gameEngine, 1);
 
 	gameEngine.addEntity(state);
 	gameEngine.addEntity(map);  
@@ -520,6 +519,9 @@ function startGame() {
 
 	gameEngine.addNpcEntity(spaceship, true);   
 	gameEngine.addNpcEntity(player, true);  
+
+	
+	var robot = new Robot(gameEngine, 1);
 	gameEngine.addProgrammableEntity(robot, true);
 	
 	soundManager.setupBackgroundMusic();
