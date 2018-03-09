@@ -30,6 +30,7 @@ function Scavenger(game, enemy) {
     this.deathSound = document.createElement("audio");
     this.deathSound.src = "sound_effects/scavenger_death.mp3";
     this.deathSound.loop = false;
+    this.game.addHealthBarEntity(new healthBar(this.game, this));
 };
 
 Scavenger.prototype = new Entity();
@@ -43,6 +44,9 @@ Scavenger.prototype.update = function () {
 		//dead
 		this.animation = this.dyingAnimation;
 		this.dead = true;
+		if(Math.floor(Math.random() * 5) + 1 == 1){
+			this.game.state.minerals += 1;
+		}
 	} else {
 		if (collideLeft(this) || collideRight(this)) { 
 			if (collideLeft(this)) this.x = this.radius;

@@ -10,8 +10,7 @@ window.requestAnimFrame = (function () {
 })(); 
 
 /** Game Engine **/
-function GameEngine(soundmanager) { 
-	this.showOutlines = true;
+function GameEngine(soundmanager) {  
 
 	this.entities = [];
 	this.environmentEntities = [];
@@ -24,6 +23,7 @@ function GameEngine(soundmanager) {
 	this.hostileEntities = [];
 	this.programmableEntities = [];
 	this.programmableButtonEntities = [];
+	this.healthBarEntities = [];
 	this.ctx = null;
 	this.level = null;
 	this.dayLength = null;
@@ -81,8 +81,10 @@ GameEngine.prototype.pause = function () {
 GameEngine.prototype.removeProgramButtons = function () {
 	for(var i = 0; i < this.programmableButtonEntities.length; i++) {
 		this.programmableButtonEntities[i].removeFromWorld = true;
-	}
+	} 
 };
+
+
 
 GameEngine.prototype.keyListener = function() {
 	var getXandY = function(e) {
@@ -132,6 +134,13 @@ GameEngine.prototype.addProgramButtonEntity = function(entity) {
 	this.entities.push(entity);
 	this.programmableButtonEntities.push(entity);
 };
+
+GameEngine.prototype.addHealthBarEntity = function(entity) { 
+	this.entities.push(entity);
+	this.healthBarEntities.push(entity);
+};
+
+
 
 GameEngine.prototype.addNpcEntity = function(entity, friendly) {
 	console.log('added npc entity');
@@ -218,6 +227,13 @@ GameEngine.prototype.update = function () {
 			this.friendlyEntities.splice(i, 1); 
 		}
 	}
+
+	for (var i = this.healthBarEntities.length - 1; i >= 0; --i) {
+		if (this.healthBarEntities[i].removeFromWorld) {
+			this.healthBarEntities.splice(i, 1); 
+		}
+	}
+
 
 	for (var i = this.hostileEntities.length - 1; i >= 0; --i) {
 		if (this.hostileEntities[i].removeFromWorld) {

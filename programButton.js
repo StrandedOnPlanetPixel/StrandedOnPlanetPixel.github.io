@@ -64,7 +64,7 @@ ProgramButton.prototype.update = function () {
 		} else if (this.task === this.robot.tasks[4]) { //logging
 			this.robot.taskEntity = this.game.treeEntities[Math.floor(Math.random() * this.game.treeEntities.length)];
 		} else if (this.task === this.robot.tasks[5] && (gameEngine.state.scrap >= 10 
-				&& gameEngine.state.minerals >= 10 && gameEngine.state.wood >= 10)) {
+				&& gameEngine.state.minerals >= 10 && gameEngine.state.wood >= 10) && this.robot.tier === 1) {
 			gameEngine.state.wood -= 10;
 			gameEngine.state.scrap -= 10;
 			gameEngine.state.minerals -= 10;   
@@ -90,7 +90,7 @@ ProgramButton.prototype.draw = function (ctx) {
  		Entity.prototype.draw.call(this);
 
  	} else if (this.task === this.robot.tasks[5]) {
- 		if((gameEngine.state.scrap >= 10 && gameEngine.state.minerals >= 10 && gameEngine.state.wood >= 10)) {
+ 		if((gameEngine.state.scrap >= 10 && gameEngine.state.minerals >= 10 && gameEngine.state.wood >= 10) && this.robot.tier === 1) {
 			this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.radius);
 			Entity.prototype.draw.call(this);
  		}

@@ -83,33 +83,8 @@ SoundManager.prototype.volumeDown = function() {
     }
  };
 
-SoundManager.prototype.playLevelUpSound= function() {
-    var levelUpSound = document.createElement("audio");
-    levelUpSound.src = "sound_effects/level_up.mp3";
-    levelUpSound.loop = false;
-    levelUpSound.volume = currentVolume;
-    levelUpSound.play();
-};
-
-SoundManager.prototype.playWinSound= function() {
-    var winSound = document.createElement("audio");
-    winSound.src = "sound_effects/win.mp3";
-    winSound.loop = false;
-    winSound.volume = currentVolume;
-    winSound.play();
-};
-
-SoundManager.prototype.playGameOverSound= function() {
-    var gameOverSound = document.createElement("audio");
-    gameOverSound.src = "sound_effects/game_over.mp3";
-    gameOverSound.loop = false;
-    gameOverSound.volume = currentVolume;
-    gameOverSound.play();
-};
-
 SoundManager.prototype.playAttackSound = function(entity) {
     if (entity.attackSound != null) {
-        console.log(entity.attackSound.src);
         entity.attackSound.volume = currentVolume;
         entity.attackSound.play();
     }
@@ -117,7 +92,6 @@ SoundManager.prototype.playAttackSound = function(entity) {
 
 SoundManager.prototype.playDamageSound = function(entity) {
     if (entity.damageSound != null) {
-        console.log(entity.damageSound.src);
         entity.damageSound.volume = currentVolume;
         entity.damageSound.play();
     }
@@ -125,7 +99,6 @@ SoundManager.prototype.playDamageSound = function(entity) {
 
 SoundManager.prototype.playDeathSound = function(entity) {
     if (entity.deathSound != null) {
-        console.log(entity.deathSound.src);
         entity.deathSound.volume = currentVolume;
         entity.deathSound.play();
     }

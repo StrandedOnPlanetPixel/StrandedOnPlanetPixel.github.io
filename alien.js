@@ -1,5 +1,5 @@
 function Alien(game, enemy) {  
-	var spritesheet = AM.getAsset("img/alien.png");
+	var spritesheet = AM.getAsset("img/alien" + (Math.floor(Math.random() * 2) + 1) + ".png");
 	this.animation = new Animation(spritesheet,             256,    192,     64, 64, 0.1, 4, true,  false,  0.75);
 	this.upAnimation = new Animation(spritesheet,           256,    192,     64, 64, 0.1, 4, true,  false,  0.75);
 	this.downAnimation = new Animation(spritesheet,         0,     64,    64, 64, 0.1, 4, true,  false,  0.75);
@@ -14,8 +14,6 @@ function Alien(game, enemy) {
 	this.name = "Alien";
 	this.game = game;
 	this.ctx = game.ctx; 
-	this.sound = game.sound;
-
 	this.enemy = enemy;
 	Entity.call(this, game, Math.random() * width, height);
 	this.radius = 24;
@@ -26,9 +24,7 @@ function Alien(game, enemy) {
 	this.lastAttackTime = 0;
 
 	this.task = 5;
-
-
-
+	
     this.attackSound = document.createElement("audio");
     this.attackSound.src = "sound_effects/alien_attack.mp3";
     this.attackSound.loop = false;
@@ -37,6 +33,7 @@ function Alien(game, enemy) {
     this.damageSound.src = "sound_effects/alien_damage.mp3";
     this.damageSound.loop = false;
 
+    this.game.addHealthBarEntity(new healthBar(this.game, this));
 };
 
 Alien.prototype = new Entity();
@@ -44,12 +41,14 @@ Alien.prototype.constructor = Alien;
 
 Alien.prototype.update = function () { 
 	if(this.dead) {
-		this.sound.playDeathSound(this);
 		this.removeFromWorld = true;
 	} else if(this.lives <= 0) {
 		//dead
 		this.animation = this.dyingAnimation;
 		this.dead = true;
+		if(Math.floor(Math.random() * 5) + 1 == 1){
+			this.game.state.food += 1;
+		}
 	} else {
 		if (collideLeft(this) || collideRight(this)) { 
 			if (collideLeft(this)) this.x = this.radius;

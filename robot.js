@@ -5,6 +5,7 @@ function Robot(game, tier) { //spriteSheet, startX, startY, frameWidth, frameHei
 	}
 	var spriteSheet = AM.getAsset(img);
 	this.stillAnimation = new Animation(spriteSheet, 0, 0, 64, 64, 0.1, 1, true, false, 0.75);
+	this.poweredDownAnimation = new Animation(spriteSheet, 704, 768, 64, 64, 0.1, 1, true, false, 0.75);
 
 	//walking animations
 	this.upAnimation = new Animation(spriteSheet, 0, 320, 64, 64, 0.1, 8, true, false, 0.75);
@@ -49,10 +50,10 @@ function Robot(game, tier) { //spriteSheet, startX, startY, frameWidth, frameHei
 	this.chargeLeftAnimation = new Animation(spriteSheet, 0, 832, 64, 64, 0.1, 6, true, false, 0.75);
 	
 	//powering down animation
-	this.pDUpAnimation = new Animation(spriteSheet, 0, 896, 64, 64, 0.1, 6, true, false, 0.75);
-	this.pDDownAnimation = new Animation(spriteSheet, 384, 768, 64, 64, 0.1, 6, true, false, 0.75);
-	this.pDRightAnimation = new Animation(spriteSheet, 0, 960, 64, 64, 0.1, 6, true, false, 0.75);
-	this.pDLeftAnimation = new Animation(spriteSheet, 384, 896, 64, 64, 0.1, 6, true, false, 0.75);
+	this.pDUpAnimation = new Animation(spriteSheet, 0, 896, 64, 64, 0.1, 6, false, false, 0.75);
+	this.pDDownAnimation = new Animation(spriteSheet, 384, 768, 64, 64, 0.1, 6, false, false, 0.75);
+	this.pDRightAnimation = new Animation(spriteSheet, 0, 960, 64, 64, 0.1, 6, false, false, 0.75);
+	this.pDLeftAnimation = new Animation(spriteSheet, 384, 896, 64, 64, 0.1, 6, false, false, 0.75);
 	
 	//Dying animation
 	this.dyingUpAnimation = new Animation(spriteSheet, 512, 576, 64, 64, 0.1, 4, true, false, 0.75);
@@ -74,9 +75,11 @@ function Robot(game, tier) { //spriteSheet, startX, startY, frameWidth, frameHei
 	this.speed = 75;  
 	this.game = game;
 	this.ctx = game.ctx; 
-	this.sound = game.sound;
 	Entity.call(this, game, (width / 2) + 10, (height / 2 ) + 45);  
-
+	/**
+	this.radius = 24;   
+	this.x += this.radius;
+	this.y += this.radius; */
 	this.height = 41;
 	this.width = 32;
 	this.textureOffset = 8;
@@ -85,14 +88,17 @@ function Robot(game, tier) { //spriteSheet, startX, startY, frameWidth, frameHei
 	this.taskEntity = null; 
 	this.directions = ["left", "right", "up", "down"];
 	this.tasks = ["repair", "gatherBerry", "gatherScrap"/*, "defend"*/, "mine", "log", "upgrade" /*"charge"*/ ];
-	this.task = this.tasks[0];
+	this.task = null;
+	this.lastTaskEntity = this.taskEntity;
 	this.dead = false; 
 	this.lives = 150; 
 	this.visualRadius = 200;
 	this.elapsedTime = 0;
+	this.elapsedChargeTime = 0;
 	this.workspeed = 5;
 	this.chargespeed = 2;
-	this.charge = 100;
+	this.charge = 20;
+	this.maxCharge = this.charge + (this.tier * 10);
 	this.day = this.game.state.day;
 	this.damage = 10;
 
@@ -111,6 +117,8 @@ function Robot(game, tier) { //spriteSheet, startX, startY, frameWidth, frameHei
     this.powerDownSound = document.createElement("audio");
     this.powerDownSound.src = "sound_effects/robot_power_down.mp3";
     this.powerDownSound.loop = false;
+
+    this.game.addHealthBarEntity(new healthBar(this.game, this));
 }
 
 Robot.prototype = new Entity();
@@ -120,31 +128,34 @@ Robot.prototype.constructor = Robot;
 Robot.prototype.setTask = function() {
 	// sets the task of the robot
 	//display menu 
-	var menuX = this.x - 150;
-	var menuY = this.y - 32;
- 	for(var i = 0; i < this.tasks.length; i++) {
-		menuX += 40;  
-		this.game.addProgramButtonEntity(new ProgramButton(this.game, menuX, menuY, this.tasks[i], this));
+	var menuX = this.x - 105;
+	var menuY = this.y - 48;
+	if(this.charge > 0){
+		for(var i = 0; i < this.tasks.length; i++) {
+			menuX += 40;  
+			this.game.addProgramButtonEntity(new ProgramButton(this.game, menuX, menuY, this.tasks[i], this));
+		} 
 	}
-	
 };
+
 
 Robot.prototype.update = function() {
 	
-	if(!this.day){
-		this.elapsedTime += this.game.clockTick;
-		if(this.elapsedTime > this.chargespeed) {
+	if(!this.day.day && this.charge > 0){
+		this.elapsedChargeTime += this.game.clockTick;
+		if(this.elapsedChargeTime > this.chargespeed) {
 			this.charge -= 1;
-			this.elapsedTime = 0;
+			this.elapsedChargeTime = 0; 
 		}
-		
-	} else if (this.day && this.charge < 100){
-		this.elapsedTime += this.game.clockTick;
-		if(this.elapsedTime > this.chargespeed) {
+	}else if (this.day.day && this.charge < this.maxCharge){
+		this.elapsedChargeTime += this.game.clockTick;
+		if(this.elapsedChargeTime > this.chargespeed) {
 			this.charge += 1;
-			this.elapsedTime = 0;
+			this.elapsedChargeTime = 0;
 		}
+		this.animation = this.stillAnimation;
 	}
+	
 	
 	if (collideLeft(this) || collideRight(this)) { 
 		if (collideLeft(this)) this.x = 0;
@@ -157,21 +168,14 @@ Robot.prototype.update = function() {
 	}
 	
 	if (this.charge <= 0){
-		if(this.dir === this.directions[3]){
-			this.animation = this.pDDownAnimation;
-		} else if(this.dir === this.directions[0]){
-			this.animation = this.pDLeftAnimation;      
-		} else if(this.dir === this.directions[1]){
-			this.animation = this.pDRightAnimation;     
-		} else{
-			this.animation = this.pDUpAnimation;
-		}
-
-		this.sound.playDeathSound(this);
-	}
+		this.lastTaskEntity = this.taskEntity;
+ 		this.animation = this.pDDownAnimation;
+		this.animation = this.poweredDownAnimation;
+	}  
 	
 	if(this.lives <= 0) { 
 		this.animation = this.dyingUpAnimation;
+		soundManager.playDeathSound(this);
 
 		if(this.dir === this.directions[3]){
 			this.animation = this.dyingDownAnimation;
@@ -182,8 +186,8 @@ Robot.prototype.update = function() {
 		} else{
 			this.animation = this.dyingUpAnimation;
 		}
-		this.sound.playDeathSound(this);
-		this.removeFromWorld = true;
+
+		this.removeFromWorld = true; 
 		this.game.state.robotCount--;
 	}
 	
@@ -199,19 +203,21 @@ Robot.prototype.update = function() {
 		}  
 	}  
 
-	if(closestEnt && collide(this, {x: closestEnt.x, y: closestEnt.y, radius: this.attackRadius}) && closestEnt.lives > 0) {
+	if(this.charge > 0 && closestEnt && collide(this, {x: closestEnt.x, y: closestEnt.y, radius: this.attackRadius}) && closestEnt.lives > 0 ) {
 		if(!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 1.5)) {
 			//record last shot time and create the bullet.
 			attack(this, closestEnt);
+			soundManager.playAttackSound(this);
 			this.lastAttackTime = this.game.timer.gameTime; 
 		}
-	} else if(closestEnt && collide(this,{x: closestEnt.x, y: closestEnt.y, radius: this.visualRadius}) && closestEnt.lives > 0) {
+	} else if(this.charge > 0 && closestEnt && collide(this,{x: closestEnt.x, y: closestEnt.y, radius: this.visualRadius}) && closestEnt.lives > 0) {
 		moveEntityToTarget(this, closestEnt);	
-	} else if(this.taskEntity && (!closestEnt || !collide(this,{x: closestEnt.x, y: closestEnt.y, radius: this.visualRadius}))) { // if the robot has been programmed
+	} else if(this.charge > 0 && this.taskEntity && (!closestEnt || !collide(this,{x: closestEnt.x, y: closestEnt.y, radius: this.visualRadius}))) { // if the robot has been programmed
 		// If the robot reaches its target entity 
 		if(collide(this, this.taskEntity)) { 
 			// fix repair directions;
-			if (this.task === this.tasks[0] ) { // repair 
+			if (this.task === this.tasks[0] ) { // repair
+				 
 				var scrapCost = 5;
 				var woodCost = 10;
 				var mineralCost = 5;	
@@ -223,10 +229,7 @@ Robot.prototype.update = function() {
 				}
 				if(this.game.state.scrap >= scrapCost && this.game.state.wood >= woodCost 
 					&& this.game.state.minerals >= mineralCost){
-					
-					console.log("Upgrading damaged ship");
-
-	
+					 
 					this.game.state.ship.lives += this.tier; 
 					this.game.state.score += this.tier;
 
@@ -239,8 +242,6 @@ Robot.prototype.update = function() {
 						this.game.state.level += 1;
 						if(this.game.state.level === 5) { // you win!
 							gameOver();
-						} else {
-							this.sound.playLevelUpSound();
 						}
 					} 	
 				} 				
@@ -331,6 +332,7 @@ Robot.prototype.update = function() {
 			moveEntityToTarget(this, this.taskEntity); 
 		} 
 	}
+	
 	Entity.prototype.update.call(this);  
 };
 
