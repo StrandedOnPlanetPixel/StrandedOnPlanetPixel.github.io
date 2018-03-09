@@ -88,14 +88,16 @@ function Robot(game, tier) { //spriteSheet, startX, startY, frameWidth, frameHei
 	this.taskEntity = null; 
 	this.directions = ["left", "right", "up", "down"];
 	this.tasks = ["repair", "gatherBerry", "gatherScrap"/*, "defend"*/, "mine", "log", "upgrade" /*"charge"*/ ];
-	this.task = this.tasks[0];
+	this.task = null;
+	this.lastTaskEntity = this.taskEntity;
 	this.dead = false; 
 	this.lives = 150; 
 	this.visualRadius = 200;
 	this.elapsedTime = 0;
+	this.elapsedChargeTime = 0;
 	this.workspeed = 5;
 	this.chargespeed = 2;
-	this.charge = 10;
+	this.charge = 30;
 	this.day = this.game.state.day;
 	this.damage = 10;
 
@@ -135,17 +137,16 @@ Robot.prototype.setTask = function() {
 Robot.prototype.update = function() {
 	
 	if(!this.day.day && this.charge > 0){
-		this.elapsedTime += this.game.clockTick;
-		if(this.elapsedTime > this.chargespeed) {
+		this.elapsedChargeTime += this.game.clockTick;
+		if(this.elapsedChargeTime > this.chargespeed) {
 			this.charge -= 1;
-			this.elapsedTime = 0;
-		//	console.log(this.charge);
+			this.elapsedChargeTime = 0; 
 		}
-	}else if (this.day.day && this.charge <= 10){
-		this.elapsedTime += this.game.clockTick;
-		if(this.elapsedTime > this.chargespeed) {
+	}else if (this.day.day && this.charge < 30){
+		this.elapsedChargeTime += this.game.clockTick;
+		if(this.elapsedChargeTime > this.chargespeed) {
 			this.charge += 1;
-			this.elapsedTime = 0;
+			this.elapsedChargeTime = 0;
 		}
 		this.animation = this.stillAnimation;
 	}
@@ -162,10 +163,10 @@ Robot.prototype.update = function() {
 	}
 	
 	if (this.charge <= 0){
-		this.taskEntity = null;
-		this.animation = this.pDDownAnimation;
+		this.lastTaskEntity = this.taskEntity;
+ 		this.animation = this.pDDownAnimation;
 		this.animation = this.poweredDownAnimation;
-	}
+	}  
 	
 	if(this.lives <= 0) { 
 		this.animation = this.dyingUpAnimation;
@@ -223,10 +224,7 @@ Robot.prototype.update = function() {
 				}
 				if(this.game.state.scrap >= scrapCost && this.game.state.wood >= woodCost 
 					&& this.game.state.minerals >= mineralCost){
-					
-					console.log("Upgrading damaged ship");
-
-	
+					 
 					this.game.state.ship.lives += this.tier; 
 					this.game.state.score += this.tier;
 
