@@ -28,6 +28,7 @@ function Rummager(game, enemy) {
     this.attackSound = document.createElement("audio");
     this.attackSound.src = "sound_effects/rummager_attack.mp3";
     this.attackSound.loop = false;
+	this.damageSound = null;
 
     this.game.addHealthBarEntity(new healthBar(this.game, this));
 };
@@ -98,6 +99,7 @@ function Bullet(game, parent, target) {
 	this.targetLocation = {x: dx * 100, y: dy * 100, radius: target.radius}; 
 	this.target = target;  
 	this.game = game;
+	this.sound = this.game.sound;
 	this.ctx = game.ctx; 
 	Entity.call(this, game, parent.x, parent.y);
 	this.radius = 6; 
