@@ -545,12 +545,13 @@ window.onload = function() {
 			"One robot wont be enough, try adding a robot when you get enough resources by pressing ['R'].",
 			"At night different enemies come out. The higher level you get, the more will spawn.",
 			"These enemies can be pesky, they have a ranged attack that shoots bullets at you from afar.",
+			"Robots have a hidden charge level, they recharge during the day but at night they might run out of charge faster. Try to plan your defense at night around this.",
 			"After you gather enough resources you will see a new option appear when you program your robots.",
 			"This will give you a fancy purple robot, that gathers faster and does more damage to enemies.",
 			"To level up, you must fully repair your ship. You can do this by simply selecting the ship option when you program your robot."];
 
 	var tutorialHolder = document.getElementById("tutorialHolder");
-	for(var i = 1; i <= 11; i++) {
+	for(var i = 1; i <= 12; i++) {
 		var div = document.createElement("div");
 		div.classList.add("tutorialSlides"); 
 		var img = document.createElement("img");
