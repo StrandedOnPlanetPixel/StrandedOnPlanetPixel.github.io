@@ -1,4 +1,7 @@
 var backgroundSong = document.createElement("audio");
+var winSound = document.createElement("audio");
+var levelUpSound = document.createElement("audio");
+var gameOverSound = document.createElement("audio");
 var daySongs = ["audio/daysong1.mp3", "audio/daysong2.mp3"];
 var nightSongs = ["audio/nightsongfast.mp3"];
 var currentVolume = 1;
@@ -73,8 +76,7 @@ SoundManager.prototype.volumeUp = function() {
     }
  };
 
-SoundManager.prototype.volumeDown = function() {
-    // loop through each sound and decrease sound???    
+SoundManager.prototype.volumeDown = function() {  
     try {
         backgroundSong.volume -= 0.1;
         currentVolume -= 0.1;
@@ -84,7 +86,7 @@ SoundManager.prototype.volumeDown = function() {
  };
 
  SoundManager.prototype.playLevelUpSound= function() {
-    var levelUpSound = document.createElement("audio");
+    console.log("play level up sound");
     levelUpSound.src = "sound_effects/level_up.mp3";
     levelUpSound.loop = false;
     levelUpSound.volume = currentVolume;
@@ -92,7 +94,7 @@ SoundManager.prototype.volumeDown = function() {
 };
 
 SoundManager.prototype.playWinSound= function() {
-    var winSound = document.createElement("audio");
+    console.log("play win sound");
     winSound.src = "sound_effects/win.mp3";
     winSound.loop = false;
     winSound.volume = currentVolume;
@@ -100,7 +102,7 @@ SoundManager.prototype.playWinSound= function() {
 };
 
 SoundManager.prototype.playGameOverSound= function() {
-    var gameOverSound = document.createElement("audio");
+    console.log("play game over sound");
     gameOverSound.src = "sound_effects/game_over.mp3";
     gameOverSound.loop = false;
     gameOverSound.volume = currentVolume;

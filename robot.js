@@ -74,6 +74,7 @@ function Robot(game, tier) { //spriteSheet, startX, startY, frameWidth, frameHei
 	this.tier = tier;
 	this.speed = 75;  
 	this.game = game;
+	this.sound = game.sound;
 	this.ctx = game.ctx; 
 	Entity.call(this, game, (width / 2) + 10, (height / 2 ) + 45);  
 	/**
@@ -171,11 +172,12 @@ Robot.prototype.update = function() {
 		this.lastTaskEntity = this.taskEntity;
  		this.animation = this.pDDownAnimation;
 		this.animation = this.poweredDownAnimation;
+		this.sound.playPowerDownSound(this);
 	}  
 	
 	if(this.lives <= 0) { 
 		this.animation = this.dyingUpAnimation;
-		soundManager.playDeathSound(this);
+		this.sound.playDeathSound(this);
 
 		if(this.dir === this.directions[3]){
 			this.animation = this.dyingDownAnimation;
@@ -207,7 +209,7 @@ Robot.prototype.update = function() {
 		if(!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 1.5)) {
 			//record last shot time and create the bullet.
 			attack(this, closestEnt);
-			soundManager.playAttackSound(this);
+			this.sound.playAttackSound(this);
 			this.lastAttackTime = this.game.timer.gameTime; 
 		}
 	} else if(this.charge > 0 && closestEnt && collide(this,{x: closestEnt.x, y: closestEnt.y, radius: this.visualRadius}) && closestEnt.lives > 0) {
@@ -240,6 +242,7 @@ Robot.prototype.update = function() {
 						this.game.state.shipMaxHealth += 100;
 						
 						this.game.state.level += 1;
+						this.sound.playLevelUpSound();
 						if(this.game.state.level === 5) { // you win!
 							gameOver();
 						}

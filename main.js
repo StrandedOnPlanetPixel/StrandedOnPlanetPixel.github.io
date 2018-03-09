@@ -244,8 +244,8 @@ function attack(ent, target) {
 		}
 	}  
 	target.lives -= ent.damage;
-	soundManager.playAttackSound(ent);
-	soundManager.playDamageSound(target);
+	gameEngine.sound.playAttackSound(ent);
+	gameEngine.sound.playDamageSound(target);
 };
  
 // no inheritance
@@ -324,7 +324,7 @@ function gameOver() {
 		if(gameEngine.gameOver) { 
 			gameEngine.state.update();
 		} else {
-			soundManager.playWinSound();
+			gameEngine.sound.playWinSound();
 	 		gameEngine.gameOver = true; 
 			playButton.classList.remove("playButtonHidden");	
 			playButtonText.classList.remove("playButtonHidden");
@@ -337,7 +337,7 @@ function gameOver() {
 		if(gameEngine.gameOver) { 
 			gameEngine.state.update();
 		} else {
-			soundManager.playGameOverSound();
+			gameEngine.sound.playGameOverSound();
 	 		gameEngine.gameOver = true; 
 			playButton.classList.remove("playButtonHidden");		
 			playButtonText.classList.remove("playButtonHidden");		
@@ -471,8 +471,6 @@ AM.queueDownload("img/plus.png");
 
 AM.downloadAll(startGame);
 
-var soundManager = new SoundManager();
-
 function startGame() {  
 	playButton = document.getElementById("button");
 	playButtonText = document.getElementById("playGameText");
@@ -496,7 +494,7 @@ function startGame() {
 
 	height = canvas.height;
 	width = canvas.width; 
-	gameEngine = new GameEngine(soundManager); 
+	gameEngine = new GameEngine();
  
 	gameEngine.init(ctx); 
 	gameEngine.start();
@@ -524,8 +522,8 @@ function startGame() {
 	var robot = new Robot(gameEngine, 1);
 	gameEngine.addProgrammableEntity(robot, true);
 	
-	soundManager.setupBackgroundMusic();
-	soundManager.playDaySong();
+	gameEngine.sound.setupBackgroundMusic();
+	gameEngine.sound.playDaySong();
 
 	console.log("All Done!");
 };
