@@ -20,6 +20,7 @@ function Player(game) {
 	this.name = "Player";
 	this.game = game;
 	this.ctx = game.ctx;  
+	this.sound = game.sound;
  
 	Entity.call(this, game, (width / 2) - 25, (height / 2 ) + 42);  
 	this.height = 38;
@@ -101,7 +102,7 @@ Player.prototype.update = function () {
 					ent.lives -= this.damage; 
 					this.lastAttackTime = this.game.timer.gameTime;
 					console.log("Player hit: " + ent.name + " for " + this.damage + " damage");
-					soundManager.playDamageSound(ent); 
+					this.sound.playDamageSound(ent); 
 				}  
 			}
 
@@ -163,7 +164,7 @@ Player.prototype.update = function () {
 				} 
 			}
 			if(this.game.keys.attack) {
-				soundManager.playAttackSound(this);
+				this.sound.playAttackSound(this);
 				this.isAttacking = true;
 				this.attackFrameCounter += 1;
 				this.animation = this.attackAnimation;
@@ -173,13 +174,13 @@ Player.prototype.update = function () {
 						(!this.lastAttackTime || (this.lastAttackTime < this.game.timer.gameTime - 0.5))) {
 							ent.lives -= this.damage; 
 							this.lastAttackTime = this.game.timer.gameTime; 
-							soundManager.playDamageSound(ent); 
+							this.sound.playDamageSound(ent); 
 					}  
 				} 
 			} 
 			if(playerMoving) {
 				if(!isPlaying(this.walkSound)) {
-					soundManager.playWalkSound(this);
+					this.sound.playWalkSound(this);
 				}
 			}
 		} 

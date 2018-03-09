@@ -13,6 +13,7 @@ function Rummager(game, enemy) {
 
 	this.name = "Rummager";
 	this.game = game;
+	this.sound = game.sound;
 	this.ctx = game.ctx;  
 	Entity.call(this, game, Math.random() * width, height);
 	this.radius = 24;
@@ -121,7 +122,7 @@ Bullet.prototype.update = function() {
 		if (this != ent && collide(this, ent)) {
 			ent.lives -= this.damage;
 			this.removeFromWorld = true;
-			soundManager.playDamageSound(ent);
+			this.sound.playDamageSound(ent);
 		}  
 	} 
 
