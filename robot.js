@@ -97,7 +97,8 @@ function Robot(game, tier) { //spriteSheet, startX, startY, frameWidth, frameHei
 	this.elapsedChargeTime = 0;
 	this.workspeed = 5;
 	this.chargespeed = 2;
-	this.charge = 30;
+	this.charge = 20;
+	this.maxCharge = this.charge + (this.tier * 10);
 	this.day = this.game.state.day;
 	this.damage = 10;
 
@@ -142,7 +143,7 @@ Robot.prototype.update = function() {
 			this.charge -= 1;
 			this.elapsedChargeTime = 0; 
 		}
-	}else if (this.day.day && this.charge < 30){
+	}else if (this.day.day && this.charge < this.maxCharge){
 		this.elapsedChargeTime += this.game.clockTick;
 		if(this.elapsedChargeTime > this.chargespeed) {
 			this.charge += 1;
