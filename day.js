@@ -50,9 +50,15 @@ Day.prototype.update = function () {
 		this.time = hr + ":" + min;
 	}
 
+	this.spawnRate = 16 - (this.game.state.level + 1);  
+	if(this.game.state.level >= 4) {
+		this.spawnRate -= 0.5; // get rid of the + 0.5 on the last two levels.
+	}
+
 	if(!this.day) {    
 		this.sound.playNightSong();
-		this.spawnRate = (Math.pow((4 - this.game.state.level), 2) + 0.5);  
+
+		console.log(this.spawnRate);
 		if(this.elapsedTime - this.spawnRate > (this.lastSpawnTime)) { 
 			this.lastSpawnTime = this.elapsedTime;
 			this.elaspedTime = 0;
@@ -66,8 +72,7 @@ Day.prototype.update = function () {
 			}  
 		} 
 	} else {
-		this.sound.playDaySong();
-		this.spawnRate = 1.5 * (Math.pow((4 - this.game.state.level), 2) + 0.5);  
+		this.sound.playDaySong(); 
 		if(this.elapsedTime - this.spawnRate > (this.lastSpawnTime)) { 
 			this.lastSpawnTime = this.elapsedTime;
 			this.game.addNpcEntity(new Alien(this.game), false);

@@ -147,6 +147,9 @@ Robot.prototype.update = function() {
 		if(this.elapsedChargeTime > this.chargespeed) {
 			this.charge -= 1;
 			this.elapsedChargeTime = 0; 
+			if(this.charge === 0) {
+				this.sound.playPowerDownSound(this);
+			}
 		}
 	}else if (this.day.day && this.charge < this.maxCharge){
 		this.elapsedChargeTime += this.game.clockTick;
@@ -172,7 +175,6 @@ Robot.prototype.update = function() {
 		this.lastTaskEntity = this.taskEntity;
  		this.animation = this.pDDownAnimation;
 		this.animation = this.poweredDownAnimation;
-		this.sound.playPowerDownSound(this);
 	}  
 	
 	if(this.lives <= 0) { 
