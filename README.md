@@ -4,7 +4,7 @@ Stranded On Planet Pixel is an original wave defense game written in HTML5 and J
 [Click here](https://strandedonplanetpixel.github.io/) to play now!
 
 ## Contributors
-'''Amanda Aldrich
+```Amanda Aldrich
 Zira Cook
 Taylor Riccetti
-'''
+```
